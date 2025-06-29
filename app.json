@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "PodoTicket",
-    "slug": "PodoTicket",
+    "name": "puppymod",
+    "slug": "puppymod",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "podoticket",
+    "scheme": "puppymod",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

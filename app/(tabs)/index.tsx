@@ -5,6 +5,7 @@ import {HelloWave} from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import {ThemedText} from '@/components/ThemedText';
 import {ThemedView} from '@/components/ThemedView';
+import BaseButton from '@/components/common/buttons/BaseButton';
 
 export default function HomeScreen() {
   return (
@@ -17,8 +18,11 @@ export default function HomeScreen() {
         />
       }
     >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type='title'>Welcome!</ThemedText>
+      <BaseButton title='아아아아' onPress={() => {}} disabled={false} />
+      <ThemedView style={styles.titleContainer} className='flex-row items-center gap-2'>
+        <ThemedText type='title' className='text-blue-600'>
+          Welcome!
+        </ThemedText>
         <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>

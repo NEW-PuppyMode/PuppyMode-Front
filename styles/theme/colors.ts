@@ -1,44 +1,49 @@
 const colors = {
-  // purple palette
-  purple: {
-    1: '#280C5A',
-    2: '#3C187C',
-    3: '#52269E',
-    4: '#6A39C0',
-    5: '#844FE2',
-    6: '#9E67FF',
-    7: '#B489FF',
-    8: '#CAABFF',
-    9: '#DFCDFF',
+  yellow: {
+    500: '#FEE500',
   },
 
-  // light purple
-  lightPurple: {
-    1: '#DFD9FF',
-    2: '#F5F4FF',
+  cream: {
+    200: '#FFFCF6',
   },
 
-  // grey palette
-  grey: {
-    1: '#FBFBFB',
-    2: '#F2F2F2',
-    3: '#E2E2E2',
-    4: '#BABABA',
-    5: '#9E9E9E',
-    6: '#777777',
-    7: '#3C3C3C',
+  brown: {
+    200: '#936C49',
   },
 
-  // red palette
-  red: {
-    1: '#FF1515',
-    2: '#FF9393',
-    3: '#FFF4F4',
+  grayscale: {
+    black: '#000000',
+    white: '#FFFFFF',
+    0: '#FBFBFB',
+    50: '#F1F1F1',
+    100: '#FBFBFB',
+    200: '#EBEBEB',
+    300: '#C1C1C1',
+    350: '#BABABA',
+    400: '#A3A3A3',
+    450: '#9D9D9D',
+    500: '#868686',
+    600: '#777777',
+    700: '#555555',
+    900: '#3C3C3C',
+    950: '#282828',
   },
 
-  // etc
-  ectWhite: '#FFF',
-  ectBlack: '#000',
+  green: {
+    '000': '#FBFFFC',
+    '050': '#F2FFF4',
+    '100': '#E4FAE8',
+    '200': '#CBF1D3',
+    '300': '#4DE3A3',
+    '400': '#50D766',
+    '500': '#0FD380',
+    '550': '#19BC77',
+    '600': '#00A775',
+    'warm-050': '#E4F2E6',
+    'warm-100': '#DAECDD',
+    'warm-300': '#A6DCCC',
+    'muted-600': '#729177',
+  },
 };
 
 export default colors;
