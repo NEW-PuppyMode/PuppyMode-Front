@@ -33,6 +33,7 @@ export default function RootLayout() {
             name='test/proceeding'
             options={{ headerShown: false }}
           />
+          <Stack.Screen name='report' options={{ headerShown: false }} />
           <Stack.Screen name='+not-found' />
         </Stack>
 
