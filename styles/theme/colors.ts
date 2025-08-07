@@ -5,6 +5,7 @@ const colors = {
 
   cream: {
     200: '#FFFCF6',
+    300: '#D9D9D9',
   },
 
   brown: {
