@@ -1,0 +1,50 @@
+import { ThemedText } from '@/components/ThemedText';
+import React from 'react';
+import { View } from 'react-native';
+import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated';
+
+type SpeechBubbleProps = {
+  children: React.ReactNode;
+  variant?: 'puppy' | 'user';
+};
+
+export function SpeechBubble({
+  children,
+  variant = 'puppy',
+}: SpeechBubbleProps) {
+  const bgColor =
+    variant === 'puppy'
+      ? 'bg-cream-200 rounded-xl px-6 py-4'
+      : 'bg-green-50 rounded-3xl px-8 py-3 shadow-sm';
+  const tailColor = variant === 'puppy' ? '#FFFCF6' : '#F2FFF4';
+  const textStyle =
+    variant === 'puppy'
+      ? 'text-gray-950 text-[20px] leading-7 font-bold text-center'
+      : 'text-gray-950 text-sm leading-5 font-semibold text-center';
+
+  return (
+    <View className='items-center mt-8 mb-4'>
+      <Animated.View
+        className={`${bgColor}`}
+        entering={ZoomIn.duration(300).springify()}
+      >
+        <ThemedText className={textStyle}>{children}</ThemedText>
+      </Animated.View>
+
+      <Animated.View
+        entering={FadeIn.duration(300).delay(100)}
+        style={{
+          width: 0,
+          height: 0,
+          borderLeftWidth: 12,
+          borderRightWidth: 12,
+          borderTopWidth: 16,
+          borderLeftColor: 'transparent',
+          borderRightColor: 'transparent',
+          borderTopColor: tailColor,
+          marginTop: -1,
+        }}
+      />
+    </View>
+  );
+}

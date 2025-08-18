@@ -61,9 +61,9 @@ module.exports = {
         pretendard: ['Pretendard', 'sans-serif'],
       },
       fontSize: {
-        '15px': ['15px', {lineHeight: 'normal'}],
-        '24px': ['24px', {lineHeight: 'normal'}],
-        '16px': ['16px', {lineHeight: '24px'}],
+        '15px': ['15px', { lineHeight: 'normal' }],
+        '24px': ['24px', { lineHeight: 'normal' }],
+        '16px': ['16px', { lineHeight: '24px' }],
       },
       fontWeight: {
         normal: '400',
