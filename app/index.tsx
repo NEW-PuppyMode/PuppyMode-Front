@@ -1,6 +1,14 @@
+import { TextInput } from '@/components/common/Inputs/TextInput';
+import { ChoiceButton } from '@/components/page/home/ChoiceButton';
+import { IconButton } from '@/components/page/home/IconButton';
+import { SpeechBubble } from '@/components/page/home/SpeechBubble';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { PUPPY_MESSAGES } from '@/constants/messages';
+import { usePuppyData } from '@/hooks/usePuppyData';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
   Image,
   ImageBackground,
@@ -9,13 +17,80 @@ import {
 } from 'react-native';
 
 export default function HomeScreen() {
+  const router = useRouter();
+
+  const { renamePuppy, renameUser, advicePuppy, isLoading, setIsLoading } =
+    usePuppyData();
+
+  const [showNameInput, setShowNameInput] = useState(false);
+  const [inputType, setInputType] = useState<'dog' | 'user' | null>(null);
+  const [dogName, setDogName] = useState('');
+  const [userName, setUserName] = useState('');
+
+  const [recordMode, setRecordMode] = useState(false);
+  const [recordType, setRecordType] = useState<'yesterday' | 'today' | null>(
+    null,
+  );
+
+  const handleDogNameButtonPress = () => {
+    setInputType('dog');
+    setShowNameInput(true);
+  };
+
+  const handleUserNameButtonPress = () => {
+    setInputType('user');
+    setShowNameInput(true);
+  };
+
+  // 음주 기록 버튼 클릭 핸들러
+  const handleDrinkRecordPress = () => {
+    setRecordMode(!recordMode);
+    // 모드 변경 시 기존 상태 초기화
+    setShowNameInput(false);
+    setInputType(null);
+    setRecordType(null);
+  };
+
+  const handleCancel = () => {
+    setShowNameInput(false);
+    setInputType(null);
+    setRecordType(null);
+  };
+
+  const handleRenameComplete = async () => {
+    try {
+      if (inputType === 'dog' && dogName.trim()) {
+        const success = await renamePuppy(dogName);
+        if (success) {
+          setDogName('');
+          setShowNameInput(false);
+          setInputType(null);
+        }
+      } else if (inputType === 'user' && userName.trim()) {
+        const success = await renameUser(userName);
+        if (success) {
+          setUserName('');
+          setShowNameInput(false);
+          setInputType(null);
+        }
+      }
+    } catch (error) {
+      console.log('log');
+    }
+  };
+
+  // 현재 입력 타입에 따른 값과 설정 함수
+  const currentValue = inputType === 'dog' ? dogName : userName;
+  const currentSetValue = inputType === 'dog' ? setDogName : setUserName;
+  const currentPlaceholder =
+    inputType === 'dog' ? '이름을 입력해주세요.' : '이름을 입력해주세요.';
+
   return (
     <ImageBackground
       source={require('../assets/images/home_background.png')}
       style={styles.background}
       resizeMode='cover'
     >
-      {/* 상단 상태바 영역 */}
       <ThemedView className='flex-row justify-between items-center gap-12 px-4 pt-20 bg-transparent'>
         <ThemedView className='flex-1 p-4 rounded-2xl'>
           <ThemedView className='flex-row items-center mb-2'>
@@ -37,7 +112,10 @@ export default function HomeScreen() {
         </ThemedView>
 
         <ThemedView className='flex-row ml-4 gap-1 bg-transparent'>
-          <TouchableOpacity className='p-2 bg-white rounded-full'>
+          <TouchableOpacity
+            className='p-2 bg-white rounded-full'
+            onPress={() => router.push('/calendar')}
+          >
             <Ionicons name='calendar-outline' size={24} color='#10B981' />
           </TouchableOpacity>
           <TouchableOpacity className='p-2 bg-white rounded-full'>
@@ -46,18 +124,9 @@ export default function HomeScreen() {
         </ThemedView>
       </ThemedView>
 
-      {/* 메인 콘텐츠 영역 */}
       <ThemedView className='flex-1 px-4 bg-transparent'>
-        {/* 인사말 */}
-        <ThemedView className='mt-8 mb-4 bg-cream-300 rounded-xl'>
-          <ThemedText className='color-gray-950 text-base leading-6 text-center p-4'>
-            주인님!{'\n'}
-            제가 금주는 도와드려도{'\n'}
-            해야할 일을 도와드릴 순 없어요..
-          </ThemedText>
-        </ThemedView>
+        <SpeechBubble>{PUPPY_MESSAGES.default}</SpeechBubble>
 
-        {/* 캐릭터 및 배경 이미지 */}
         <ThemedView className='flex-1 justify-center items-center relative bg-transparent'>
           <Image
             source={require('../assets/images/bichon.png')}
@@ -66,39 +135,117 @@ export default function HomeScreen() {
           />
         </ThemedView>
 
-        {/* 하단 버튼들 */}
-        <ThemedView className='rounded-2xl bg-cream-300 '>
+        <ThemedView className='rounded-2xl bg-cream-200 '>
+          {showNameInput && (
+            <ThemedView
+              className='mb-6 bg-transparent rounded-xl p-4'
+              style={{
+                position: 'absolute',
+                top: -130,
+                left: -15,
+                right: -15,
+                zIndex: 10,
+              }}
+            >
+              <ThemedView className='flex-row bg-transparent justify-between mb-2'>
+                <ChoiceButton label='취소' onPress={handleCancel} />
+                <ChoiceButton
+                  label='작성 완료'
+                  variant={currentValue.trim() ? 'primary' : 'ghost'}
+                  onPress={handleRenameComplete}
+                />
+              </ThemedView>
+
+              <TextInput
+                placeholder={currentPlaceholder}
+                value={currentValue}
+                onChangeText={currentSetValue}
+                autoFocus={true}
+              />
+            </ThemedView>
+          )}
+
+          {recordMode && recordType && (
+            <ThemedView
+              className='bg-transparent rounded-xl p-4'
+              style={{
+                position: 'absolute',
+                top: -115,
+                left: -15,
+                right: -15,
+                zIndex: 10,
+              }}
+            >
+              <ThemedView
+                className='flex-row bg-transparent mb-2'
+                style={{
+                  justifyContent:
+                    recordType === 'yesterday' ? 'flex-start' : 'flex-end',
+                }}
+              >
+                <SpeechBubble variant='user'>술 마셨어!</SpeechBubble>
+                <ThemedView className='w-[10px] bg-transparent' />
+                <SpeechBubble variant='user'>술 안 마셨어!</SpeechBubble>
+              </ThemedView>
+            </ThemedView>
+          )}
+
           <ThemedView className='flex-col mb-10 rounded-xl p-6'>
             <ThemedView className='flex-row justify-between mb-4'>
-              <TouchableOpacity className='flex-row gap-2 bg-white p-2 rounded-2xl shadow-sm flex-1 mr-2 items-center'>
-                <Ionicons name='paw' size={24} color='#10B981' />
-                <ThemedText className='flex-1 text-sm text-gray-700 text-center flex-shrink-0'>
-                  강아지 이름 지어주기
-                </ThemedText>
-              </TouchableOpacity>
+              {!recordMode ? (
+                <>
+                  <IconButton
+                    iconName='paw'
+                    text='강아지 이름 지어주기'
+                    variant={inputType === 'dog' ? 'primary' : 'ghost'}
+                    onPress={handleDogNameButtonPress}
+                  />
 
-              <TouchableOpacity className='flex-row gap-2 bg-white p-2 rounded-2xl shadow-sm flex-1 ml-2 items-center'>
-                <Ionicons name='person' size={24} color='#10B981' />
-                <ThemedText className='flex-1 text-sm text-gray-700 text-center flex-shrink-0'>
-                  내 이름 알려주기
-                </ThemedText>
-              </TouchableOpacity>
+                  <IconButton
+                    iconName='person'
+                    text='내 이름 알려주기'
+                    variant={inputType === 'user' ? 'primary' : 'ghost'}
+                    onPress={handleUserNameButtonPress}
+                  />
+                </>
+              ) : (
+                <>
+                  <IconButton
+                    iconName='calendar'
+                    text='어제 까먹은 거 기록할래!'
+                    variant={
+                      recordType === 'yesterday' ? 'primary' : 'lightgreen'
+                    }
+                    onPress={() => {
+                      setRecordType('yesterday');
+                    }}
+                  />
+
+                  <IconButton
+                    iconName='today'
+                    text='오늘 기록할래!'
+                    variant={recordType === 'today' ? 'primary' : 'lightgreen'}
+                    onPress={() => {
+                      setRecordType('today');
+                    }}
+                  />
+                </>
+              )}
             </ThemedView>
 
             <ThemedView className='flex-row justify-between'>
-              <TouchableOpacity className='flex-row gap-2 bg-white p-2 rounded-2xl shadow-sm flex-1 mr-2 items-center'>
-                <Ionicons name='chatbubble' size={24} color='#10B981' />
-                <ThemedText className='flex-1 text-sm text-gray-700 text-center flex-shrink-0'>
-                  나만의 한마디만 해줘
-                </ThemedText>
-              </TouchableOpacity>
+              <IconButton
+                iconName='chatbubble'
+                text='나만의 한마디만 해줘'
+                onPress={() => console.log('클릭')}
+              />
 
-              <TouchableOpacity className='flex-row gap-2 bg-white p-2 rounded-2xl shadow-sm flex-1 ml-2 items-center'>
-                <Ionicons name='checkbox' size={24} color='#10B981' />
-                <ThemedText className='flex-1 text-sm text-gray-700 text-center flex-shrink-0'>
-                  음주 기록 할래!
-                </ThemedText>
-              </TouchableOpacity>
+              <IconButton
+                iconName='checkbox'
+                text='음주 기록 할래!'
+                variant={recordMode ? 'primary' : 'ghost'}
+                onPress={handleDrinkRecordPress}
+              />
             </ThemedView>
           </ThemedView>
         </ThemedView>
