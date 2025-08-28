@@ -122,7 +122,10 @@ export default function HomeScreen() {
           >
             <Ionicons name='calendar-outline' size={24} color='#10B981' />
           </TouchableOpacity>
-          <TouchableOpacity className='p-2 bg-white rounded-full'>
+          <TouchableOpacity
+            className='p-2 bg-white rounded-full'
+            onPress={() => router.push('/setting')}
+          >
             <Ionicons name='settings-outline' size={24} color='#10B981' />
           </TouchableOpacity>
         </ThemedView>
