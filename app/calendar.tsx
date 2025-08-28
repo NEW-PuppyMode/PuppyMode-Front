@@ -1,3 +1,4 @@
+import { Stack, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Dimensions,
@@ -9,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import { Calendar, DateData, LocaleConfig } from 'react-native-calendars';
-
+import Svg, { Circle, Path } from 'react-native-svg';
 // Get screen dimensions for responsive modal sizing
 const { width } = Dimensions.get('window');
 
@@ -219,6 +220,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   backButton: {
+    marginTop: 48,
     paddingLeft: 16,
     paddingTop: 18,
     paddingBottom: 18,
@@ -362,6 +364,7 @@ export default function CalendarPage() {
   const [selectedMonth, setSelectedMonth] = useState(
     new Date(currentDate).getMonth() + 1,
   );
+  const router = useRouter();
   const currentMonthName =
     LocaleConfig.locales['ko'].monthNames[new Date(currentDate).getMonth()];
 
@@ -411,137 +414,139 @@ export default function CalendarPage() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* 상단 헤더 */}
-      <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.backButton}>
-          <Image source={require('@/assets/icons/ic_chevron_left.svg')} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.header} onPress={handleMonthPress}>
-          <Text style={styles.monthTitle}>{currentMonthName}</Text>
-          <Image source={require('@/assets/icons/ic_grey_arrow_bottom.svg')} />
-        </TouchableOpacity>
-      </View>
-
-      {/* 캘린더 */}
-      <Calendar
-        key={currentDate}
-        current={currentDate}
-        markingType={'custom'}
-        markedDates={{
-          ...markedDatesData,
-          [currentDate]: {
-            selected: true,
-            customStyles: markedDatesData[currentDate]?.customStyles,
-          },
-        }}
-        dayComponent={(dayProps) => (
-          <DayComponent
-            {...dayProps}
-            currentMonth={currentDate.substring(0, 7)}
-          />
-        )}
-        hideArrows={true}
-        enableSwipeMonths={false}
-        renderHeader={() => null}
-        theme={{
-          calendarBackground: 'transparent',
-          textSectionTitleColor: '#b6c1cd',
-          selectedDayBackgroundColor: '#00adf5',
-          selectedDayTextColor: '#ffffff',
-          todayTextColor: '#2d4150',
-          dayTextColor: '#2d4150',
-          textDisabledColor: '#d9e1e8',
-          textDayFontSize: 16,
-          textMonthFontSize: 18,
-          textDayHeaderFontSize: 14,
-        }}
-      />
-
-      {/* 하단 버튼 */}
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.reportButton}>
-          <Text style={styles.reportButtonText}>음주 주간 리포트 보기</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* 월 선택 모달 */}
-      <Modal
-        animationType='fade'
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <View style={styles.modalYearSelector}>
-                <TouchableOpacity onPress={() => handleYearChange('prev')}>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    width='24'
-                    height='24'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                  >
-                    <circle
-                      cx='12'
-                      cy='12'
-                      r='11.5'
-                      transform='matrix(-1 0 0 1 24 0)'
-                      stroke='#868686'
-                    />
-                    <path
-                      d='M14.6084 7.30078L9.91275 11.9964L14.6084 16.6921'
-                      stroke='#868686'
-                    />
-                  </svg>
-                </TouchableOpacity>
-                <Text style={styles.modalTitle}>{selectedYear}</Text>
-                <TouchableOpacity onPress={() => handleYearChange('next')}>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    width='24'
-                    height='24'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                  >
-                    <circle cx='12' cy='12' r='11.5' stroke='#868686' />
-                    <path
-                      d='M9.3916 7.30078L14.0873 11.9964L9.3916 16.6921'
-                      stroke='#868686'
-                    />
-                  </svg>
-                </TouchableOpacity>
-              </View>
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                width={(336 / 393) * width}
-                height='2'
-                viewBox='0 0 336 2'
-                fill='none'
-              >
-                <path
-                  d='M1.5 1L334.5 0.999971'
-                  stroke='#F1F1F1'
-                  strokeWidth='2'
-                  strokeLinecap='square'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            </View>
-
-            <View style={styles.modalMonthContainer}>{renderMonths()}</View>
-
-            <TouchableOpacity
-              style={styles.modalConfirmButton}
-              onPress={handleModalConfirm}
-            >
-              <Text style={styles.modalConfirmText}>확인</Text>
-            </TouchableOpacity>
-          </View>
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      <View style={styles.container}>
+        {/* 상단 헤더 */}
+        <View style={styles.headerContainer}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.push('/')}
+          >
+            <Image
+              className='w-[8px] h-[16px]'
+              source={require('@/assets/images/chevron_left.png')}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.header} onPress={handleMonthPress}>
+            <Text style={styles.monthTitle}>{currentMonthName}</Text>
+            <Image
+              className='w-[14px] h-[7px]'
+              source={require('@/assets/images/grey_arrow_bottom.png')}
+            />
+          </TouchableOpacity>
         </View>
-      </Modal>
-    </View>
+
+        {/* 캘린더 */}
+        <Calendar
+          key={currentDate}
+          current={currentDate}
+          markingType={'custom'}
+          markedDates={{
+            ...markedDatesData,
+            [currentDate]: {
+              selected: true,
+              customStyles: markedDatesData[currentDate]?.customStyles,
+            },
+          }}
+          dayComponent={(dayProps) => (
+            <DayComponent
+              {...dayProps}
+              currentMonth={currentDate.substring(0, 7)}
+            />
+          )}
+          hideArrows={true}
+          enableSwipeMonths={false}
+          renderHeader={() => null}
+          theme={{
+            calendarBackground: 'transparent',
+            textSectionTitleColor: '#b6c1cd',
+            selectedDayBackgroundColor: '#00adf5',
+            selectedDayTextColor: '#ffffff',
+            todayTextColor: '#2d4150',
+            dayTextColor: '#2d4150',
+            textDisabledColor: '#d9e1e8',
+            textDayFontSize: 16,
+            textMonthFontSize: 18,
+            textDayHeaderFontSize: 14,
+          }}
+        />
+
+        {/* 하단 버튼 */}
+        <View style={styles.footer} className=''>
+          <TouchableOpacity
+            style={styles.reportButton}
+            onPress={() => router.push('/report')}
+          >
+            <Text style={styles.reportButtonText}>음주 주간 리포트 보기</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* 월 선택 모달 */}
+        <Modal
+          animationType='fade'
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <View style={styles.modalYearSelector}>
+                  <TouchableOpacity onPress={() => handleYearChange('prev')}>
+                    <Svg width={24} height={24} viewBox='0 0 24 24' fill='none'>
+                      <Circle
+                        cx={12}
+                        cy={12}
+                        r={11.5}
+                        transform='matrix(-1 0 0 1 24 0)'
+                        stroke='#868686'
+                      />
+                      <Path
+                        d='M14.6084 7.30078L9.91275 11.9964L14.6084 16.6921'
+                        stroke='#868686'
+                      />
+                    </Svg>
+                  </TouchableOpacity>
+                  <Text style={styles.modalTitle}>{selectedYear}</Text>
+                  <TouchableOpacity onPress={() => handleYearChange('next')}>
+                    <Svg width={24} height={24} viewBox='0 0 24 24' fill='none'>
+                      <Circle cx={12} cy={12} r={11.5} stroke='#868686' />
+                      <Path
+                        d='M9.3916 7.30078L14.0873 11.9964L9.3916 16.6921'
+                        stroke='#868686'
+                      />
+                    </Svg>
+                  </TouchableOpacity>
+                </View>
+                <Svg
+                  width={(336 / 393) * width}
+                  height={2}
+                  viewBox='0 0 336 2'
+                  fill='none'
+                >
+                  <Path
+                    d='M1.5 1L334.5 0.999971'
+                    stroke='#F1F1F1'
+                    strokeWidth='2'
+                    strokeLinecap='square'
+                    strokeLinejoin='round'
+                  />
+                </Svg>
+              </View>
+
+              <View style={styles.modalMonthContainer}>{renderMonths()}</View>
+
+              <TouchableOpacity
+                style={styles.modalConfirmButton}
+                onPress={handleModalConfirm}
+              >
+                <Text style={styles.modalConfirmText}>확인</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </>
   );
 }
