@@ -1,5 +1,5 @@
 // import { useCalendarData } from '@/hooks/useCalendarData'; // Get screen dimensions for responsive modal sizing
-import { useCalendarData } from '@/hooks/useCalendarData.mock';
+import { useCalendarData } from '@/hooks/useCalendarData';
 import { Stack, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
