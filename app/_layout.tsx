@@ -40,6 +40,14 @@ export default function RootLayout() {
             name='index'
             options={{ title: '홈', headerShown: false }}
           />
+          <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+          <Stack.Screen name='signin' options={{ headerShown: false }} />
+          <Stack.Screen name='test/start' options={{ headerShown: false }} />
+          <Stack.Screen
+            name='test/proceeding'
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name='report' options={{ headerShown: false }} />
           <Stack.Screen name='+not-found' />
         </Stack>
         <StatusBar style='auto' />
