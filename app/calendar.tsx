@@ -219,20 +219,23 @@ const DayComponent = ({
   }
   // const containerStyles = [styles.dayContainer];
   const textStyles = [styles.dayText];
-  let statusStyle = styles.statusGray;
-  if (marked?.isDrink === true) statusStyle = styles.statusOrange;
-  if (marked?.isDrink === false) statusStyle = styles.statusGreen;
+  let statusImage = require('@/assets/images/unmarked_drink.png'); // 디폴트 (회색)
+  if (marked?.isDrink === true) {
+    statusImage = require('@/assets/images/drink.png'); // 주황
+  } else if (marked?.isDrink === false) {
+    statusImage = require('@/assets/images/not_drink.png'); // 초록
+  }
 
   if (isToday) {
     textStyles.push(styles.todayText);
+  } else if (!isCurrentMonth) {
+    textStyles.push(styles.otherMonthText);
   } else {
-    if (!isCurrentMonth) {
-      textStyles.push(styles.otherMonthText);
-    } else {
-      // If not a marked day, make text color #555
-      if (!marked) {
-        textStyles.push(styles.currentMonthText);
-      }
+    // 🟢 여기서 미래 날짜 처리
+    if (date.dateString > today) {
+      textStyles.push(styles.otherMonthText); // 회색 처리
+    } else if (!marked) {
+      textStyles.push(styles.currentMonthText);
     }
   }
 
@@ -240,7 +243,11 @@ const DayComponent = ({
     <TouchableOpacity className='w-10 h-[66px] items-center justify-center'>
       <View className='items-center justify-center w-10 h-10 rounded-full'>
         <Text style={[textStyles]}>{date.day}</Text>
-        <View className='w-10 h-10 rounded-full mt-0.5' style={[statusStyle]} />
+        <Image
+          source={statusImage}
+          style={{ width: 40, height: 40, marginTop: 2 }}
+          resizeMode='contain'
+        />
       </View>
     </TouchableOpacity>
   );
@@ -402,6 +409,7 @@ export default function CalendarPage() {
           hideArrows={true}
           enableSwipeMonths={false}
           renderHeader={() => null}
+          hideExtraDays={true}
           theme={{
             calendarBackground: 'transparent',
             textSectionTitleColor: '#b6c1cd',
