@@ -63,6 +63,8 @@ LocaleConfig.defaultLocale = 'ko';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
+    height: '100%',
     backgroundColor: '#fff',
   },
 
@@ -103,8 +105,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
     width: 96,
     textAlign: 'center',
   },
@@ -156,18 +156,8 @@ const styles = StyleSheet.create({
   },
   modalConfirmText: {
     color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
-    fontFamily: 'Pretendard',
-    fontStyle: 'normal',
-    lineHeight: 24,
   },
-  backButton: {
-    marginTop: 48,
-    paddingLeft: 16,
-    paddingTop: 18,
-    paddingBottom: 18,
-  },
+
   currentMonthText: {
     color: '#555555',
   },
@@ -368,18 +358,18 @@ export default function CalendarPage() {
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.container}>
         {/* 상단 헤더 */}
-        <View className='px-5 mt-5'>
-          <View style={styles.backButton}>
-            <TouchableOpacity onPress={() => router.back()} className='w-[8px]'>
-              <Image
-                className='w-[8px] h-[16px]'
-                source={require('@/assets/images/chevron_left.png')}
-              />
-            </TouchableOpacity>
-          </View>
+        <View className='px-4 mt-12 h-[60px] justify-center'>
+          <TouchableOpacity onPress={() => router.back()} className='w-[8px]'>
+            <Image
+              className='w-[8px] h-[16px]'
+              source={require('@/assets/images/chevron_left.png')}
+            />
+          </TouchableOpacity>
+        </View>
 
+        <View className='flex-row items-center justify-center mt-5'>
           <TouchableOpacity
-            className='flex-row items-center justify-center gap-2.5'
+            className='flex-row items-center justify-center gap-2 '
             onPress={handleMonthPress}
             disabled={isLoading}
           >
@@ -393,39 +383,40 @@ export default function CalendarPage() {
           </TouchableOpacity>
         </View>
 
-        {/* 캘린더 */}
-        <Calendar
-          key={currentDate}
-          current={currentDate}
-          markingType={'custom'}
-          markedDates={mergedMarkedDates}
-          dayComponent={(dayProps) => (
-            <DayComponent
-              {...dayProps}
-              currentMonth={currentDate.substring(0, 7)}
-              markedDates={mergedMarkedDates}
-            />
-          )}
-          hideArrows={true}
-          enableSwipeMonths={false}
-          renderHeader={() => null}
-          hideExtraDays={true}
-          theme={{
-            calendarBackground: 'transparent',
-            textSectionTitleColor: '#b6c1cd',
-            selectedDayBackgroundColor: '#00adf5',
-            selectedDayTextColor: '#ffffff',
-            todayTextColor: '#2d4150',
-            dayTextColor: '#2d4150',
-            textDisabledColor: '#d9e1e8',
-            textDayFontSize: 16,
-            textMonthFontSize: 18,
-            textDayHeaderFontSize: 14,
-          }}
-        />
+        <View className='px-2'>
+          {/* 캘린더 */}
+          <Calendar
+            key={currentDate}
+            current={currentDate}
+            markingType={'custom'}
+            markedDates={mergedMarkedDates}
+            dayComponent={(dayProps) => (
+              <DayComponent
+                {...dayProps}
+                currentMonth={currentDate.substring(0, 7)}
+                markedDates={mergedMarkedDates}
+              />
+            )}
+            hideArrows={true}
+            enableSwipeMonths={false}
+            renderHeader={() => null}
+            hideExtraDays={true}
+            theme={{
+              calendarBackground: 'transparent',
+              textSectionTitleColor: '#b6c1cd',
+              selectedDayBackgroundColor: '#00adf5',
+              selectedDayTextColor: '#ffffff',
+              todayTextColor: '#2d4150',
+              dayTextColor: '#2d4150',
+              textDisabledColor: '#d9e1e8',
+              textDayFontSize: 16,
+              textDayHeaderFontSize: 14,
+            }}
+          />
+        </View>
 
         {/* 하단 버튼 */}
-        <View className='absolute bottom-0 w-full p-5'>
+        <View className='absolute w-full p-5 bottom-11'>
           <TouchableOpacity
             className='bg-[#1EBE71] rounded-[10px] p-[18px] items-center'
             onPress={() => router.push('/report')}
@@ -462,7 +453,12 @@ export default function CalendarPage() {
                       />
                     </Svg>
                   </TouchableOpacity>
-                  <Text style={styles.modalTitle}>{selectedYear}</Text>
+                  <Text
+                    style={styles.modalTitle}
+                    className='text-lg font-semibold'
+                  >
+                    {selectedYear}
+                  </Text>
                   <TouchableOpacity onPress={() => handleYearChange('next')}>
                     <Svg width={24} height={24} viewBox='0 0 24 24' fill='none'>
                       <Circle cx={12} cy={12} r={11.5} stroke='#868686' />
@@ -496,7 +492,12 @@ export default function CalendarPage() {
                 onPress={handleModalConfirm}
                 disabled={isLoading}
               >
-                <Text style={styles.modalConfirmText}>확인</Text>
+                <Text
+                  style={styles.modalConfirmText}
+                  className='text-xs font-medium'
+                >
+                  확인
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
