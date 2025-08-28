@@ -1,5 +1,7 @@
+// import { useCalendarData } from '@/hooks/useCalendarData'; // Get screen dimensions for responsive modal sizing
+import { useCalendarData } from '@/hooks/useCalendarData.mock';
 import { Stack, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -11,10 +13,9 @@ import {
 } from 'react-native';
 import { Calendar, DateData, LocaleConfig } from 'react-native-calendars';
 import Svg, { Circle, Path } from 'react-native-svg';
-// Get screen dimensions for responsive modal sizing
 const { width } = Dimensions.get('window');
 
-// LocaleConfig를 사용해 요일을 한국어로 설정
+// ----- 한글 로케일 설정 -----
 LocaleConfig.locales['ko'] = {
   monthNames: [
     '1월',
@@ -58,32 +59,15 @@ LocaleConfig.locales['ko'] = {
 };
 LocaleConfig.defaultLocale = 'ko';
 
+// ----- 스타일 -----
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
   },
-  headerContainer: {
-    paddingHorizontal: 20,
-    marginTop: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-  },
-  monthTitle: {
-    color: '#0FD380',
-    textAlign: 'center',
-    fontSize: 30,
-    fontWeight: '800',
-  },
-  dayWrapper: {
-    width: 40,
-    height: 66,
-    alignItems: 'center',
-    justifyContent: 'center',
+
+  dayText: {
+    fontSize: 16,
   },
   dayContainer: {
     width: 40,
@@ -92,12 +76,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 20,
   },
-  dayText: {
-    fontSize: 16,
-  },
-  todayContainer: {
-    backgroundColor: '#1EBE71', // 오늘 날짜 배경색
-  },
   todayText: {
     width: 32,
     color: '#fff',
@@ -105,39 +83,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0FD380',
     textAlign: 'center',
   },
-  markedDay: {
-    backgroundColor: 'rgba(255, 182, 193, 0.5)', // 연한 핑크색 (곰)
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cloudMarkedDay: {
-    backgroundColor: 'rgba(173, 216, 230, 0.5)', // 연한 파란색 (구름)
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  footer: {
-    padding: 20,
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-  },
-  reportButton: {
-    backgroundColor: '#1EBE71',
-    borderRadius: 10,
-    padding: 18,
-    alignItems: 'center',
-  },
-  reportButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
@@ -175,7 +121,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     width: (197 / 393) * width,
-    margin: 'auto',
+    alignSelf: 'center',
   },
   modalMonthButton: {
     width: '23%',
@@ -188,7 +134,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Pretendard',
     fontSize: 16,
     fontStyle: 'normal',
-    fontWeight: 600,
+    fontWeight: '600',
     lineHeight: 24,
 
     alignItems: 'center',
@@ -211,12 +157,9 @@ const styles = StyleSheet.create({
   modalConfirmText: {
     color: '#fff',
     fontSize: 12,
-    fontWeight: 500,
-
+    fontWeight: '500',
     fontFamily: 'Pretendard',
-
     fontStyle: 'normal',
-
     lineHeight: 24,
   },
   backButton: {
@@ -232,12 +175,6 @@ const styles = StyleSheet.create({
     color: '#EBEBEB',
   },
 
-  statusIndicator: {
-    width: 40,
-    height: 40,
-    borderRadius: 40,
-    marginTop: 2,
-  },
   statusOrange: {
     backgroundColor: '#FF8A00', // 주황색
   },
@@ -249,70 +186,30 @@ const styles = StyleSheet.create({
   },
 });
 
+// ----- 캘린더 markedDates 타입 -----
 interface MarkedDayConfig {
   selected: boolean;
   customStyles: {
     container: object;
   };
-  emotion: string;
+  isDrink: boolean | null;
 }
+type MarkedDatesMap = Record<string, MarkedDayConfig>;
 
-const markedDatesData: { [key: string]: MarkedDayConfig } = {
-  '2024-05-01': {
-    selected: true,
-    customStyles: { container: styles.markedDay },
-    emotion: '🐻',
-  },
-  '2024-05-05': {
-    selected: true,
-    customStyles: { container: styles.cloudMarkedDay },
-    emotion: '☁️',
-  },
-  '2024-05-06': {
-    selected: true,
-    customStyles: { container: styles.cloudMarkedDay },
-    emotion: '☁️',
-  },
-  '2024-05-09': {
-    selected: true,
-    customStyles: { container: styles.cloudMarkedDay },
-    emotion: '☁️',
-  },
-  '2024-05-13': {
-    selected: true,
-    customStyles: { container: styles.cloudMarkedDay },
-    emotion: '☁️',
-  },
-  '2024-05-14': {
-    selected: true,
-    customStyles: { container: styles.cloudMarkedDay },
-    emotion: '☁️',
-  },
-  '2024-05-16': {
-    selected: true,
-    customStyles: { container: styles.markedDay },
-    emotion: '🐻',
-  },
-  '2024-05-24': {
-    selected: true,
-    customStyles: { container: styles.cloudMarkedDay },
-    emotion: '☁️',
-  },
-  '2024-05-26': {
-    selected: true,
-    customStyles: { container: styles.todayContainer },
-    emotion: '🐶',
-  },
-};
-
+// ----- DayComponent: 한 날짜 셀을 렌더링 -----
 interface DayComponentProps {
   date?: DateData;
-  currentMonth: string;
+  currentMonth: string; // 'YYYY-MM'
+  markedDates: MarkedDatesMap; // API에서 매핑된 데이터
 }
 
-const DayComponent = ({ date, currentMonth }: DayComponentProps) => {
+const DayComponent = ({
+  date,
+  currentMonth,
+  markedDates,
+}: DayComponentProps) => {
   if (!date) return null;
-  const marked = markedDatesData[date.dateString];
+  const marked = markedDates[date.dateString];
   const today = new Date().toISOString().split('T')[0];
   const isToday = date.dateString === today;
   const isCurrentMonth = date.dateString.startsWith(currentMonth);
@@ -323,13 +220,8 @@ const DayComponent = ({ date, currentMonth }: DayComponentProps) => {
   // const containerStyles = [styles.dayContainer];
   const textStyles = [styles.dayText];
   let statusStyle = styles.statusGray;
-  if (marked) {
-    if (marked.emotion === '🐻') {
-      statusStyle = styles.statusOrange;
-    } else if (marked.emotion === '🐶') {
-      statusStyle = styles.statusGreen;
-    }
-  }
+  if (marked?.isDrink === true) statusStyle = styles.statusOrange;
+  if (marked?.isDrink === false) statusStyle = styles.statusGreen;
 
   if (isToday) {
     textStyles.push(styles.todayText);
@@ -345,10 +237,10 @@ const DayComponent = ({ date, currentMonth }: DayComponentProps) => {
   }
 
   return (
-    <TouchableOpacity style={styles.dayWrapper} onPress={() => {}}>
-      <View style={styles.dayContainer}>
+    <TouchableOpacity className='w-10 h-[66px] items-center justify-center'>
+      <View className='items-center justify-center w-10 h-10 rounded-full'>
         <Text style={[textStyles]}>{date.day}</Text>
-        <View style={[styles.statusIndicator, statusStyle]} />
+        <View className='w-10 h-10 rounded-full mt-0.5' style={[statusStyle]} />
       </View>
     </TouchableOpacity>
   );
@@ -356,7 +248,9 @@ const DayComponent = ({ date, currentMonth }: DayComponentProps) => {
 
 export default function CalendarPage() {
   const today = new Date().toISOString().split('T')[0];
-  const [currentDate, setCurrentDate] = useState(today);
+  const [currentDate, setCurrentDate] = useState(today); // 'YYYY-MM-DD'
+
+  // 월 선택 모달 상태
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedYear, setSelectedYear] = useState(
     new Date(currentDate).getFullYear(),
@@ -364,7 +258,41 @@ export default function CalendarPage() {
   const [selectedMonth, setSelectedMonth] = useState(
     new Date(currentDate).getMonth() + 1,
   );
+
   const router = useRouter();
+  const { lookupCalendar, isLoading } = useCalendarData();
+
+  // API 응답 → 캘린더 markedDates로 변환한 결과를 보관
+  const [markedDates, setMarkedDates] = useState<MarkedDatesMap>({});
+
+  // API 배열을 markedDates 형태로 매핑
+  const mapApiToMarkedDates = (
+    rows: { date: string; isDrink: boolean }[],
+  ): MarkedDatesMap => {
+    const map: MarkedDatesMap = {};
+    rows.forEach(({ date, isDrink }) => {
+      map[date] = {
+        selected: true,
+        customStyles: { container: styles.dayContainer },
+        isDrink,
+      };
+    });
+    return map;
+  };
+
+  // 특정 연/월 데이터를 서버에서 가져와 상태에 반영
+  const fetchCalendar = async (y: number, m: number) => {
+    const data = await lookupCalendar(y, m); // ← 배열
+    setMarkedDates(data ? mapApiToMarkedDates(data) : {});
+  };
+
+  // 최초 마운트 시: 현재 연/월로 1회 로드
+  useEffect(() => {
+    const y = new Date(currentDate).getFullYear();
+    const m = new Date(currentDate).getMonth() + 1;
+    fetchCalendar(y, m);
+  }, []);
+
   const currentMonthName =
     LocaleConfig.locales['ko'].monthNames[new Date(currentDate).getMonth()];
 
@@ -374,16 +302,18 @@ export default function CalendarPage() {
     setModalVisible(true);
   };
 
-  const handleModalConfirm = () => {
+  // 모달 확인: currentDate 갱신 + 선택한 연/월로 API 재요청
+  const handleModalConfirm = async () => {
     const newDate = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`;
     setCurrentDate(newDate);
     setModalVisible(false);
+    await fetchCalendar(selectedYear, selectedMonth); // ★ 연/월 바뀌면 바로 재요청
   };
 
+  // 월/년 증감
   const handleMonthChange = (month: number) => {
     setSelectedMonth(month);
   };
-
   const handleYearChange = (direction: 'prev' | 'next') => {
     setSelectedYear((prevYear) =>
       direction === 'next' ? prevYear + 1 : prevYear - 1,
@@ -413,12 +343,25 @@ export default function CalendarPage() {
     ));
   };
 
+  const mergedMarkedDates = useMemo<MarkedDatesMap>(() => {
+    return {
+      ...markedDates,
+      [currentDate]: {
+        ...(markedDates[currentDate] ?? {
+          selected: true,
+          customStyles: { container: styles.dayContainer },
+          isDrink: null, // 오늘은 점 색상 없음(회색) 유지. 필요 시 true/false로 지정 가능
+        }),
+      },
+    };
+  }, [markedDates, currentDate]);
+
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.container}>
         {/* 상단 헤더 */}
-        <View style={styles.headerContainer}>
+        <View className='px-5 mt-5'>
           <View style={styles.backButton}>
             <TouchableOpacity onPress={() => router.back()} className='w-[8px]'>
               <Image
@@ -428,8 +371,14 @@ export default function CalendarPage() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.header} onPress={handleMonthPress}>
-            <Text style={styles.monthTitle}>{currentMonthName}</Text>
+          <TouchableOpacity
+            className='flex-row items-center justify-center gap-2.5'
+            onPress={handleMonthPress}
+            disabled={isLoading}
+          >
+            <Text className='text-[#0FD380] text-center text-[30px] font-extrabold'>
+              {currentMonthName}
+            </Text>
             <Image
               className='w-[14px] h-[7px]'
               source={require('@/assets/images/grey_arrow_bottom.png')}
@@ -442,17 +391,12 @@ export default function CalendarPage() {
           key={currentDate}
           current={currentDate}
           markingType={'custom'}
-          markedDates={{
-            ...markedDatesData,
-            [currentDate]: {
-              selected: true,
-              customStyles: markedDatesData[currentDate]?.customStyles,
-            },
-          }}
+          markedDates={mergedMarkedDates}
           dayComponent={(dayProps) => (
             <DayComponent
               {...dayProps}
               currentMonth={currentDate.substring(0, 7)}
+              markedDates={mergedMarkedDates}
             />
           )}
           hideArrows={true}
@@ -473,12 +417,14 @@ export default function CalendarPage() {
         />
 
         {/* 하단 버튼 */}
-        <View style={styles.footer} className=''>
+        <View className='absolute bottom-0 w-full p-5'>
           <TouchableOpacity
-            style={styles.reportButton}
+            className='bg-[#1EBE71] rounded-[10px] p-[18px] items-center'
             onPress={() => router.push('/report')}
           >
-            <Text style={styles.reportButtonText}>음주 주간 리포트 보기</Text>
+            <Text className='text-white text-[18px] font-bold'>
+              음주 주간 리포트 보기
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -540,6 +486,7 @@ export default function CalendarPage() {
               <TouchableOpacity
                 style={styles.modalConfirmButton}
                 onPress={handleModalConfirm}
+                disabled={isLoading}
               >
                 <Text style={styles.modalConfirmText}>확인</Text>
               </TouchableOpacity>
