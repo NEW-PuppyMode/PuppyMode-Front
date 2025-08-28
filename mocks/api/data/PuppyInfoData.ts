@@ -1,16 +1,25 @@
 export const PuppyInfoData = {
   isSuccess: true,
-  code: 'string',
-  message: 'string',
+  code: '200',
+  message: 'success',
   result: {
-    puppyLevel: 1,
-    puppyLevelName: 'string',
-    puppyLevelPercent: 30,
+    puppyLevel: 2,
+    puppyLevelName: '서준',
+    puppyLevelPercent: 99,
     puppyImageUrl: 'string',
     didRecordYesterday: true,
     didRecordToday: true,
-    isPuppyName: true,
-    isMyName: true,
+    isPuppyName: false,
+    isMyName: false,
     isGoal: true,
+  },
+};
+
+export const PuppyAdviceData = {
+  isSuccess: true,
+  code: '200',
+  message: 'success',
+  result: {
+    advice: `그만 좀 마시세요. ${'\n'} 알겠죠? ${'\n'} 알겠냐고.`,
   },
 };

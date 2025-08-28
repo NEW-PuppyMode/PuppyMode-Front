@@ -1,10 +1,12 @@
 import { handelError } from '@/services/handelErrors';
 import { PuppyDataAPI } from '@/services/puppyData';
+import { IPuppyInfo } from '@/types/models/puppy';
 import axios from 'axios';
 import { useState } from 'react';
 
 export const usePuppyData = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [puppyInfo, setPuppyInfo] = useState<IPuppyInfo | null>(null);
 
   const renamePuppy = async (authCode: string) => {
     setIsLoading(true);
@@ -49,11 +51,11 @@ export const usePuppyData = () => {
 
     try {
       const data = await PuppyDataAPI.advicePuppy();
-
-      return true;
+      console.log(data.result.advice);
+      return data.result.advice;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        console.log('log');
+        console.log('401');
       } else {
         handelError(error);
       }
@@ -68,6 +70,7 @@ export const usePuppyData = () => {
 
     try {
       const data = await PuppyDataAPI.fetchPuppyInfo();
+      setPuppyInfo(data.result);
       console.log('강아지 정보', data);
       return true;
     } catch (error) {
@@ -87,6 +90,7 @@ export const usePuppyData = () => {
     renameUser,
     advicePuppy,
     fetchPuppyInfo,
+    puppyInfo,
     isLoading,
     setIsLoading,
   };

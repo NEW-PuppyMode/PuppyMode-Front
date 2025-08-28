@@ -1,26 +1,23 @@
+import { useRouter } from 'expo-router';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const Report = () => {
+  const router = useRouter();
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginTop: 48,
-          width: '100%',
-          height: 60,
-        }}
-      >
-        <TouchableOpacity onPress={() => {}}>
+      <View className='relative flex-row justify-center w-full py-4 mt-12 '>
+        <TouchableOpacity
+          className='absolute left-0 self-center '
+          onPress={() => router.back()}
+        >
           <Image
-            source={require('@/assets/icons/report/ic_back.svg')}
-            style={{ margin: 10 }}
+            className='w-[8px] h-[16px] left-0 self-center ml-4'
+            source={require('@/assets/images/chevron_left.png')}
           />
         </TouchableOpacity>
-        <Text style={styles.title}>음주 리포트</Text>
-        <View style={{ width: 24 }}></View>
+        <View className='self-center '>
+          <Text className='text-xl font-semibold'>음주 리포트</Text>
+        </View>
       </View>
 
       <View

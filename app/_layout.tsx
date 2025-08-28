@@ -9,6 +9,7 @@ import {
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
 export default function RootLayout() {
@@ -17,18 +18,26 @@ export default function RootLayout() {
     pretendard: require('../assets/fonts/PretendardVariable.ttf'),
   });
 
-  async function enableMocking() {
-    if (!__DEV__) return;
+  const [mockReady, setMockReady] = useState(false);
 
-    await import('../msw.polyfills');
-    const { server } = await import('../mocks/server');
-    server.listen();
-    console.log('msw start');
-  }
+  useEffect(() => {
+    async function enableMocking() {
+      if (!__DEV__) {
+        setMockReady(true);
+        return;
+      }
 
-  enableMocking();
+      await import('../msw.polyfills');
+      const { server } = await import('../mocks/server');
+      server.listen({ onUnhandledRequest: 'bypass' });
+      console.log('[MSW] server.listen(native) ON');
+      setMockReady(true);
+    }
 
-  if (!loaded) {
+    enableMocking();
+  }, []);
+
+  if (!loaded || !mockReady) {
     return null;
   }
 
