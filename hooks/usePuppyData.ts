@@ -85,25 +85,6 @@ export const usePuppyData = () => {
     }
   };
 
-  const fetchPuppyInfo = async () => {
-    setIsLoading(true);
-
-    try {
-      const data = await PuppyDataAPI.fetchPuppyInfo();
-      console.log('강아지 정보', data);
-      return true;
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        console.log('401 error');
-      } else {
-        handelError(error);
-      }
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return {
     renamePuppy,
     renameUser,
