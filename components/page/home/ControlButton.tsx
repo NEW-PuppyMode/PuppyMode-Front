@@ -2,18 +2,18 @@ import { ThemedText } from '@/components/ThemedText';
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 
-type ChoiceButtonProps = {
+type ControlButtonProps = {
   label: string;
   onPress?: () => void;
   variant?: 'primary' | 'ghost';
 };
 
-export function ChoiceButton({
+export function ControlButton({
   label,
   onPress,
   variant = 'ghost',
-}: ChoiceButtonProps) {
-  const base = 'px-2 py-3 rounded-xl items-center justify-center min-w-[88px]';
+}: ControlButtonProps) {
+  const base = 'rounded-full items-center justify-center w-10 h-10 shadow-lg';
   const variants = {
     primary: 'border border-green-500 bg-white',
     ghost: 'border border-grayscale-200 bg-white bg-opacity-50',
@@ -29,7 +29,7 @@ export function ChoiceButton({
         className={
           variant === 'primary'
             ? 'text-green-600 font-semibold text-[15px]'
-            : 'text-grayscale-600 font-medium text-[15px]'
+            : 'text-green-500 font-medium text-[23px]'
         }
       >
         {label}

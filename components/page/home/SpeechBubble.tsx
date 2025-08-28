@@ -1,16 +1,18 @@
 import { ThemedText } from '@/components/ThemedText';
 import React from 'react';
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated';
 
 type SpeechBubbleProps = {
   children: React.ReactNode;
   variant?: 'puppy' | 'user';
+  onPress?: () => void;
 };
 
 export function SpeechBubble({
   children,
   variant = 'puppy',
+  onPress,
 }: SpeechBubbleProps) {
   const bgColor =
     variant === 'puppy'
@@ -22,14 +24,24 @@ export function SpeechBubble({
       ? 'text-gray-950 text-[20px] leading-7 font-bold text-center'
       : 'text-gray-950 text-sm leading-5 font-semibold text-center';
 
+  const Content = (
+    <Animated.View
+      className={`${bgColor}`}
+      entering={ZoomIn.duration(300).springify()}
+    >
+      <ThemedText className={textStyle}>{children}</ThemedText>
+    </Animated.View>
+  );
+
   return (
     <View className='items-center mt-8 mb-4'>
-      <Animated.View
-        className={`${bgColor}`}
-        entering={ZoomIn.duration(300).springify()}
-      >
-        <ThemedText className={textStyle}>{children}</ThemedText>
-      </Animated.View>
+      {onPress ? (
+        <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+          {Content}
+        </TouchableOpacity>
+      ) : (
+        Content
+      )}
 
       <Animated.View
         entering={FadeIn.duration(300).delay(100)}
