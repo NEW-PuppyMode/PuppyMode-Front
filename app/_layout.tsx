@@ -18,7 +18,6 @@ export default function RootLayout() {
   });
 
   if (!loaded) {
-    // Async font loading only occurs in development.
     return null;
   }
 
@@ -26,6 +25,10 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <EmotionThemeProvider theme={theme}>
         <Stack>
+          <Stack.Screen
+            name='index'
+            options={{ title: '홈', headerShown: false }}
+          />
           <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
           <Stack.Screen name='signin' options={{ headerShown: false }} />
           <Stack.Screen name='test/start' options={{ headerShown: false }} />
@@ -36,7 +39,6 @@ export default function RootLayout() {
           <Stack.Screen name='report' options={{ headerShown: false }} />
           <Stack.Screen name='+not-found' />
         </Stack>
-
         <StatusBar style='auto' />
       </EmotionThemeProvider>
     </ThemeProvider>
