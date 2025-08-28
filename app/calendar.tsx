@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     width: 32,
     color: '#fff',
     borderRadius: 15,
-    backgroundColor: 'var(--Green-500, #0FD380)',
+    backgroundColor: '#0FD380',
     textAlign: 'center',
   },
   markedDay: {
@@ -419,15 +419,18 @@ export default function CalendarPage() {
       <View style={styles.container}>
         {/* 상단 헤더 */}
         <View style={styles.headerContainer}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.push('/')}
-          >
-            <Image
-              className='w-[8px] h-[16px]'
-              source={require('@/assets/images/chevron_left.png')}
-            />
-          </TouchableOpacity>
+          <View style={styles.backButton}>
+            <TouchableOpacity
+              onPress={() => router.push('/')}
+              className='w-[8px]'
+            >
+              <Image
+                className='w-[8px] h-[16px]'
+                source={require('@/assets/images/chevron_left.png')}
+              />
+            </TouchableOpacity>
+          </View>
+
           <TouchableOpacity style={styles.header} onPress={handleMonthPress}>
             <Text style={styles.monthTitle}>{currentMonthName}</Text>
             <Image
