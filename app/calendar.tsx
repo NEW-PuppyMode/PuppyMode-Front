@@ -420,10 +420,7 @@ export default function CalendarPage() {
         {/* 상단 헤더 */}
         <View style={styles.headerContainer}>
           <View style={styles.backButton}>
-            <TouchableOpacity
-              onPress={() => router.push('/')}
-              className='w-[8px]'
-            >
+            <TouchableOpacity onPress={() => router.back()} className='w-[8px]'>
               <Image
                 className='w-[8px] h-[16px]'
                 source={require('@/assets/images/chevron_left.png')}
