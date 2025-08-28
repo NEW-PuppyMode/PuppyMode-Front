@@ -29,8 +29,8 @@ export default function RootLayout() {
 
       await import('../msw.polyfills');
       const { server } = await import('../mocks/server');
-      server.listen();
-      console.log('MSW started');
+      server.listen({ onUnhandledRequest: 'bypass' });
+      console.log('[MSW] server.listen(native) ON');
       setMockReady(true);
     }
 

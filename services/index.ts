@@ -12,3 +12,9 @@ export const axiosInstance = axios.create({
   baseURL: baseUrl,
   withCredentials: true,
 });
+
+axiosInstance.interceptors.request.use((config) => {
+  const url = (config.baseURL || '') + (config.url || '');
+  console.log('[AXIOS] →', url, 'params=', config.params);
+  return config;
+});
