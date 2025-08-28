@@ -8,7 +8,7 @@ import { PUPPY_MESSAGES } from '@/constants/messages';
 import { usePuppyData } from '@/hooks/usePuppyData';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Image,
   ImageBackground,
@@ -19,8 +19,14 @@ import {
 export default function HomeScreen() {
   const router = useRouter();
 
-  const { renamePuppy, renameUser, advicePuppy, isLoading, setIsLoading } =
+  const { renamePuppy, renameUser, fetchPuppyInfo, isLoading, setIsLoading } =
     usePuppyData();
+
+  useEffect(() => {
+    fetchPuppyInfo().then(() => {
+      console.log('finishhh');
+    });
+  }, []);
 
   const [showNameInput, setShowNameInput] = useState(false);
   const [inputType, setInputType] = useState<'dog' | 'user' | null>(null);
@@ -42,10 +48,8 @@ export default function HomeScreen() {
     setShowNameInput(true);
   };
 
-  // 음주 기록 버튼 클릭 핸들러
   const handleDrinkRecordPress = () => {
     setRecordMode(!recordMode);
-    // 모드 변경 시 기존 상태 초기화
     setShowNameInput(false);
     setInputType(null);
     setRecordType(null);
