@@ -1,3 +1,4 @@
+import { onboardHandlers } from './api/onboard';
 import { puppyHandlers } from './api/puppy';
 
-export const handlers = [...puppyHandlers];
+export const handlers = [...puppyHandlers, ...onboardHandlers];

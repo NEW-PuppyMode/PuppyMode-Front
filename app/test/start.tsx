@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import {
   Dimensions,
   Image,
@@ -10,6 +11,7 @@ import {
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const TestStart = () => {
+  const router = useRouter();
   return (
     <View style={styles.container}>
       <Text style={styles.title}>나에게 딱 맞는</Text>
@@ -34,7 +36,7 @@ const TestStart = () => {
             borderRadius: 10,
             backgroundColor: '#0FD380',
           }}
-          onPress={() => {}}
+          onPress={() => router.push('/test/proceeding')}
         >
           <Text
             style={{
