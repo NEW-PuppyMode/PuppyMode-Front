@@ -19,4 +19,9 @@ export const PuppyDataAPI = {
     const response = await axiosInstance.get('/advice');
     return response.data;
   },
+
+  fetchPuppyInfo: async () => {
+    const response = await axiosInstance.get('/main');
+    return response.data;
+  },
 };

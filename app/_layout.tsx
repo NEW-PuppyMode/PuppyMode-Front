@@ -14,8 +14,19 @@ import 'react-native-reanimated';
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    pretendard: require('../assets/fonts/PretendardVariable.ttf'),
   });
+
+  async function enableMocking() {
+    if (!__DEV__) return;
+
+    await import('../msw.polyfills');
+    const { server } = await import('../mocks/server');
+    server.listen();
+    console.log('msw start');
+  }
+
+  enableMocking();
 
   if (!loaded) {
     return null;
