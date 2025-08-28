@@ -9,8 +9,8 @@ export const PuppyInfoData = {
     puppyImageUrl: 'string',
     didRecordYesterday: true,
     didRecordToday: true,
-    isPuppyName: true,
-    isMyName: true,
+    isPuppyName: false,
+    isMyName: false,
     isGoal: true,
   },
 };

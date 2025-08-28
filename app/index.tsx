@@ -112,11 +112,12 @@ export default function HomeScreen() {
           setInputType(null);
           const coloredMessage = (
             <>
-              <Text>와우 {'\n'}</Text>
+              <Text>허걱{'\n'}</Text>
               <Text style={{ color: '#21D08A', fontWeight: 'bold' }}>
-                {userName}
+                {dogName}
               </Text>
-              <Text>{'\n'}감다살이네요.</Text>
+              이라니..
+              <Text>{'\n'}나쁘지 않지만.. 좋진 않아요..</Text>
             </>
           );
           setRenameMessage(coloredMessage);
@@ -128,7 +129,16 @@ export default function HomeScreen() {
           setUserName('');
           setShowNameInput(false);
           setInputType(null);
-          setRenameMessage(`와우 \n ${userName}?\n감다살이네요.`);
+          const coloredMessage = (
+            <>
+              <Text>와우 {'\n'}</Text>
+              <Text style={{ color: '#21D08A', fontWeight: 'bold' }}>
+                {userName}
+              </Text>
+              ?<Text>{'\n'}감다살이네요.</Text>
+            </>
+          );
+          setRenameMessage(coloredMessage);
         }
       }
     } catch (error) {
