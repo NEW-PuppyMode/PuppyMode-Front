@@ -165,7 +165,8 @@ export default function TestProceeding() {
             onPress={() => setStep((s) => Math.max(1, s - 1))}
           >
             <Image
-              source={require('@/assets/icons/test/ic_back.svg')}
+              className='w-[8px] h-[16px]'
+              source={require('@/assets/images/chevron_left.png')}
               style={{ margin: 10 }}
             />
           </TouchableOpacity>
@@ -234,7 +235,7 @@ export default function TestProceeding() {
           selected[step] !== 0 && styles.bottomBtnActive,
         ]}
       >
-        다음
+        <Text className='font-medium text-white'>다음</Text>
       </TouchableOpacity>
     </View>
   );
