@@ -51,7 +51,7 @@ const TestResult = () => {
           style={styles.bottomBtn}
           onPress={() => router.push('/')}
         >
-          시작하기
+          <Text className='font-medium text-white'>시작하기</Text>
         </TouchableOpacity>
       </View>
     </View>

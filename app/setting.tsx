@@ -17,7 +17,8 @@ const Setting = () => {
       >
         <TouchableOpacity onPress={() => router.back()}>
           <Image
-            source={require('@/assets/icons/test/ic_back.svg')}
+            className='w-[8px] h-[16px]'
+            source={require('@/assets/images/chevron_left.png')}
             style={{ margin: 10 }}
           />
         </TouchableOpacity>
