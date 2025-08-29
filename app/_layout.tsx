@@ -1,3 +1,4 @@
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import theme from '@/styles/theme';
 import { ThemeProvider as EmotionThemeProvider } from '@emotion/react';
@@ -7,10 +8,21 @@ import {
   ThemeProvider,
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Redirect, Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
+
+function AuthGate() {
+  const { isLoggedIn } = useAuth();
+  const pathname = usePathname();
+
+  if (!isLoggedIn && pathname !== '/signin') {
+    return <Redirect href='/signin' />;
+  }
+
+  return null;
+}
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -44,24 +56,27 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <EmotionThemeProvider theme={theme}>
-        <Stack>
-          <Stack.Screen
-            name='index'
-            options={{ title: '홈', headerShown: false }}
-          />
-          <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-          <Stack.Screen name='signin' options={{ headerShown: false }} />
-          <Stack.Screen name='test/start' options={{ headerShown: false }} />
-          <Stack.Screen
-            name='test/proceeding'
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen name='test/result' options={{ headerShown: false }} />
-          <Stack.Screen name='report' options={{ headerShown: false }} />
-          <Stack.Screen name='setting' options={{ headerShown: false }} />
-          <Stack.Screen name='+not-found' />
-        </Stack>
-        <StatusBar style='auto' />
+        <AuthProvider>
+          <AuthGate />
+          <Stack>
+            <Stack.Screen
+              name='index'
+              options={{ title: '홈', headerShown: false }}
+            />
+            <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+            <Stack.Screen name='signin' options={{ headerShown: false }} />
+            <Stack.Screen name='test/start' options={{ headerShown: false }} />
+            <Stack.Screen
+              name='test/proceeding'
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name='test/result' options={{ headerShown: false }} />
+            <Stack.Screen name='report' options={{ headerShown: false }} />
+            <Stack.Screen name='setting' options={{ headerShown: false }} />
+            <Stack.Screen name='+not-found' />
+          </Stack>
+          <StatusBar style='auto' />
+        </AuthProvider>
       </EmotionThemeProvider>
     </ThemeProvider>
   );
