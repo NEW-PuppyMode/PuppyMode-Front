@@ -1,3 +1,5 @@
+import { useAuth } from '@/contexts/AuthContext';
+import { router } from 'expo-router';
 import {
   Dimensions,
   Image,
@@ -10,6 +12,8 @@ import {
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const SignIn = () => {
+  const { login } = useAuth();
+
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
@@ -36,7 +40,10 @@ const SignIn = () => {
           <TouchableOpacity
             style={[btnStyles.btn, { backgroundColor: '#FEE500' }]}
             activeOpacity={0.8}
-            onPress={() => {}}
+            onPress={() => {
+              login();
+              router.replace('/test/start');
+            }}
           >
             <Image
               source={require('@/assets/icons/signin/ic_kakao.svg')}
