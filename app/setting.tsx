@@ -36,7 +36,12 @@ const Setting = () => {
       </View>
       <SettingBtn title='이용약관' onPress={() => {}} />
       <SettingBtn title='개인정보 처리방침' onPress={() => {}} />
-      <SettingBtn title='탈퇴하기' onPress={() => {}} />
+      <SettingBtn
+        title='탈퇴하기'
+        onPress={() => {
+          router.push('/delete_account');
+        }}
+      />
       <SettingBtn title='로그아웃' onPress={() => {}} />
       <View style={styles.view}>
         <Text style={styles.text}>앱 버전</Text>
