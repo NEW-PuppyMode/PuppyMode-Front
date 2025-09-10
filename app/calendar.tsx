@@ -128,6 +128,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 15,
     marginBottom: 23,
+    padding: 1,
   },
   modalMonthText: {
     display: 'flex',
@@ -136,7 +137,6 @@ const styles = StyleSheet.create({
     fontStyle: 'normal',
     fontWeight: '600',
     lineHeight: 24,
-
     alignItems: 'center',
   },
   modalActiveMonth: {
