@@ -71,7 +71,7 @@ export const usePuppyData = () => {
     try {
       const data = await PuppyDataAPI.fetchPuppyInfo();
       setPuppyInfo(data.result);
-      console.log('강아지 정보', data);
+
       return true;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
