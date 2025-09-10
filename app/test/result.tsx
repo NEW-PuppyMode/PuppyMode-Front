@@ -65,9 +65,6 @@ const styles = StyleSheet.create({
   },
   background: {
     position: 'absolute',
-    top: '-42.25%',
-    width: '100%',
-    height: '100%',
   },
   title: {
     fontSize: 30,
