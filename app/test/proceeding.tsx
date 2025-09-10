@@ -234,6 +234,7 @@ export default function TestProceeding() {
           styles.bottomBtn,
           selected[step] !== 0 && styles.bottomBtnActive,
         ]}
+        disabled={selected[step] === 0}
       >
         <Text className='font-medium text-white'>다음</Text>
       </TouchableOpacity>

@@ -2,12 +2,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
 import {
   Dimensions,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import Kakao from '../assets/icons/signin/ic_kakao.svg';
+import Apple from '../assets/icons/signin/ic_apple.svg';
+import Background from '../assets/images/signin/background.svg';
+import Footprint1 from '../assets/images/signin/footprint1.svg';
+import Footprint2 from '../assets/images/signin/footprint2.svg';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -45,10 +49,7 @@ const SignIn = () => {
               router.replace('/test/start');
             }}
           >
-            <Image
-              source={require('@/assets/icons/signin/ic_kakao.svg')}
-              style={{ width: 17, height: 16 }}
-            />
+            <Kakao width={17} height={16} />
             <Text>카카오로 로그인</Text>
             <View></View>
           </TouchableOpacity>
@@ -64,10 +65,7 @@ const SignIn = () => {
             activeOpacity={0.8}
             onPress={() => {}}
           >
-            <Image
-              source={require('@/assets/icons/signin/ic_apple.svg')}
-              style={{ width: 18, height: 18 }}
-            />
+            <Apple width={18} height={18} />
             <Text>Apple로 로그인</Text>
             <View></View>
           </TouchableOpacity>
@@ -77,23 +75,21 @@ const SignIn = () => {
       {/* 배경 */}
       <View style={{ position: 'absolute', bottom: 0, zIndex: -1 }}>
         <View style={{ flex: 1, position: 'relative' }}>
-          <Image
-            source={require('@/assets/images/signin/footprint2.svg')}
+          <Footprint2
             style={{
               position: 'absolute',
               left: SCREEN_WIDTH * 0.23949109414758269720101781170483,
               bottom: SCREEN_HEIGHT * 0.58091549295774647887323943661972,
             }}
           />
-          <Image
-            source={require('@/assets/images/signin/footprint1.svg')}
+          <Footprint1
             style={{
               position: 'absolute',
               left: SCREEN_WIDTH * 0.10178117048346055979643765903308,
               bottom: SCREEN_HEIGHT * 0.53210093896713615023474178403756,
             }}
           />
-          <Image source={require('@/assets/images/signin/background.svg')} />
+          <Background />
         </View>
       </View>
     </View>
