@@ -1,14 +1,17 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { useLogin } from '@/hooks/auth/useLogin';
 import { router } from 'expo-router';
+import { useEffect } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   Dimensions,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import Kakao from '../assets/icons/signin/ic_kakao.svg';
 import Apple from '../assets/icons/signin/ic_apple.svg';
+import Kakao from '../assets/icons/signin/ic_kakao.svg';
 import Background from '../assets/images/signin/background.svg';
 import Footprint1 from '../assets/images/signin/footprint1.svg';
 import Footprint2 from '../assets/images/signin/footprint2.svg';
@@ -16,7 +19,19 @@ import Footprint2 from '../assets/images/signin/footprint2.svg';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const SignIn = () => {
-  const { login } = useAuth();
+  const { isLoading, error, userInfo, loginWithKakao } = useLogin();
+
+  useEffect(() => {
+    if (userInfo) {
+      router.replace('/test/start');
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+    if (error) {
+      Alert.alert('로그인 오류', error);
+    }
+  }, [error]);
 
   return (
     <View style={styles.container}>
@@ -29,29 +44,28 @@ const SignIn = () => {
           </Text>
           가 도와드립니다.
         </Text>
-
         <Text style={styles.description}>
           올바른 음주 습관을 가질 수 있도록 도와드릴게요.
         </Text>
-
         <View style={{ alignItems: 'center', width: '100%' }}>
-          <View style={styles.centerCircle}></View>
+          <View style={styles.centerCircle} />
         </View>
-
         <View
           style={{ gap: 13, marginTop: 64, paddingRight: SCREEN_WIDTH * 0.05 }}
         >
           <TouchableOpacity
             style={[btnStyles.btn, { backgroundColor: '#FEE500' }]}
             activeOpacity={0.8}
-            onPress={() => {
-              login();
-              router.replace('/test/start');
-            }}
+            onPress={loginWithKakao}
+            disabled={isLoading}
           >
             <Kakao width={17} height={16} />
-            <Text>카카오로 로그인</Text>
-            <View></View>
+            {isLoading ? (
+              <ActivityIndicator color='#3C1E1E' />
+            ) : (
+              <Text>카카오로 로그인</Text>
+            )}
+            <View />
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -63,11 +77,13 @@ const SignIn = () => {
               },
             ]}
             activeOpacity={0.8}
-            onPress={() => {}}
+            onPress={() =>
+              Alert.alert('준비중', 'Apple 로그인 기능은 준비중입니다.')
+            }
           >
             <Apple width={18} height={18} />
             <Text>Apple로 로그인</Text>
-            <View></View>
+            <View />
           </TouchableOpacity>
         </View>
       </View>
@@ -78,15 +94,15 @@ const SignIn = () => {
           <Footprint2
             style={{
               position: 'absolute',
-              left: SCREEN_WIDTH * 0.23949109414758269720101781170483,
-              bottom: SCREEN_HEIGHT * 0.58091549295774647887323943661972,
+              left: SCREEN_WIDTH * 0.2395,
+              bottom: SCREEN_HEIGHT * 0.5809,
             }}
           />
           <Footprint1
             style={{
               position: 'absolute',
-              left: SCREEN_WIDTH * 0.10178117048346055979643765903308,
-              bottom: SCREEN_HEIGHT * 0.53210093896713615023474178403756,
+              left: SCREEN_WIDTH * 0.1018,
+              bottom: SCREEN_HEIGHT * 0.5321,
             }}
           />
           <Background />
@@ -97,12 +113,9 @@ const SignIn = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
+  container: { flex: 1, backgroundColor: 'white' },
   titleContainer: {
-    marginTop: SCREEN_HEIGHT * 0.16549295774647887323943661971831,
+    marginTop: SCREEN_HEIGHT * 0.1655,
     paddingLeft: SCREEN_WIDTH * 0.05,
     width: '100%',
   },
@@ -119,7 +132,6 @@ const styles = StyleSheet.create({
     right: 0,
     width: '100%',
     height: 17,
-    flexShrink: 0,
     backgroundColor: '#E4FAE8',
     zIndex: -1,
   },
@@ -131,10 +143,10 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   centerCircle: {
-    marginTop: SCREEN_HEIGHT * 0.11267605633802816901408450704225,
-    width: SCREEN_WIDTH * 0.5190839694656488549618320610687,
+    marginTop: SCREEN_HEIGHT * 0.1127,
+    width: SCREEN_WIDTH * 0.5191,
     aspectRatio: 1,
-    borderRadius: '100%',
+    borderRadius: (SCREEN_WIDTH * 0.5191) / 2,
     backgroundColor: '#0FD380',
   },
 });
