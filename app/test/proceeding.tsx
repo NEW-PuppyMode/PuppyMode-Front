@@ -108,7 +108,6 @@ const questions: Question[] = [
 
 export default function TestProceeding() {
   const [step, setStep] = useState(1);
-
   const [selected, setSelected] = useState<number[]>([0, 0, 0, 0, 0, 0, 0]); // 0: default, 1: 첫번째, 2: 두번째. 0번째 index dummy
 
   const onPressSelectBtn = (currentStep: number, answer: number) => {
@@ -165,9 +164,8 @@ export default function TestProceeding() {
             onPress={() => setStep((s) => Math.max(1, s - 1))}
           >
             <Image
-              className='w-[8px] h-[16px]'
               source={require('@/assets/images/chevron_left.png')}
-              style={{ margin: 10 }}
+              style={{ width: 8, height: 16 }}
             />
           </TouchableOpacity>
         </View>
@@ -183,7 +181,7 @@ export default function TestProceeding() {
 
         <View style={styles.pill}>
           <Text style={styles.pillText}>
-            <Text style={{ color: ACTIVE_COLOR }}>{step}</Text> / {TOTAL_STEPS}
+            <Text style={{ color: '#00A775' }}>{step}</Text> / {TOTAL_STEPS}
           </Text>
         </View>
 
@@ -250,7 +248,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   pill: {
-    marginTop: 8,
+    marginTop: 27,
     alignSelf: 'flex-start',
     paddingVertical: 4,
     paddingHorizontal: 8,
@@ -260,7 +258,7 @@ const styles = StyleSheet.create({
   pillText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#166534',
+    color: '#A6DCCC',
     lineHeight: 16,
   },
   title: {

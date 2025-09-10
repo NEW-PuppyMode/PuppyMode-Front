@@ -35,8 +35,8 @@ const TestResult = () => {
       <View style={styles.outerBox}>
         <View style={styles.innerBox}>
           <Image
-            // source={{ uri: imageUrl }}
-            style={{ width: 160, height: 160 }}
+            source={require('@/assets/images/bichon.png')}
+            className=' w-[148px] h-[160px]'
           />
         </View>
       </View>
