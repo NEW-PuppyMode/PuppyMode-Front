@@ -23,7 +23,7 @@ const TestResult = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('@/assets/images/test/result-bg.svg')}
+        source={require('@/assets/images/test/result_bg.png')}
         style={styles.background}
       />
 
@@ -37,8 +37,8 @@ const TestResult = () => {
       <View style={styles.outerBox}>
         <View style={styles.innerBox}>
           <Image
-            // source={{ uri: imageUrl }}
-            style={{ width: 160, height: 160 }}
+            source={require('@/assets/images/bichon.png')}
+            className=' w-[148px] h-[160px]'
           />
         </View>
       </View>
@@ -67,6 +67,9 @@ const styles = StyleSheet.create({
   },
   background: {
     position: 'absolute',
+    top: '-42.25%',
+    width: '100%',
+    height: '100%',
   },
   title: {
     fontSize: 30,
