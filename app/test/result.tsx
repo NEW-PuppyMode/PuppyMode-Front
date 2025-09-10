@@ -1,3 +1,4 @@
+import ResultBG from '@/assets/images/test/result-bg.svg';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   Dimensions,
@@ -22,10 +23,7 @@ const TestResult = () => {
     }>();
   return (
     <View style={styles.container}>
-      <Image
-        source={require('@/assets/images/test/result_bg.png')}
-        style={styles.background}
-      />
+      <ResultBG style={styles.background} />
 
       <View style={{ marginTop: (SCREEN_HEIGHT * 112) / 852 }}>
         <Text style={styles.title}>
