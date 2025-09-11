@@ -1,3 +1,4 @@
+import { AuthProvider } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import theme from '@/styles/theme';
 import { ThemeProvider as EmotionThemeProvider } from '@emotion/react';
@@ -42,30 +43,32 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <EmotionThemeProvider theme={theme}>
-        <Stack>
-          <Stack.Screen name='signin' options={{ headerShown: false }} />
-          <Stack.Screen
-            name='home'
-            options={{ title: '홈', headerShown: false }}
-          />
-          <Stack.Screen name='test/start' options={{ headerShown: false }} />
-          <Stack.Screen
-            name='test/proceeding'
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen name='test/result' options={{ headerShown: false }} />
-          <Stack.Screen name='report' options={{ headerShown: false }} />
-          <Stack.Screen name='setting' options={{ headerShown: false }} />
-          <Stack.Screen
-            name='delete_account'
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen name='+not-found' />
-        </Stack>
-        <StatusBar style='auto' />
-      </EmotionThemeProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <EmotionThemeProvider theme={theme}>
+          <Stack>
+            <Stack.Screen name='signin' options={{ headerShown: false }} />
+            <Stack.Screen
+              name='home'
+              options={{ title: '홈', headerShown: false }}
+            />
+            <Stack.Screen name='test/start' options={{ headerShown: false }} />
+            <Stack.Screen
+              name='test/proceeding'
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name='test/result' options={{ headerShown: false }} />
+            <Stack.Screen name='report' options={{ headerShown: false }} />
+            <Stack.Screen name='setting' options={{ headerShown: false }} />
+            <Stack.Screen
+              name='delete_account'
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name='+not-found' />
+          </Stack>
+          <StatusBar style='auto' />
+        </EmotionThemeProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
