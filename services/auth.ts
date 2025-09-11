@@ -49,4 +49,12 @@ export const loginAPI = {
     }
     return response.data.result.userInfo;
   },
+  // ✅ 카카오 소셜 회원 탈퇴
+  withdraw: async (): Promise<void> => {
+    const response = await axiosInstance.post('/users/withdraw', {});
+    if (!response.data.isSuccess) {
+      throw new Error(response.data.message);
+    }
+    console.log('탈퇴 성공:', response.data.message);
+  },
 };

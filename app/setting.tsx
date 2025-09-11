@@ -16,6 +16,7 @@ const Setting = () => {
   const [signOutModalVisible, setSignOutModalVisible] = useState(false);
 
   const { logout } = useAuth();
+
   return (
     <View style={styles.container}>
       <View
@@ -65,7 +66,7 @@ const Setting = () => {
       <SettingBtn
         title='탈퇴하기'
         onPress={() => {
-          router.push('/delete_account');
+          router.replace('/delete_account');
         }}
       />
       <SettingBtn
