@@ -40,13 +40,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setIsLoggedIn(true);
   }, []);
 
-  const logout = useCallback(() => {
-    // 서버 로그아웃 요청(Optional)
-    loginAPI.logout().catch(console.error);
-
-    // 로컬 상태 초기화
-    setUserInfo(null);
-    setIsLoggedIn(false);
+  const logout = useCallback(async () => {
+    try {
+      await loginAPI.logout();
+    } catch (e: any) {
+      if (e?.response?.status !== 401) {
+        console.error('서버 로그아웃 실패:', e);
+      }
+    } finally {
+      setUserInfo(null);
+      setIsLoggedIn(false);
+    }
   }, []);
 
   const value = useMemo(

@@ -1,6 +1,8 @@
 import NavHeader from '@/components/common/NavHeader';
 import { useAuth } from '@/contexts/AuthContext';
+import { loginAPI } from '@/services/auth';
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,6 +10,22 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const DeleteAccount = () => {
   const { logout } = useAuth();
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (isWithdrawing) return;
+    setIsWithdrawing(true);
+    try {
+      await loginAPI.withdraw();
+      await logout();
+      router.replace('/signin');
+    } catch (err: any) {
+      await logout();
+    } finally {
+      setIsWithdrawing(false);
+    }
+  };
+
   return (
     <SafeAreaView className='flex-1 bg-white'>
       <NavHeader title='탈퇴하기' />
@@ -28,10 +46,7 @@ const DeleteAccount = () => {
         </View>
         <TouchableOpacity
           className='justify-center items-center w-full h-[60px] rounded-[10px] bg-[#0FD380]'
-          onPress={() => {
-            logout();
-            router.replace('/signin');
-          }}
+          onPress={handleDeleteAccount}
         >
           <Text className='text-center text-[16px] font-medium leading-[24px] text-[#F2FFF4]'>
             계정 삭제

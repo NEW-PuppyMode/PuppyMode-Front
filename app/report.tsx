@@ -1,8 +1,67 @@
+import { ReportApi } from '@/services/reportData';
 import { useRouter } from 'expo-router';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+type ReportResultDTO = {
+  goal: number;
+  drinkRecordCount: number;
+  drinkDays: number;
+  achievementRate: number;
+  scoldedCount: number;
+};
 
 const Report = () => {
   const router = useRouter();
+
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<ReportResultDTO | null>(null);
+
+  const now = useMemo(() => new Date(), []);
+  const month = now.getMonth() + 1; // 1~12
+  const year = now.getFullYear();
+  const daysInMonth = useMemo(
+    () => new Date(year, month, 0).getDate(),
+    [year, month],
+  );
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const result = await ReportApi.lookupReport(); // Authorization 헤더는 axiosInstance 인터셉터로 주입되어야 함
+        setData(result);
+      } catch (e: any) {
+        Alert.alert('알림', e?.message || '리포트 조회에 실패했어요.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center' }]}>
+        <ActivityIndicator size='large' />
+      </View>
+    );
+  }
+
+  if (!data) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center' }]}>
+        <Text>데이터가 없어요.</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View className='relative flex-row justify-center w-full py-4 mt-12 '>
@@ -31,7 +90,7 @@ const Report = () => {
       >
         <View style={{ alignItems: 'center' }}>
           <Text style={styles.summaryTitle}>
-            <Text style={{ color: '#0FD380' }}>1월의 나</Text>는
+            <Text style={{ color: '#0FD380' }}>{month}월의 나</Text>는
           </Text>
           <Text style={styles.summaryTitle}>이렇게 살았다</Text>
         </View>
@@ -54,16 +113,22 @@ const Report = () => {
           <Text style={styles.contentText}>음주 기록 횟수</Text>
           <View style={{ alignItems: 'flex-end', width: '100%' }}>
             <View style={[styles.contentGreenBlock, { flexDirection: 'row' }]}>
-              <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                <Text style={styles.contentBlockCommonText}>15</Text>
+              <View
+                className='flex-row items-end'
+                style={{ flexDirection: 'row', alignItems: 'flex-end' }}
+              >
+                <Text style={styles.contentBlockCommonText}>
+                  {data.drinkRecordCount}
+                </Text>
                 <Text
+                  className='text-base'
                   style={{
                     color: '#A6DCCC',
                     fontSize: 16,
                     fontWeight: '700',
                   }}
                 >
-                  /31
+                  /{daysInMonth}
                 </Text>
               </View>
             </View>
@@ -87,7 +152,9 @@ const Report = () => {
               <View
                 style={[styles.contentGreenBlock, { flexDirection: 'row' }]}
               >
-                <Text style={styles.contentBlockCommonText}>10일</Text>
+                <Text style={styles.contentBlockCommonText}>
+                  {data.drinkDays}일
+                </Text>
               </View>
             </View>
           </View>
@@ -108,7 +175,7 @@ const Report = () => {
               <View
                 style={[styles.contentGreenBlock, { flexDirection: 'row' }]}
               >
-                <Text style={styles.contentBlockCommonText}>15번</Text>
+                <Text style={styles.contentBlockCommonText}>{data.goal}번</Text>
               </View>
             </View>
           </View>
@@ -153,7 +220,7 @@ const Report = () => {
                 lineHeight: 40,
               }}
             >
-              28%
+              {data.achievementRate}%
             </Text>
           </View>
         </View>
@@ -178,7 +245,9 @@ const Report = () => {
         </Text>
         <View style={{ justifyContent: 'flex-end' }}>
           <View style={styles.contentGreenBlock}>
-            <Text style={styles.contentBlockCommonText}>3번</Text>
+            <Text style={styles.contentBlockCommonText}>
+              {data.scoldedCount}번
+            </Text>
           </View>
         </View>
       </View>

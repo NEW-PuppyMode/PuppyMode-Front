@@ -24,12 +24,12 @@ export const useLogin = (): UseLoginReturn => {
     try {
       const { accessToken, refreshToken } = await kakaoLoginSDK();
 
-      await AsyncStorage.setItem(KEYS.ACCESS_TOKEN, accessToken);
-
       const result: KakaoLoginResult = await loginAPI.kakaoLogin(
         accessToken,
         refreshToken,
       );
+
+      await AsyncStorage.setItem(KEYS.ACCESS_TOKEN, result.accessToken);
 
       setUserInfo(result.userInfo);
     } catch (err: any) {
