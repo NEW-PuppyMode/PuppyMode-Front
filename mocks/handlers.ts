@@ -1,5 +1,5 @@
 // import { calendarHandlers } from './api/calendar';
-import { onboardHandlers } from './api/onboard';
+// import { onboardHandlers } from './api/onboard';
 import { puppyHandlers } from './api/puppy';
 
-export const handlers = [...puppyHandlers, ...onboardHandlers];
+export const handlers = [...puppyHandlers];

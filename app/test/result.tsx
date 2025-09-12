@@ -1,8 +1,8 @@
 import ResultBG from '@/assets/images/test/result-bg.svg';
+import { Image as ExpoImage } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   Dimensions,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -13,14 +13,12 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const TestResult = () => {
   const router = useRouter();
-  const { type, puppyBreed, puppyBreedEng, description, imageUrl } =
-    useLocalSearchParams<{
-      type: string;
-      puppyBreed: string;
-      puppyBreedEng: string;
-      description: string;
-      imageUrl: string;
-    }>();
+
+  const { result } = useLocalSearchParams<{
+    result: string;
+  }>();
+
+  const { type, puppyBreed, description, imageUrl } = JSON.parse(result);
   return (
     <View style={styles.container}>
       <ResultBG style={styles.background} />
@@ -34,15 +32,21 @@ const TestResult = () => {
 
       <View style={styles.outerBox}>
         <View style={styles.innerBox}>
-          <Image
-            source={require('@/assets/images/bichon.png')}
-            className=' w-[148px] h-[160px]'
+          <ExpoImage
+            source={{ uri: imageUrl }} 
+            style={{ width: 148, height: 160 }} 
+            contentFit='cover'
+            cachePolicy='disk'
+            onError={(e) => {
+              console.log('Image load error:', e);
+              console.log('imageUrl:', imageUrl);
+            }}
           />
         </View>
       </View>
 
       <Text style={styles.korText}>{puppyBreed}</Text>
-      <Text style={styles.engText}>{puppyBreedEng}</Text>
+      <Text style={styles.engText}>{description}</Text>
 
       <View style={{ paddingHorizontal: 16, width: '100%' }}>
         <TouchableOpacity

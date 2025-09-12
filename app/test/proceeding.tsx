@@ -1,4 +1,4 @@
-import { axiosInstance } from '@/services';
+import { TestApi } from '@/services/testData';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -121,29 +121,23 @@ export default function TestProceeding() {
       setStep(step + 1);
     } else {
       const answers = questions
-        .slice(1) // 0번 index dummy 제외
+        .slice(1) // 0번 dummy 제외
         .map((_, index) => ({
-          questionId: index + 1, // 1-based index
+          questionId: index + 1,
           answer: selected[index + 1],
         }));
 
       try {
-        const { data } = await axiosInstance.post('/api/onboarding/test', {
-          answers,
-        });
-        console.log('Test submitted successfully', data);
+        const res = await TestApi.submitTest(answers);
+
+        console.log('제출 성공:', res.message);
+        console.log('제출 성공:', res.result);
         router.push({
           pathname: '/test/result',
-          params: {
-            type: data.result.type,
-            puppyBreed: data.result.puppyBreed,
-            puppyBreedEng: data.result.puppyBreedEng,
-            description: data.result.description,
-            imageUrl: data.result.imageUrl,
-          },
+          params: { result: JSON.stringify(res.result) },
         });
-      } catch (error) {
-        console.error('Error submitting test:', error);
+      } catch (e) {
+        console.error('제출 실패 :', e);
       }
     }
   };
