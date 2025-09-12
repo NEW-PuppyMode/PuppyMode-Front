@@ -1,6 +1,6 @@
 import { handelError } from '@/services/handelErrors';
 import { PuppyDataAPI } from '@/services/puppyData';
-import { IPuppyInfo } from '@/types/models/puppy';
+import { DrinkHistoryDTO, GoalDTO, IPuppyInfo } from '@/types/models/puppy';
 import axios from 'axios';
 import { useState } from 'react';
 
@@ -71,7 +71,7 @@ export const usePuppyData = () => {
     try {
       const data = await PuppyDataAPI.fetchPuppyInfo();
       setPuppyInfo(data.result);
-
+      console.log('fetchPuppyInfo', data);
       return true;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -85,11 +85,109 @@ export const usePuppyData = () => {
     }
   };
 
+  const fetchIsRecorded = async () => {
+    setIsLoading(true);
+
+    try {
+      const data = await PuppyDataAPI.fetchIsRecorded();
+      console.log('fetchIsRecorded', data.result);
+      return data.result;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.log('401 error');
+      } else {
+        handelError(error);
+      }
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchRecentGoal = async () => {
+    setIsLoading(true);
+
+    try {
+      const data = await PuppyDataAPI.fetchRecentGoal();
+      console.log('fetchRecentGoal', data.result);
+      return data.result;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.log('401 error');
+      } else {
+        handelError(error);
+      }
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchGoal30daysPassed = async () => {
+    setIsLoading(true);
+
+    try {
+      const data = await PuppyDataAPI.fetchGoal30daysPassed();
+      console.log('fetchGoal30daysPassed', data.result);
+      return data.result;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.log('401 error');
+      } else {
+        handelError(error);
+      }
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createDrinkHistory = async (drinkHistory: DrinkHistoryDTO) => {
+    setIsLoading(true);
+
+    try {
+      const data = await PuppyDataAPI.createDrinkHistory(drinkHistory);
+      return data.result;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.log('401 error');
+      } else {
+        handelError(error);
+      }
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createGoal = async (goal: GoalDTO) => {
+    setIsLoading(true);
+
+    try {
+      const data = await PuppyDataAPI.createGoal(goal);
+      return data.result;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.log('401 error');
+      } else {
+        handelError(error);
+      }
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
+    fetchIsRecorded,
+    fetchRecentGoal,
+    fetchGoal30daysPassed,
+    fetchPuppyInfo,
+    advicePuppy,
+    createDrinkHistory,
+    createGoal,
     renamePuppy,
     renameUser,
-    advicePuppy,
-    fetchPuppyInfo,
     puppyInfo,
     isLoading,
     setIsLoading,

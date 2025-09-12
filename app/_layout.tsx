@@ -28,6 +28,11 @@ export default function RootLayout() {
         return;
       }
 
+      if (process.env.NEXT_PUBLIC_MOCK_ACTIVATE !== 'enable') {
+        setMockReady(true);
+        return;
+      }
+
       await import('../msw.polyfills');
       const { server } = await import('../mocks/server');
       server.listen({ onUnhandledRequest: 'bypass' });
