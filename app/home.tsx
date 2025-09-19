@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { TextInput } from '@/components/common/Inputs/TextInput';
 import { ChoiceButton } from '@/components/page/home/ChoiceButton';
 import { ControlButton } from '@/components/page/home/ControlButton';
@@ -7,6 +8,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { PUPPY_MESSAGES } from '@/constants/messages';
 import { usePuppyData } from '@/hooks/usePuppyData';
+import { IsRecorded, RecentGoal } from '@/types/models/puppy';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -21,12 +23,39 @@ import {
 export default function HomeScreen() {
   const router = useRouter();
 
-  const { renamePuppy, renameUser, fetchPuppyInfo, puppyInfo, advicePuppy } =
-    usePuppyData();
+  const {
+    renamePuppy,
+    renameUser,
+    fetchPuppyInfo,
+    puppyInfo,
+    advicePuppy,
+    fetchIsRecorded,
+    fetchRecentGoal,
+    fetchGoal30daysPassed,
+    createDrinkHistory,
+    createGoal,
+  } = usePuppyData();
 
   useEffect(() => {
-    fetchPuppyInfo();
+    const fetchData = async () => {
+      fetchPuppyInfo();
+      const recentGoal = await fetchRecentGoal();
+      const goal30daysPassed = await fetchGoal30daysPassed();
+      const isRecorded = await fetchIsRecorded();
+
+      setRecentGoal(recentGoal);
+      setGoal30daysPassed(goal30daysPassed);
+      setIsRecorded(isRecorded);
+    };
+
+    fetchData();
   }, []);
+
+  const [isRecorded, setIsRecorded] = useState<IsRecorded | false>(false);
+  const [recentGoal, setRecentGoal] = useState<RecentGoal | false>(false);
+  const [goal30daysPassed, setGoal30daysPassed] = useState<boolean | false>(
+    false,
+  );
 
   const [messageKey, setMessageKey] = useState<
     | 'default'
@@ -104,8 +133,8 @@ export default function HomeScreen() {
   const handleRenameComplete = async () => {
     try {
       if (inputType === 'dog' && dogName.trim()) {
-        // const success = await renamePuppy(dogName);
-        const success = true;
+        const success = await renamePuppy(dogName);
+
         if (success) {
           setDogName('');
           setShowNameInput(false);
@@ -123,8 +152,7 @@ export default function HomeScreen() {
           setRenameMessage(coloredMessage);
         }
       } else if (inputType === 'user' && userName.trim()) {
-        // const success = await renameUser(userName);
-        const success = true;
+        const success = await renameUser(userName);
         if (success) {
           setUserName('');
           setShowNameInput(false);
@@ -142,13 +170,15 @@ export default function HomeScreen() {
         }
       }
     } catch (error) {
-      console.log('log');
+      console.log('error');
+    } finally {
+      fetchPuppyInfo();
     }
   };
 
   const handleAdviceClick = async () => {
     const result = await advicePuppy();
-    setAdviceMessage(result);
+    setAdviceMessage(result || '');
     setRenameMessage('');
     setShowGoalOptions(false);
     setMessageKey('default');
@@ -229,6 +259,7 @@ export default function HomeScreen() {
         </ThemedView>
 
         <ThemedView className='rounded-2xl bg-transparent shadow-lg'>
+          {/* 이름 설정 */}
           {showNameInput && (
             <ThemedView
               className='mb-6 bg-transparent rounded-xl p-4'
@@ -258,6 +289,7 @@ export default function HomeScreen() {
             </ThemedView>
           )}
 
+          {/* 음주 기록 */}
           {recordMode && recordType && (
             <ThemedView
               className='bg-transparent rounded-xl p-4'
@@ -282,6 +314,20 @@ export default function HomeScreen() {
                     setMessageKey('archiveSuccess');
                     setRecordMode(false);
                     setRecordType(null);
+
+                    const drinkDate = new Date();
+                    if (recordType === 'yesterday') {
+                      drinkDate.setDate(drinkDate.getDate() - 1);
+                    } else if (recordType === 'today') {
+                      drinkDate.setDate(drinkDate.getDate());
+                    }
+                    const formattedDate = drinkDate.toISOString().slice(0, 10);
+                    createDrinkHistory({
+                      drinkDate: formattedDate,
+                      isDrink: true,
+                    });
+
+                    fetchPuppyInfo();
                   }}
                 >
                   술 마셨어!
@@ -293,6 +339,20 @@ export default function HomeScreen() {
                     setMessageKey('archiveSuccess');
                     setRecordMode(false);
                     setRecordType(null);
+
+                    const drinkDate = new Date();
+                    if (recordType === 'yesterday') {
+                      drinkDate.setDate(drinkDate.getDate() - 1);
+                    } else if (recordType === 'today') {
+                      drinkDate.setDate(drinkDate.getDate());
+                    }
+                    const formattedDate = drinkDate.toISOString().slice(0, 10);
+                    createDrinkHistory({
+                      drinkDate: formattedDate,
+                      isDrink: false,
+                    });
+
+                    fetchPuppyInfo();
                   }}
                 >
                   술 안 마셨어!
@@ -301,6 +361,7 @@ export default function HomeScreen() {
             </ThemedView>
           )}
 
+          {/* 목표 설정 */}
           {showGoalOptions && showGoalInput && (
             <ThemedView
               className='mb-6 bg-transparent rounded-xl p-4'
@@ -350,9 +411,15 @@ export default function HomeScreen() {
                   label='작성 완료'
                   variant='primary'
                   onPress={() => {
+                    createGoal({
+                      goal: goalCount,
+                      isNew: true,
+                    });
                     setShowGoalInput(false);
                     setShowGoalOptions(false);
                     setGoalCount(0);
+
+                    fetchPuppyInfo();
                   }}
                 />
               </ThemedView>
@@ -371,6 +438,12 @@ export default function HomeScreen() {
                       setGoalType('same');
                       setShowGoalInput(false);
                       setShowGoalOptions(false);
+                      createGoal({
+                        goal: 0,
+                        isNew: false,
+                      });
+
+                      fetchPuppyInfo();
                     }}
                   />
                   <IconButton
