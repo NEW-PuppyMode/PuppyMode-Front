@@ -57,13 +57,17 @@ const TestStart = () => {
           backgroundStyles.box,
           { left: -69, transform: [{ rotate: '-15deg' }] },
         ]}
-      />
+      >
+        <View style={backgroundStyles.innerBox} />
+      </View>
       <View
         style={[
           backgroundStyles.box,
           { right: -69, transform: [{ rotate: '15deg' }] },
         ]}
-      />
+      >
+        <View style={backgroundStyles.innerBox} />
+      </View>
     </View>
   );
 };
@@ -100,6 +104,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    zIndex: 20,
   },
   innerBox: {
     flex: 1,
@@ -113,6 +118,8 @@ const styles = StyleSheet.create({
 
 const backgroundStyles = StyleSheet.create({
   box: {
+    justifyContent: 'center',
+    alignItems: 'center',
     position: 'absolute',
     // sin 15 = 0.2588 = h / 191. h = 49.4
     bottom: (SCREEN_HEIGHT * 211.8) / 852 + 49.4 / 4,
@@ -122,6 +129,13 @@ const backgroundStyles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.40)',
     boxShadow: '0px 0px 20px 0px rgba(83, 157, 95, 0.20)',
-    zIndex: -1,
+  },
+  innerBox: {
+    width: 176.879,
+    height: 263.09,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#EBEBEB',
+    zIndex: 10,
   },
 });
