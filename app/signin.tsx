@@ -15,6 +15,7 @@ import Kakao from '../assets/icons/signin/ic_kakao.svg';
 import Background from '../assets/images/signin/background.svg';
 import Footprint1 from '../assets/images/signin/footprint1.svg';
 import Footprint2 from '../assets/images/signin/footprint2.svg';
+import CircleExpoVideo from '../components/page/signin/CircleExpoVideo';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -37,21 +38,41 @@ const SignIn = () => {
     <View style={styles.container}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>어차피 못지킬 약속,</Text>
-        <Text style={styles.title}>
-          <Text style={{ position: 'relative', color: '#00A775' }}>
-            강아지 모드
-            <Text style={styles.titleBox} />
+        <View style={{ position: 'relative', alignSelf: 'flex-start' }}>
+          <Text style={[styles.title, { color: '#3C3C3C', zIndex: 10 }]}>
+            <Text style={{ color: '#00A775' }}>강아지 모드</Text>가
+            도와드립니다.
           </Text>
-          가 도와드립니다.
-        </Text>
+
+          <View style={styles.titleBox} />
+        </View>
+
         <Text style={styles.description}>
           올바른 음주 습관을 가질 수 있도록 도와드릴게요.
         </Text>
-        <View style={{ alignItems: 'center', width: '100%' }}>
-          <View style={styles.centerCircle} />
+        <View
+          style={{
+            alignItems: 'center',
+            width: '100%',
+            zIndex: 20,
+          }}
+        >
+          <CircleExpoVideo
+            source={require('../assets/videos/signin.mp4')}
+            size={SCREEN_WIDTH * 0.5191}
+            translateX={0}
+            translateY={20}
+            scale={1.2}
+            style={{ marginTop: SCREEN_HEIGHT * 0.1127 + 20 }}
+          />
         </View>
         <View
-          style={{ gap: 13, marginTop: 64, paddingRight: SCREEN_WIDTH * 0.05 }}
+          style={{
+            gap: 13,
+            marginTop: 64,
+            paddingRight: SCREEN_WIDTH * 0.05,
+            zIndex: 10,
+          }}
         >
           <TouchableOpacity
             style={[btnStyles.btn, { backgroundColor: '#FEE500' }]}
@@ -89,7 +110,7 @@ const SignIn = () => {
       </View>
 
       {/* 배경 */}
-      <View style={{ position: 'absolute', bottom: 0, zIndex: -1 }}>
+      <View style={{ position: 'absolute', bottom: 0 }}>
         <View style={{ flex: 1, position: 'relative' }}>
           <Footprint2
             style={{
@@ -105,7 +126,7 @@ const SignIn = () => {
               bottom: SCREEN_HEIGHT * 0.5321,
             }}
           />
-          <Background />
+          <Background width={SCREEN_WIDTH} />
         </View>
       </View>
     </View>
@@ -128,12 +149,12 @@ const styles = StyleSheet.create({
   },
   titleBox: {
     position: 'absolute',
-    bottom: 0,
+    left: 0,
     right: 0,
-    width: '100%',
+    bottom: 0,
+    width: 137,
     height: 17,
     backgroundColor: '#E4FAE8',
-    zIndex: -1,
   },
   description: {
     marginTop: 7,

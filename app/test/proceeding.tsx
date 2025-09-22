@@ -155,7 +155,13 @@ export default function TestProceeding() {
         >
           <TouchableOpacity
             style={{ width: '100%' }}
-            onPress={() => setStep((s) => Math.max(1, s - 1))}
+            onPress={() => {
+              if (step === 1) {
+                router.back();
+              } else {
+                setStep((s) => Math.max(1, s - 1));
+              }
+            }}
           >
             <Image
               source={require('@/assets/images/chevron_left.png')}

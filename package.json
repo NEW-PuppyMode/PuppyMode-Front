@@ -35,6 +35,7 @@
     "expo-status-bar": "~2.2.3",
     "expo-symbols": "~0.4.4",
     "expo-system-ui": "~5.0.7",
+    "expo-video": "~2.2.2",
     "expo-web-browser": "~14.1.6",
     "fast-text-encoding": "^1.0.6",
     "msw": "^2.10.5",
