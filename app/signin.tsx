@@ -15,6 +15,7 @@ import Kakao from '../assets/icons/signin/ic_kakao.svg';
 import Background from '../assets/images/signin/background.svg';
 import Footprint1 from '../assets/images/signin/footprint1.svg';
 import Footprint2 from '../assets/images/signin/footprint2.svg';
+import CircleExpoVideo from '../components/page/signin/CircleExpoVideo';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -49,8 +50,21 @@ const SignIn = () => {
         <Text style={styles.description}>
           올바른 음주 습관을 가질 수 있도록 도와드릴게요.
         </Text>
-        <View style={{ alignItems: 'center', width: '100%', zIndex: 10 }}>
-          <View style={styles.centerCircle} />
+        <View
+          style={{
+            alignItems: 'center',
+            width: '100%',
+            zIndex: 20,
+          }}
+        >
+          <CircleExpoVideo
+            source={require('../assets/videos/signin.mp4')}
+            size={SCREEN_WIDTH * 0.5191}
+            translateX={0}
+            translateY={20}
+            scale={1.2}
+            style={{ marginTop: SCREEN_HEIGHT * 0.1127 + 20 }}
+          />
         </View>
         <View
           style={{
