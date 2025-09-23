@@ -422,7 +422,7 @@ export default function CalendarPage() {
             onPress={() => router.push('/report')}
           >
             <Text className='text-white text-[18px] font-bold'>
-              음주 주간 리포트 보기
+              음주 리포트 보기
             </Text>
           </TouchableOpacity>
         </View>
