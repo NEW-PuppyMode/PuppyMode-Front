@@ -1,4 +1,14 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
+import CalendarIcon from '@/assets/icons/home/ic_calendar.svg';
+import CalendarTodayIcon from '@/assets/icons/home/ic_calendar_t.svg';
+import CalendarVIcon from '@/assets/icons/home/ic_calendar_v.svg';
+import CalendarYesterdayIcon from '@/assets/icons/home/ic_calendar_y.svg';
+import SettingIcon from '@/assets/icons/home/ic_cogwheel.svg';
+import SetGoalIcon from '@/assets/icons/home/ic_file.svg';
+import NewGoalIcon from '@/assets/icons/home/ic_file_plus.svg';
+import PawIcon from '@/assets/icons/home/ic_footprint.svg';
+import MessageIcon from '@/assets/icons/home/ic_message.svg';
+import PersonIcon from '@/assets/icons/home/ic_person.svg';
 import { TextInput } from '@/components/common/Inputs/TextInput';
 import { ChoiceButton } from '@/components/page/home/ChoiceButton';
 import { ControlButton } from '@/components/page/home/ControlButton';
@@ -9,7 +19,6 @@ import { ThemedView } from '@/components/ThemedView';
 import { PUPPY_MESSAGES } from '@/constants/messages';
 import { usePuppyData } from '@/hooks/usePuppyData';
 import { IsRecorded, RecentGoal } from '@/types/models/puppy';
-import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
@@ -36,20 +45,20 @@ export default function HomeScreen() {
     createGoal,
   } = usePuppyData();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      fetchPuppyInfo();
-      const recentGoal = await fetchRecentGoal();
-      const goal30daysPassed = await fetchGoal30daysPassed();
-      const isRecorded = await fetchIsRecorded();
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     fetchPuppyInfo();
+  //     const recentGoal = await fetchRecentGoal();
+  //     const goal30daysPassed = await fetchGoal30daysPassed();
+  //     const isRecorded = await fetchIsRecorded();
 
-      setRecentGoal(recentGoal);
-      setGoal30daysPassed(goal30daysPassed);
-      setIsRecorded(isRecorded);
-    };
+  //     setRecentGoal(recentGoal);
+  //     setGoal30daysPassed(goal30daysPassed);
+  //     setIsRecorded(isRecorded);
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   const [isRecorded, setIsRecorded] = useState<IsRecorded | false>(false);
   const [recentGoal, setRecentGoal] = useState<RecentGoal | false>(false);
@@ -196,14 +205,28 @@ export default function HomeScreen() {
   const currentPlaceholder =
     inputType === 'dog' ? '이름을 입력해주세요.' : '이름을 입력해주세요.';
 
+  useEffect(() => {
+    if (messageKey !== 'default' || adviceMessage !== '' || renameMessage) {
+      const timer = setTimeout(() => {
+        setMessageKey('default');
+        setAdviceMessage('');
+        setRenameMessage(null);
+        setRecordMode(false);
+        setShowGoalOptions(false);
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [messageKey, adviceMessage, renameMessage]);
+
   return (
     <ImageBackground
       source={require('../assets/images/home_background.png')}
       style={styles.background}
       resizeMode='cover'
     >
-      <ThemedView className='flex-row justify-between items-center gap-12 px-4 pt-20 bg-transparent'>
-        <ThemedView className='flex-1 p-4 rounded-2xl'>
+      <ThemedView className='relative flex-row justify-between items-center gap-12 px-4 pt-20 bg-transparent'>
+        <ThemedView className='flex-1 px-4 py-3 rounded-2xl'>
           <ThemedView className='flex-row items-center mb-2'>
             <ThemedView className='bg-green-500 px-2 py-1 rounded-full'>
               <ThemedText className='text-white text-xs font-semibold'>
@@ -213,11 +236,11 @@ export default function HomeScreen() {
             <ThemedText className='ml-2 text-sm text-gray-600'>
               {displayName}
             </ThemedText>
-            <ThemedText className='ml-auto text-green-600 font-bold'>
+            <ThemedText className='ml-auto text-green-500 text-xs font-bold'>
               {percent}%
             </ThemedText>
           </ThemedView>
-          <ThemedView className='bg-gray-200 h-2 rounded-full'>
+          <ThemedView className='bg-green-100 h-2 rounded-full'>
             <ThemedView
               className='bg-green-500 h-2 rounded-full'
               style={{ width: `${percent}%` }}
@@ -227,16 +250,16 @@ export default function HomeScreen() {
 
         <ThemedView className='flex-row ml-4 gap-1 bg-transparent'>
           <TouchableOpacity
-            className='p-2 bg-white rounded-full'
+            className='p-3 bg-white rounded-full shadow-sm'
             onPress={() => router.push('/calendar')}
           >
-            <Ionicons name='calendar-outline' size={24} color='#10B981' />
+            <CalendarIcon width={24} height={24} />
           </TouchableOpacity>
           <TouchableOpacity
-            className='p-2 bg-white rounded-full'
+            className='p-3 bg-white rounded-full shadow-sm'
             onPress={() => router.push('/setting')}
           >
-            <Ionicons name='settings-outline' size={24} color='#10B981' />
+            <SettingIcon width={24} height={24} color='#10B981' />
           </TouchableOpacity>
         </ThemedView>
       </ThemedView>
@@ -253,7 +276,7 @@ export default function HomeScreen() {
                 ? require('../assets/images/bichon_angry.png')
                 : require('../assets/images/bichon.png')
             }
-            style={{ width: 300, height: 300, padding: 14 }}
+            style={{ width: 250, height: 250, padding: 14 }}
             resizeMode='contain'
           />
         </ThemedView>
@@ -426,12 +449,12 @@ export default function HomeScreen() {
             </ThemedView>
           )}
 
-          <ThemedView className='flex-col mb-10 rounded-xl p-6 bg-cream-200'>
+          <ThemedView className='flex-col mb-10 rounded-xl p-6 bg-cream-200 border border-gray-200'>
             <ThemedView className='flex-row justify-between mb-4 bg-transparent'>
               {showGoalOptions ? (
                 <>
                   <IconButton
-                    iconName='document-text-outline'
+                    icon={<CalendarIcon width={24} height={24} />}
                     text='지난 달이랑 똑같아!'
                     variant={goalType === 'same' ? 'primary' : 'lightgreen'}
                     onPress={() => {
@@ -445,9 +468,12 @@ export default function HomeScreen() {
 
                       fetchPuppyInfo();
                     }}
+                    style={{
+                      marginRight: 16,
+                    }}
                   />
                   <IconButton
-                    iconName='document-text-outline'
+                    icon={<NewGoalIcon width={24} height={24} />}
                     text='새로운 목표로 가자!'
                     variant={goalType === 'new' ? 'primary' : 'lightgreen'}
                     onPress={handleNewGoalClick}
@@ -457,14 +483,14 @@ export default function HomeScreen() {
                 !(puppyInfo?.isPuppyName && puppyInfo?.isMyName) ? (
                 <>
                   <IconButton
-                    iconName='paw'
+                    icon={<PawIcon width={24} height={24} />}
                     text='강아지 이름 지어주기'
                     variant={inputType === 'dog' ? 'primary' : 'ghost'}
                     onPress={handleDogNameButtonPress}
                     disabled={puppyInfo?.isPuppyName === true}
                   />
                   <IconButton
-                    iconName='person'
+                    icon={<PersonIcon width={24} height={24} />}
                     text='내 이름 알려주기'
                     variant={inputType === 'user' ? 'primary' : 'ghost'}
                     onPress={handleUserNameButtonPress}
@@ -474,7 +500,7 @@ export default function HomeScreen() {
               ) : recordMode ? (
                 <>
                   <IconButton
-                    iconName='calendar'
+                    icon={<CalendarYesterdayIcon width={24} height={24} />}
                     text='어제 까먹은 거 기록할래!'
                     variant={
                       recordType === 'yesterday' ? 'primary' : 'lightgreen'
@@ -485,7 +511,7 @@ export default function HomeScreen() {
                     }}
                   />
                   <IconButton
-                    iconName='today'
+                    icon={<CalendarTodayIcon width={24} height={24} />}
                     text='오늘 기록할래!'
                     variant={recordType === 'today' ? 'primary' : 'lightgreen'}
                     onPress={() => {
@@ -499,21 +525,21 @@ export default function HomeScreen() {
 
             <ThemedView className='flex-row justify-between bg-transparent'>
               <IconButton
-                iconName='chatbubble'
+                icon={<MessageIcon width={24} height={24} />}
                 text='나한테 한마디만 해줘'
                 onPress={handleAdviceClick}
               />
 
               {puppyInfo?.isGoal === false ? (
                 <IconButton
-                  iconName='document-outline'
+                  icon={<SetGoalIcon width={24} height={24} />}
                   text='목표 설정하기'
                   variant={showGoalOptions ? 'primary' : 'ghost'}
                   onPress={handleShowGoalOptions}
                 />
               ) : (
                 <IconButton
-                  iconName='checkbox'
+                  icon={<CalendarVIcon width={24} height={24} />}
                   text='음주 기록 할래!'
                   variant={recordMode ? 'primary' : 'ghost'}
                   onPress={handleDrinkRecordPress}
