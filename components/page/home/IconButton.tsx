@@ -15,7 +15,6 @@ type IconButtonProps = {
 
 export function IconButton({
   icon,
-  iconColor = '#10B981',
   text,
   onPress,
   variant = 'ghost',
@@ -38,7 +37,7 @@ export function IconButton({
   };
 
   const baseText =
-    'flex-1 flex-shrink-0 font-pretendard text-[12px] font-medium text-center';
+    'flex-1 flex-shrink-0 font-pretendard text-[11px] font-medium text-center';
 
   const textVariants = {
     primary: disabled ? 'text-green-300' : 'text-green-600',
