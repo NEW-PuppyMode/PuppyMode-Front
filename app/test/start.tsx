@@ -96,14 +96,8 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     borderRadius: 10,
     backgroundColor: '#FFF',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    boxShadow: '0px 0px 20px 0px rgba(83, 157, 95, 0.20)',
+    // elevation: 5,
     zIndex: 20,
   },
   innerBox: {
