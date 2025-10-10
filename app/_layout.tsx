@@ -12,6 +12,30 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
+import {
+  Text as RNText,
+  TextInput as RNTextInput,
+  type StyleProp,
+  type TextStyle,
+} from 'react-native';
+
+function setGlobalFontFamily(fontFamily: string) {
+  const TextComp = RNText as unknown as {
+    defaultProps?: { style?: StyleProp<TextStyle> };
+  };
+  TextComp.defaultProps = {
+    ...(TextComp.defaultProps || {}),
+    style: [TextComp.defaultProps?.style, { fontFamily }],
+  };
+
+  const TextInputComp = RNTextInput as unknown as {
+    defaultProps?: { style?: StyleProp<TextStyle> };
+  };
+  TextInputComp.defaultProps = {
+    ...(TextInputComp.defaultProps || {}),
+    style: [TextInputComp.defaultProps?.style, { fontFamily }],
+  };
+}
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -22,6 +46,10 @@ export default function RootLayout() {
   const [mockReady, setMockReady] = useState(false);
 
   useEffect(() => {
+    if (loaded) {
+      setGlobalFontFamily('pretendard');
+    }
+
     async function enableMocking() {
       if (!__DEV__) {
         setMockReady(true);
