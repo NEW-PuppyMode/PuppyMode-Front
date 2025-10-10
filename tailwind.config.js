@@ -58,7 +58,7 @@ module.exports = {
         },
       },
       fontFamily: {
-        pretendard: ['Pretendard', 'sans-serif'],
+        pretendard: ['pretendard'],
       },
       fontSize: {
         '15px': ['15px', { lineHeight: 'normal' }],
