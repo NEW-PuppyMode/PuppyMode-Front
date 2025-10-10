@@ -24,9 +24,12 @@ import { useEffect, useState } from 'react';
 import {
   Image,
   ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function HomeScreen() {
@@ -45,20 +48,20 @@ export default function HomeScreen() {
     createGoal,
   } = usePuppyData();
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     fetchPuppyInfo();
-  //     const recentGoal = await fetchRecentGoal();
-  //     const goal30daysPassed = await fetchGoal30daysPassed();
-  //     const isRecorded = await fetchIsRecorded();
+  useEffect(() => {
+    const fetchData = async () => {
+      fetchPuppyInfo();
+      const recentGoal = await fetchRecentGoal();
+      const goal30daysPassed = await fetchGoal30daysPassed();
+      const isRecorded = await fetchIsRecorded();
 
-  //     setRecentGoal(recentGoal);
-  //     setGoal30daysPassed(goal30daysPassed);
-  //     setIsRecorded(isRecorded);
-  //   };
+      setRecentGoal(recentGoal);
+      setGoal30daysPassed(goal30daysPassed);
+      setIsRecorded(isRecorded);
+    };
 
-  //   fetchData();
-  // }, []);
+    fetchData();
+  }, []);
 
   const [isRecorded, setIsRecorded] = useState<IsRecorded | false>(false);
   const [recentGoal, setRecentGoal] = useState<RecentGoal | false>(false);
@@ -78,6 +81,7 @@ export default function HomeScreen() {
   >('default');
   const [adviceMessage, setAdviceMessage] = useState<string>('');
   const [renameMessage, setRenameMessage] = useState<React.ReactNode>(null);
+  const [showMessage, setShowMessage] = useState(false);
 
   const [showNameInput, setShowNameInput] = useState(false);
   const [inputType, setInputType] = useState<'dog' | 'user' | null>(null);
@@ -94,24 +98,28 @@ export default function HomeScreen() {
   const [goalCount, setGoalCount] = useState(10);
 
   const handleNewGoalClick = () => {
+    setShowMessage(true);
     setShowGoalInput(true);
     setGoalType('new');
     setMessageKey('makeNewGoal');
   };
 
   const handleDogNameButtonPress = () => {
+    setShowMessage(true);
     setInputType('dog');
     setShowNameInput(true);
     setMessageKey('namingPuppy');
   };
 
   const handleUserNameButtonPress = () => {
+    setShowMessage(true);
     setInputType('user');
     setShowNameInput(true);
     setMessageKey('namingUser');
   };
 
   const handleDrinkRecordPress = () => {
+    setShowMessage(true);
     setRecordMode(!recordMode);
     setShowNameInput(false);
     setInputType(null);
@@ -128,6 +136,7 @@ export default function HomeScreen() {
   };
 
   const handleShowGoalOptions = () => {
+    setShowMessage(true);
     setAdviceMessage('');
     setRenameMessage('');
     setShowGoalOptions((prev) => {
@@ -145,6 +154,7 @@ export default function HomeScreen() {
         const success = await renamePuppy(dogName);
 
         if (success) {
+          setShowMessage(true);
           setDogName('');
           setShowNameInput(false);
           setInputType(null);
@@ -163,6 +173,7 @@ export default function HomeScreen() {
       } else if (inputType === 'user' && userName.trim()) {
         const success = await renameUser(userName);
         if (success) {
+          setShowMessage(true);
           setUserName('');
           setShowNameInput(false);
           setInputType(null);
@@ -186,6 +197,7 @@ export default function HomeScreen() {
   };
 
   const handleAdviceClick = async () => {
+    setShowMessage(true);
     const result = await advicePuppy();
     setAdviceMessage(result || '');
     setRenameMessage('');
@@ -206,18 +218,18 @@ export default function HomeScreen() {
     inputType === 'dog' ? '이름을 입력해주세요.' : '이름을 입력해주세요.';
 
   useEffect(() => {
-    if (messageKey !== 'default' || adviceMessage !== '' || renameMessage) {
+    if (showMessage) {
       const timer = setTimeout(() => {
+        setShowMessage(false);
         setMessageKey('default');
         setAdviceMessage('');
         setRenameMessage(null);
         setRecordMode(false);
         setShowGoalOptions(false);
-      }, 300);
-
+      }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [messageKey, adviceMessage, renameMessage]);
+  }, [showMessage]);
 
   return (
     <ImageBackground
@@ -248,26 +260,32 @@ export default function HomeScreen() {
           </ThemedView>
         </ThemedView>
 
-        <ThemedView className='flex-row ml-4 gap-1 bg-transparent'>
+        <ThemedView className='fixed top-[-10px] right-0 flex-row ml-4 gap-1 bg-transparent'>
           <TouchableOpacity
-            className='p-3 bg-white rounded-full shadow-sm'
+            className='w-10 h-10 justify-center items-center bg-white rounded-full shadow-sm'
             onPress={() => router.push('/calendar')}
           >
-            <CalendarIcon width={24} height={24} />
+            <CalendarIcon width={20} height={20} />
           </TouchableOpacity>
           <TouchableOpacity
-            className='p-3 bg-white rounded-full shadow-sm'
+            className='w-10 h-10 justify-center items-center bg-white rounded-full shadow-sm'
             onPress={() => router.push('/setting')}
           >
-            <SettingIcon width={24} height={24} color='#10B981' />
+            <SettingIcon width={20} height={20} color='#10B981' />
           </TouchableOpacity>
         </ThemedView>
       </ThemedView>
 
       <ThemedView className='flex-1 px-4 bg-transparent'>
-        <SpeechBubble>
-          {renameMessage || adviceMessage || PUPPY_MESSAGES[messageKey]}
-        </SpeechBubble>
+        <View className='h-28 pt-4 justify-center'>
+          {showMessage && (
+            <View className='absolute top-0 w-full'>
+              <SpeechBubble>
+                {renameMessage || adviceMessage || PUPPY_MESSAGES[messageKey]}
+              </SpeechBubble>
+            </View>
+          )}
+        </View>
 
         <ThemedView className='flex-1 justify-center items-center relative bg-transparent'>
           <Image
@@ -284,8 +302,8 @@ export default function HomeScreen() {
         <ThemedView className='rounded-2xl bg-transparent shadow-lg'>
           {/* 이름 설정 */}
           {showNameInput && (
-            <ThemedView
-              className='mb-6 bg-transparent rounded-xl p-4'
+            <KeyboardAvoidingView // 👈 KeyboardAvoidingView로 감싸기
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
               style={{
                 position: 'absolute',
                 top: -130,
@@ -294,22 +312,24 @@ export default function HomeScreen() {
                 zIndex: 10,
               }}
             >
-              <ThemedView className='flex-row bg-transparent justify-between mb-2'>
-                <ChoiceButton label='취소' onPress={handleCancel} />
-                <ChoiceButton
-                  label='작성 완료'
-                  variant={currentValue.trim() ? 'primary' : 'ghost'}
-                  onPress={handleRenameComplete}
+              <ThemedView className='mb-6 bg-transparent rounded-xl p-4'>
+                <ThemedView className='flex-row bg-transparent justify-between mb-2'>
+                  <ChoiceButton label='취소' onPress={handleCancel} />
+                  <ChoiceButton
+                    label='작성 완료'
+                    variant={currentValue.trim() ? 'primary' : 'ghost'}
+                    onPress={handleRenameComplete}
+                  />
+                </ThemedView>
+
+                <TextInput
+                  placeholder={currentPlaceholder}
+                  value={currentValue}
+                  onChangeText={currentSetValue}
+                  autoFocus={true}
                 />
               </ThemedView>
-
-              <TextInput
-                placeholder={currentPlaceholder}
-                value={currentValue}
-                onChangeText={currentSetValue}
-                autoFocus={true}
-              />
-            </ThemedView>
+            </KeyboardAvoidingView>
           )}
 
           {/* 음주 기록 */}
@@ -452,7 +472,7 @@ export default function HomeScreen() {
           <ThemedView className='flex-col mb-10 rounded-xl p-6 bg-cream-200 border border-gray-200'>
             <ThemedView className='flex-row justify-between mb-4 bg-transparent'>
               {showGoalOptions ? (
-                <>
+                <View className='flex-1 flex-row justify-between space-x-2 bg-transparent'>
                   <IconButton
                     icon={<CalendarIcon width={24} height={24} />}
                     text='지난 달이랑 똑같아!'
@@ -478,10 +498,10 @@ export default function HomeScreen() {
                     variant={goalType === 'new' ? 'primary' : 'lightgreen'}
                     onPress={handleNewGoalClick}
                   />
-                </>
+                </View>
               ) : !recordMode &&
                 !(puppyInfo?.isPuppyName && puppyInfo?.isMyName) ? (
-                <>
+                <View className='flex-1 flex-row justify-between space-x-2 bg-transparent'>
                   <IconButton
                     icon={<PawIcon width={24} height={24} />}
                     text='강아지 이름 지어주기'
@@ -496,12 +516,12 @@ export default function HomeScreen() {
                     onPress={handleUserNameButtonPress}
                     disabled={puppyInfo?.isMyName === true}
                   />
-                </>
+                </View>
               ) : recordMode ? (
-                <>
+                <View className='flex-1 flex-row justify-between space-x-2 bg-transparent'>
                   <IconButton
                     icon={<CalendarYesterdayIcon width={24} height={24} />}
-                    text='어제 까먹은 거 기록할래!'
+                    text='어제 거 기록할래!'
                     variant={
                       recordType === 'yesterday' ? 'primary' : 'lightgreen'
                     }
@@ -519,11 +539,11 @@ export default function HomeScreen() {
                       setMessageKey('archiveToday');
                     }}
                   />
-                </>
+                </View>
               ) : null}
             </ThemedView>
 
-            <ThemedView className='flex-row justify-between bg-transparent'>
+            <ThemedView className='flex-row justify-between space-x-2 bg-transparent'>
               <IconButton
                 icon={<MessageIcon width={24} height={24} />}
                 text='나한테 한마디만 해줘'

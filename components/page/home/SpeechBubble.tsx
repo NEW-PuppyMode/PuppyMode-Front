@@ -44,7 +44,7 @@ export function SpeechBubble({
       )}
 
       <Animated.View
-        entering={FadeIn.duration(300).delay(100)}
+        entering={FadeIn.duration(100).delay(100)}
         style={{
           width: 0,
           height: 0,

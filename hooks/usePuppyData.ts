@@ -13,7 +13,7 @@ export const usePuppyData = () => {
 
     try {
       const data = await PuppyDataAPI.renamePuppy(authCode);
-
+      console.log('renamePuppy', data);
       return true;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -32,7 +32,7 @@ export const usePuppyData = () => {
 
     try {
       const data = await PuppyDataAPI.renameUser(authCode);
-
+      console.log('renameUser', data);
       return true;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {

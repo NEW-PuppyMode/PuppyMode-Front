@@ -37,7 +37,7 @@ export function IconButton({
   };
 
   const baseText =
-    'flex-1 flex-shrink-0 font-pretendard text-[11px] font-medium text-center';
+    'flex-1 flex-shrink-0 font-pretendard text-[12px] font-medium ml-1 text-left';
 
   const textVariants = {
     primary: disabled ? 'text-green-300' : 'text-green-600',

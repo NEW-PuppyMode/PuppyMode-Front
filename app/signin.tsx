@@ -25,6 +25,8 @@ const SignIn = () => {
   useEffect(() => {
     if (userInfo) {
       router.replace('/test/start');
+    } else {
+      router.replace('/home');
     }
   }, [userInfo]);
 
