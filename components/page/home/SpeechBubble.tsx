@@ -16,8 +16,8 @@ export function SpeechBubble({
 }: SpeechBubbleProps) {
   const bgColor =
     variant === 'puppy'
-      ? 'bg-cream-200 rounded-xl px-6 py-4'
-      : 'bg-green-50 rounded-3xl px-8 py-3 shadow-sm';
+      ? 'w-full bg-cream-200 rounded-xl py-4'
+      : 'bg-green-50 rounded-3xl px-8 py-3 shadow-md';
   const tailColor = variant === 'puppy' ? '#FFFCF6' : '#F2FFF4';
   const textStyle =
     variant === 'puppy'
@@ -44,7 +44,7 @@ export function SpeechBubble({
       )}
 
       <Animated.View
-        entering={FadeIn.duration(300).delay(100)}
+        entering={FadeIn.duration(100).delay(100)}
         style={{
           width: 0,
           height: 0,

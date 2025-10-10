@@ -21,20 +21,21 @@ export const loginAPI = {
     accessToken: string,
     refreshToken: string,
   ): Promise<KakaoLoginResult> => {
-    const response = await axiosInstance.get<KakaoLoginResponse>(
+    console.log('accessToken: ', accessToken);
+    console.log('refreshToken: ', refreshToken);
+    const response = await axiosInstance.post<KakaoLoginResponse>(
       '/auth/kakao/login',
       {
-        params: {
-          accessToken,
-          refreshToken,
-        },
+        accessToken,
+        refreshToken,
       },
     );
+
     if (!response.data.isSuccess) {
       throw new Error(response.data.message);
     }
 
-    console.log(response.data.result);
+    console.log('response.data.result: ', response.data.result);
     return response.data.result;
   },
 

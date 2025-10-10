@@ -6,6 +6,7 @@ export const handelError = (error: unknown) => {
 
     if (status === 500) {
       console.log('500 error');
+      console.error(error);
     } else {
       console.log('unknown error');
     }

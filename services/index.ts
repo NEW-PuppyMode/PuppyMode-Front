@@ -1,8 +1,6 @@
 import { KEYS } from '@/constants/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { InternalAxiosRequestConfig } from 'axios';
-import { router } from 'expo-router';
-import { loginAPI } from './auth';
 
 const baseUrl =
   process.env.MOCK_ACTIVATE === 'enable'
@@ -45,28 +43,28 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
+    // const originalRequest = error.config;
 
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      originalRequest.url !== '/auth/refresh'
-    ) {
-      originalRequest._retry = true;
+    // if (
+    //   error.response?.status === 401 &&
+    //   !originalRequest._retry
+    //   // && originalRequest.url !== '/auth/refresh'
+    // ) {
+    //   originalRequest._retry = true;
 
-      try {
-        const { result: newAccessToken } = await loginAPI.refresh();
+    //   try {
+    //     const { result: newAccessToken } = await loginAPI.refresh();
 
-        await AsyncStorage.setItem(KEYS.ACCESS_TOKEN, newAccessToken);
-        return axiosInstance(
-          attachAccessToken(originalRequest, newAccessToken),
-        );
-      } catch (refreshError) {
-        await AsyncStorage.removeItem(KEYS.ACCESS_TOKEN);
-        router.navigate('/');
-        return Promise.reject(refreshError);
-      }
-    }
+    //     await AsyncStorage.setItem(KEYS.ACCESS_TOKEN, newAccessToken);
+    //     return axiosInstance(
+    //       attachAccessToken(originalRequest, newAccessToken),
+    //     );
+    //   } catch (refreshError) {
+    //     await AsyncStorage.removeItem(KEYS.ACCESS_TOKEN);
+    //     router.navigate('/');
+    //     return Promise.reject(refreshError);
+    //   }
+    // }
     return Promise.reject(error);
   },
 );
