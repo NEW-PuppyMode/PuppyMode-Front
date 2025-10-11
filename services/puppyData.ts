@@ -62,9 +62,7 @@ export const PuppyDataAPI = {
   },
 
   createGoal: async (goal: GoalDTO): Promise<ApiResponse<{ goal: number }>> => {
-    const response = await axiosInstance.post('/goals', {
-      goal,
-    });
+    const response = await axiosInstance.post('/goals', goal);
     return response.data;
   },
 };

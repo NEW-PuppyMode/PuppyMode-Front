@@ -223,9 +223,6 @@ export default function HomeScreen() {
         setShowMessage(false);
         setMessageKey('default');
         setAdviceMessage('');
-        setRenameMessage(null);
-        setRecordMode(false);
-        setShowGoalOptions(false);
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -277,7 +274,7 @@ export default function HomeScreen() {
       </ThemedView>
 
       <ThemedView className='flex-1 px-4 bg-transparent'>
-        <View className='h-28 pt-4 justify-center'>
+        <View className='h-44 pt-4 justify-center'>
           {showMessage && (
             <View className='absolute top-0 w-full'>
               <SpeechBubble>
@@ -287,14 +284,14 @@ export default function HomeScreen() {
           )}
         </View>
 
-        <ThemedView className='flex-1 justify-center items-center relative bg-transparent'>
+        <ThemedView className='absolute left-0 right-0 bottom-24 flex-1 justify-center items-center relative bg-transparent'>
           <Image
             source={
               adviceMessage !== ''
                 ? require('../assets/images/bichon_angry.png')
                 : require('../assets/images/bichon.png')
             }
-            style={{ width: 250, height: 250, padding: 14 }}
+            style={{ width: 240, height: 240, padding: 14 }}
             resizeMode='contain'
           />
         </ThemedView>
@@ -302,11 +299,11 @@ export default function HomeScreen() {
         <ThemedView className='rounded-2xl bg-transparent shadow-lg'>
           {/* 이름 설정 */}
           {showNameInput && (
-            <KeyboardAvoidingView // 👈 KeyboardAvoidingView로 감싸기
+            <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
               style={{
                 position: 'absolute',
-                top: -130,
+                top: -320,
                 left: -15,
                 right: -15,
                 zIndex: 10,
@@ -338,7 +335,7 @@ export default function HomeScreen() {
               className='bg-transparent rounded-xl p-4'
               style={{
                 position: 'absolute',
-                top: -115,
+                top: -300,
                 left: -15,
                 right: -15,
                 zIndex: 10,
@@ -410,7 +407,7 @@ export default function HomeScreen() {
               className='mb-6 bg-transparent rounded-xl p-4'
               style={{
                 position: 'absolute',
-                top: -80,
+                top: -270,
                 left: -15,
                 right: -15,
                 zIndex: 10,
@@ -424,21 +421,28 @@ export default function HomeScreen() {
                     setShowGoalOptions(false);
                     setGoalCount(10);
                   }}
+                  style={{
+                    opacity: 0.9,
+                  }}
                 />
 
                 <ThemedView className='flex-row items-center justify-between bg-transparent'>
                   <ControlButton
                     label='-'
                     onPress={() => setGoalCount((n) => Math.max(1, n - 1))}
+                    style={{
+                      opacity: 0.9,
+                    }}
                   />
 
-                  <ThemedView className='bg-green-100 rounded-2xl px-6 py-3 mx-1 shadow-lg'>
+                  <ThemedView className='bg-green-100 rounded-2xl px-6 py-3 mx-1 shadow-sm'>
                     <ThemedText
                       style={{
                         color: '#21D08A',
                         fontWeight: '600',
-                        fontSize: 20,
+                        fontSize: 16,
                       }}
+                      className='text-green-500'
                     >
                       {goalCount}번
                     </ThemedText>
@@ -447,6 +451,9 @@ export default function HomeScreen() {
                   <ControlButton
                     label='+'
                     onPress={() => setGoalCount((n) => n + 1)}
+                    style={{
+                      opacity: 0.9,
+                    }}
                   />
                 </ThemedView>
 
@@ -464,107 +471,111 @@ export default function HomeScreen() {
 
                     fetchPuppyInfo();
                   }}
+                  style={{
+                    opacity: 0.7,
+                  }}
                 />
               </ThemedView>
             </ThemedView>
           )}
 
-          <ThemedView className='flex-col mb-10 rounded-xl p-6 bg-cream-200 border border-gray-200'>
-            <ThemedView className='flex-row justify-between mb-4 bg-transparent'>
-              {showGoalOptions ? (
-                <View className='flex-1 flex-row justify-between space-x-2 bg-transparent'>
-                  <IconButton
-                    icon={<CalendarIcon width={24} height={24} />}
-                    text='지난 달이랑 똑같아!'
-                    variant={goalType === 'same' ? 'primary' : 'lightgreen'}
-                    onPress={() => {
-                      setGoalType('same');
-                      setShowGoalInput(false);
-                      setShowGoalOptions(false);
-                      createGoal({
-                        goal: 0,
-                        isNew: false,
-                      });
+          <ThemedView className='absolute left-0 right-0 bottom-10 bg-transparent justify-center h-40'>
+            <ThemedView className='flex-col rounded-2xl p-5 px-4 bg-cream-200 border border-gray-200'>
+              <ThemedView className='flex-row justify-between bg-transparent'>
+                {showGoalOptions ? (
+                  <View className='flex-1 flex-row justify-between space-x-2 bg-transparent mb-4'>
+                    <IconButton
+                      icon={<CalendarIcon width={24} height={24} />}
+                      text='지난 달이랑 똑같아!'
+                      variant={goalType === 'same' ? 'primary' : 'lightgreen'}
+                      onPress={() => {
+                        setGoalType('same');
+                        setShowGoalInput(false);
+                        setShowGoalOptions(false);
+                        createGoal({
+                          goal: 0,
+                          isNew: false,
+                        });
 
-                      fetchPuppyInfo();
-                    }}
-                    style={{
-                      marginRight: 16,
-                    }}
-                  />
-                  <IconButton
-                    icon={<NewGoalIcon width={24} height={24} />}
-                    text='새로운 목표로 가자!'
-                    variant={goalType === 'new' ? 'primary' : 'lightgreen'}
-                    onPress={handleNewGoalClick}
-                  />
-                </View>
-              ) : !recordMode &&
-                !(puppyInfo?.isPuppyName && puppyInfo?.isMyName) ? (
-                <View className='flex-1 flex-row justify-between space-x-2 bg-transparent'>
-                  <IconButton
-                    icon={<PawIcon width={24} height={24} />}
-                    text='강아지 이름 지어주기'
-                    variant={inputType === 'dog' ? 'primary' : 'ghost'}
-                    onPress={handleDogNameButtonPress}
-                    disabled={puppyInfo?.isPuppyName === true}
-                  />
-                  <IconButton
-                    icon={<PersonIcon width={24} height={24} />}
-                    text='내 이름 알려주기'
-                    variant={inputType === 'user' ? 'primary' : 'ghost'}
-                    onPress={handleUserNameButtonPress}
-                    disabled={puppyInfo?.isMyName === true}
-                  />
-                </View>
-              ) : recordMode ? (
-                <View className='flex-1 flex-row justify-between space-x-2 bg-transparent'>
-                  <IconButton
-                    icon={<CalendarYesterdayIcon width={24} height={24} />}
-                    text='어제 거 기록할래!'
-                    variant={
-                      recordType === 'yesterday' ? 'primary' : 'lightgreen'
-                    }
-                    onPress={() => {
-                      setRecordType('yesterday');
-                      setMessageKey('archiveYesterday');
-                    }}
-                  />
-                  <IconButton
-                    icon={<CalendarTodayIcon width={24} height={24} />}
-                    text='오늘 기록할래!'
-                    variant={recordType === 'today' ? 'primary' : 'lightgreen'}
-                    onPress={() => {
-                      setRecordType('today');
-                      setMessageKey('archiveToday');
-                    }}
-                  />
-                </View>
-              ) : null}
-            </ThemedView>
+                        fetchPuppyInfo();
+                      }}
+                    />
+                    <IconButton
+                      icon={<NewGoalIcon width={24} height={24} />}
+                      text='새로운 목표로 가자!'
+                      variant={goalType === 'new' ? 'primary' : 'lightgreen'}
+                      onPress={handleNewGoalClick}
+                    />
+                  </View>
+                ) : !recordMode &&
+                  !(puppyInfo?.isPuppyName && puppyInfo?.isMyName) ? (
+                  <View className='flex-1 flex-row justify-between space-x-2 bg-transparent mb-4'>
+                    <IconButton
+                      icon={<PawIcon width={24} height={24} />}
+                      text='강아지 이름 지어주기'
+                      variant={inputType === 'dog' ? 'primary' : 'ghost'}
+                      onPress={handleDogNameButtonPress}
+                      disabled={puppyInfo?.isPuppyName === true}
+                    />
+                    <IconButton
+                      icon={<PersonIcon width={24} height={24} />}
+                      text='내 이름 알려주기'
+                      variant={inputType === 'user' ? 'primary' : 'ghost'}
+                      onPress={handleUserNameButtonPress}
+                      disabled={puppyInfo?.isMyName === true}
+                    />
+                  </View>
+                ) : recordMode ? (
+                  <View className='flex-1 flex-row justify-between space-x-2 bg-transparent mb-4'>
+                    <IconButton
+                      icon={<CalendarYesterdayIcon width={24} height={24} />}
+                      text='어제 거 기록할래!'
+                      variant={
+                        recordType === 'yesterday' ? 'primary' : 'lightgreen'
+                      }
+                      onPress={() => {
+                        setRecordType('yesterday');
+                        setMessageKey('archiveYesterday');
+                      }}
+                    />
+                    <IconButton
+                      icon={<CalendarTodayIcon width={24} height={24} />}
+                      text='오늘 기록할래!'
+                      variant={
+                        recordType === 'today' ? 'primary' : 'lightgreen'
+                      }
+                      onPress={() => {
+                        setRecordType('today');
+                        setMessageKey('archiveToday');
+                      }}
+                    />
+                  </View>
+                ) : null}
+              </ThemedView>
 
-            <ThemedView className='flex-row justify-between space-x-2 bg-transparent'>
-              <IconButton
-                icon={<MessageIcon width={24} height={24} />}
-                text='나한테 한마디만 해줘'
-                onPress={handleAdviceClick}
-              />
-
-              {puppyInfo?.isGoal === false ? (
+              <ThemedView className='flex-row justify-between space-x-2 bg-transparent'>
                 <IconButton
-                  icon={<SetGoalIcon width={24} height={24} />}
-                  text='목표 설정하기'
-                  variant={showGoalOptions ? 'primary' : 'ghost'}
-                  onPress={handleShowGoalOptions}
+                  icon={<MessageIcon width={24} height={24} />}
+                  text='나한테 한마디만 해줘'
+                  onPress={handleAdviceClick}
                 />
-              ) : (
-                <IconButton
-                  icon={<CalendarVIcon width={24} height={24} />}
-                  text='음주 기록 할래!'
-                  variant={recordMode ? 'primary' : 'ghost'}
-                  onPress={handleDrinkRecordPress}
-                />
-              )}
+
+                {puppyInfo?.isGoal === false ? (
+                  <IconButton
+                    icon={<SetGoalIcon width={24} height={24} />}
+                    text='목표 설정하기'
+                    variant={showGoalOptions ? 'primary' : 'ghost'}
+                    onPress={handleShowGoalOptions}
+                  />
+                ) : (
+                  <IconButton
+                    icon={<CalendarVIcon width={24} height={24} />}
+                    text='음주 기록 할래!'
+                    variant={recordMode ? 'primary' : 'ghost'}
+                    onPress={handleDrinkRecordPress}
+                  />
+                )}
+              </ThemedView>
             </ThemedView>
           </ThemedView>
         </ThemedView>

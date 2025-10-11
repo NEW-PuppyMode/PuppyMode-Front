@@ -1,17 +1,21 @@
 import { ThemedText } from '@/components/ThemedText';
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { StyleProp, TouchableOpacity, ViewStyle } from 'react-native';
 
 type ControlButtonProps = {
   label: string;
   onPress?: () => void;
   variant?: 'primary' | 'ghost';
+  style?: StyleProp<ViewStyle>;
+  className?: string;
 };
 
 export function ControlButton({
   label,
   onPress,
   variant = 'ghost',
+  style,
+  className,
 }: ControlButtonProps) {
   const base = 'rounded-full items-center justify-center w-10 h-10 shadow-lg';
   const variants = {
@@ -23,7 +27,8 @@ export function ControlButton({
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.8}
-      className={`${base} ${variants[variant]}`}
+      className={`${base} ${variants[variant]} ${className}`}
+      style={style}
     >
       <ThemedText
         className={

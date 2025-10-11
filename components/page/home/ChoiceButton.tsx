@@ -1,17 +1,19 @@
 import { ThemedText } from '@/components/ThemedText';
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { StyleProp, TouchableOpacity, ViewStyle } from 'react-native';
 
 type ChoiceButtonProps = {
   label: string;
   onPress?: () => void;
   variant?: 'primary' | 'ghost';
+  style?: StyleProp<ViewStyle>;
 };
 
 export function ChoiceButton({
   label,
   onPress,
   variant = 'ghost',
+  style,
 }: ChoiceButtonProps) {
   const base = 'px-2 py-3 rounded-xl items-center justify-center min-w-[88px]';
   const variants = {
@@ -24,6 +26,7 @@ export function ChoiceButton({
       onPress={onPress}
       activeOpacity={0.8}
       className={`${base} ${variants[variant]}`}
+      style={style}
     >
       <ThemedText
         className={
