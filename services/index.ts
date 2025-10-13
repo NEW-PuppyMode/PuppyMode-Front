@@ -10,7 +10,7 @@ const baseUrl =
 export const axiosInstance = axios.create({
   baseURL: baseUrl,
   withCredentials: true,
-  timeout: 1000,
+  timeout: 10000,
 });
 
 async function getAccessToken(): Promise<string | null> {

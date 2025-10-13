@@ -162,7 +162,7 @@ export const usePuppyData = () => {
 
   const createGoal = async (goal: GoalDTO) => {
     setIsLoading(true);
-
+    console.log('request createGoal', goal);
     try {
       const data = await PuppyDataAPI.createGoal(goal);
       return data.result;

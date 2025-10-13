@@ -23,9 +23,9 @@ const SignIn = () => {
   const { isLoading, error, userInfo, loginWithKakao } = useLogin();
 
   useEffect(() => {
-    if (userInfo) {
+    if (userInfo?.isNewUser) {
       router.replace('/test/start');
-    } else {
+    } else if (userInfo?.isNewUser === false && userInfo?.username) {
       router.replace('/home');
     }
   }, [userInfo]);

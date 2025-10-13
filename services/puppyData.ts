@@ -52,19 +52,13 @@ export const PuppyDataAPI = {
     return response.data;
   },
 
-  createDrinkHistory: async (
-    drinkHistory: DrinkHistoryDTO,
-  ): Promise<ApiResponse<DrinkHistoryDTO>> => {
-    const response = await axiosInstance.post('/drink-history', {
-      drinkHistory,
-    });
+  createDrinkHistory: async (drinkHistory: DrinkHistoryDTO) => {
+    const response = await axiosInstance.post('/drink-history', drinkHistory);
     return response.data;
   },
 
   createGoal: async (goal: GoalDTO): Promise<ApiResponse<{ goal: number }>> => {
-    const response = await axiosInstance.post('/goals', {
-      goal,
-    });
+    const response = await axiosInstance.post('/goals', goal);
     return response.data;
   },
 };
