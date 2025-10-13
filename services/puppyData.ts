@@ -52,12 +52,8 @@ export const PuppyDataAPI = {
     return response.data;
   },
 
-  createDrinkHistory: async (
-    drinkHistory: DrinkHistoryDTO,
-  ): Promise<ApiResponse<DrinkHistoryDTO>> => {
-    const response = await axiosInstance.post('/drink-history', {
-      drinkHistory,
-    });
+  createDrinkHistory: async (drinkHistory: DrinkHistoryDTO) => {
+    const response = await axiosInstance.post('/drink-history', drinkHistory);
     return response.data;
   },
 

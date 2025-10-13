@@ -3,38 +3,36 @@ import CalendarIcon from '@/assets/icons/home/ic_calendar.svg';
 import CalendarTodayIcon from '@/assets/icons/home/ic_calendar_t.svg';
 import CalendarVIcon from '@/assets/icons/home/ic_calendar_v.svg';
 import CalendarYesterdayIcon from '@/assets/icons/home/ic_calendar_y.svg';
-import SettingIcon from '@/assets/icons/home/ic_cogwheel.svg';
 import SetGoalIcon from '@/assets/icons/home/ic_file.svg';
 import NewGoalIcon from '@/assets/icons/home/ic_file_plus.svg';
 import PawIcon from '@/assets/icons/home/ic_footprint.svg';
 import MessageIcon from '@/assets/icons/home/ic_message.svg';
 import PersonIcon from '@/assets/icons/home/ic_person.svg';
+import DogShadowImage from '@/assets/images/dog_shadow.svg';
 import { TextInput } from '@/components/common/Inputs/TextInput';
 import { ChoiceButton } from '@/components/page/home/ChoiceButton';
 import { ControlButton } from '@/components/page/home/ControlButton';
 import { IconButton } from '@/components/page/home/IconButton';
 import { SpeechBubble } from '@/components/page/home/SpeechBubble';
+import { TopBar } from '@/components/page/home/TopBar';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { PUPPY_MESSAGES } from '@/constants/messages';
 import { usePuppyData } from '@/hooks/usePuppyData';
 import { IsRecorded, RecentGoal } from '@/types/models/puppy';
-import { useRouter } from 'expo-router';
+import { getPuppyGifSource } from '@/utils/dogMapper';
 import { useEffect, useState } from 'react';
 import {
-  Image,
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
+import Gif from 'react-native-gif';
 
 export default function HomeScreen() {
-  const router = useRouter();
-
   const {
     renamePuppy,
     renameUser,
@@ -234,44 +232,7 @@ export default function HomeScreen() {
       style={styles.background}
       resizeMode='cover'
     >
-      <ThemedView className='relative flex-row justify-between items-center gap-12 px-4 pt-20 bg-transparent'>
-        <ThemedView className='flex-1 px-4 py-3 rounded-2xl'>
-          <ThemedView className='flex-row items-center mb-2'>
-            <ThemedView className='bg-green-500 px-2 py-1 rounded-full'>
-              <ThemedText className='text-white text-xs font-semibold'>
-                Level {level}
-              </ThemedText>
-            </ThemedView>
-            <ThemedText className='ml-2 text-sm text-gray-600'>
-              {displayName}
-            </ThemedText>
-            <ThemedText className='ml-auto text-green-500 text-xs font-bold'>
-              {percent}%
-            </ThemedText>
-          </ThemedView>
-          <ThemedView className='bg-green-100 h-2 rounded-full'>
-            <ThemedView
-              className='bg-green-500 h-2 rounded-full'
-              style={{ width: `${percent}%` }}
-            />
-          </ThemedView>
-        </ThemedView>
-
-        <ThemedView className='fixed top-[-10px] right-0 flex-row ml-4 gap-1 bg-transparent'>
-          <TouchableOpacity
-            className='w-10 h-10 justify-center items-center bg-white rounded-full shadow-sm'
-            onPress={() => router.push('/calendar')}
-          >
-            <CalendarIcon width={20} height={20} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            className='w-10 h-10 justify-center items-center bg-white rounded-full shadow-sm'
-            onPress={() => router.push('/setting')}
-          >
-            <SettingIcon width={20} height={20} color='#10B981' />
-          </TouchableOpacity>
-        </ThemedView>
-      </ThemedView>
+      <TopBar level={level} displayName={displayName} percent={percent} />
 
       <ThemedView className='flex-1 px-4 bg-transparent'>
         <View className='h-44 pt-4 justify-center'>
@@ -285,13 +246,15 @@ export default function HomeScreen() {
         </View>
 
         <ThemedView className='absolute left-0 right-0 bottom-24 flex-1 justify-center items-center relative bg-transparent'>
-          <Image
-            source={
-              adviceMessage !== ''
-                ? require('../assets/images/bichon_angry.png')
-                : require('../assets/images/bichon.png')
-            }
-            style={{ width: 240, height: 240, padding: 14 }}
+          <DogShadowImage
+            width={150}
+            height={150}
+            style={{ position: 'absolute', bottom: 120, left: 105 }}
+          />
+
+          <Gif
+            source={getPuppyGifSource(puppyInfo?.puppyLevelName ?? '', level)}
+            style={{ width: 240, height: 240, position: 'absolute' }}
             resizeMode='contain'
           />
         </ThemedView>
@@ -356,6 +319,8 @@ export default function HomeScreen() {
                     setRecordType(null);
 
                     const drinkDate = new Date();
+                    console.log(drinkDate.getDate() - 1);
+                    console.log(drinkDate.getDate());
                     if (recordType === 'yesterday') {
                       drinkDate.setDate(drinkDate.getDate() - 1);
                     } else if (recordType === 'today') {
@@ -537,6 +502,9 @@ export default function HomeScreen() {
                         setRecordType('yesterday');
                         setMessageKey('archiveYesterday');
                       }}
+                      disabled={
+                        isRecorded && isRecorded.yesterdayRecorded === true
+                      }
                     />
                     <IconButton
                       icon={<CalendarTodayIcon width={24} height={24} />}
@@ -548,6 +516,7 @@ export default function HomeScreen() {
                         setRecordType('today');
                         setMessageKey('archiveToday');
                       }}
+                      disabled={isRecorded && isRecorded.todayRecorded === true}
                     />
                   </View>
                 ) : null}
@@ -560,7 +529,7 @@ export default function HomeScreen() {
                   onPress={handleAdviceClick}
                 />
 
-                {puppyInfo?.isGoal === false ? (
+                {puppyInfo?.isGoal === false && goal30daysPassed === false ? (
                   <IconButton
                     icon={<SetGoalIcon width={24} height={24} />}
                     text='목표 설정하기'
