@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import CalendarIcon from '@/assets/icons/home/ic_calendar.svg';
 import CalendarTodayIcon from '@/assets/icons/home/ic_calendar_t.svg';
 import CalendarVIcon from '@/assets/icons/home/ic_calendar_v.svg';
 import CalendarYesterdayIcon from '@/assets/icons/home/ic_calendar_y.svg';
 import SetGoalIcon from '@/assets/icons/home/ic_file.svg';
+import PastGoalIcon from '@/assets/icons/home/ic_file_minus.svg';
 import NewGoalIcon from '@/assets/icons/home/ic_file_plus.svg';
 import PawIcon from '@/assets/icons/home/ic_footprint.svg';
 import MessageIcon from '@/assets/icons/home/ic_message.svg';
 import PersonIcon from '@/assets/icons/home/ic_person.svg';
-import DogShadowImage from '@/assets/images/dog_shadow.svg';
 import { TextInput } from '@/components/common/Inputs/TextInput';
 import { ChoiceButton } from '@/components/page/home/ChoiceButton';
 import { ControlButton } from '@/components/page/home/ControlButton';
@@ -20,8 +19,10 @@ import { ThemedView } from '@/components/ThemedView';
 import { PUPPY_MESSAGES } from '@/constants/messages';
 import { usePuppyData } from '@/hooks/usePuppyData';
 import { IsRecorded, RecentGoal } from '@/types/models/puppy';
+import { maxDaysInMonth } from '@/utils/dateUtils';
 import { getPuppyGifSource } from '@/utils/dogMapper';
-import { useEffect, useState } from 'react';
+import { throttle } from 'lodash';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ImageBackground,
   KeyboardAvoidingView,
@@ -194,7 +195,7 @@ export default function HomeScreen() {
     }
   };
 
-  const handleAdviceClick = async () => {
+  const _handleAdviceClick = async () => {
     setShowMessage(true);
     const result = await advicePuppy();
     setAdviceMessage(result || '');
@@ -203,6 +204,15 @@ export default function HomeScreen() {
     setMessageKey('default');
     setRecordMode(false);
   };
+
+  const handleAdviceClick = useMemo(
+    () =>
+      throttle(_handleAdviceClick, 3000, {
+        leading: true,
+        trailing: false,
+      }),
+    [],
+  );
 
   const level = puppyInfo?.puppyLevel ?? 0;
   const percent = puppyInfo?.puppyLevelPercent ?? 0;
@@ -226,6 +236,31 @@ export default function HomeScreen() {
     }
   }, [showMessage]);
 
+  const handleRecordDrinkHistory = async (didDrink: boolean) => {
+    try {
+      setMessageKey('archiveSuccess');
+      setRecordMode(false);
+      setRecordType(null);
+
+      const drinkDate = new Date();
+      if (recordType === 'yesterday') {
+        drinkDate.setDate(drinkDate.getDate() - 1);
+      }
+      const formattedDate = drinkDate.toISOString().slice(0, 10);
+
+      await createDrinkHistory({
+        drinkDate: formattedDate,
+        isDrink: didDrink,
+      });
+
+      await fetchPuppyInfo();
+      const updatedIsRecorded = await fetchIsRecorded();
+      setIsRecorded(updatedIsRecorded);
+    } catch (error) {
+      console.error('음주 기록 처리 중 오류 발생:', error);
+    }
+  };
+
   return (
     <ImageBackground
       source={require('../assets/images/home_background.png')}
@@ -246,11 +281,11 @@ export default function HomeScreen() {
         </View>
 
         <ThemedView className='absolute left-0 right-0 bottom-24 flex-1 justify-center items-center relative bg-transparent'>
-          <DogShadowImage
+          {/* <DogShadowImage
             width={150}
             height={150}
             style={{ position: 'absolute', bottom: 120, left: 105 }}
-          />
+          /> */}
 
           <Gif
             source={getPuppyGifSource(puppyInfo?.puppyLevelName ?? '', level)}
@@ -313,52 +348,14 @@ export default function HomeScreen() {
               >
                 <SpeechBubble
                   variant='user'
-                  onPress={() => {
-                    setMessageKey('archiveSuccess');
-                    setRecordMode(false);
-                    setRecordType(null);
-
-                    const drinkDate = new Date();
-                    console.log(drinkDate.getDate() - 1);
-                    console.log(drinkDate.getDate());
-                    if (recordType === 'yesterday') {
-                      drinkDate.setDate(drinkDate.getDate() - 1);
-                    } else if (recordType === 'today') {
-                      drinkDate.setDate(drinkDate.getDate());
-                    }
-                    const formattedDate = drinkDate.toISOString().slice(0, 10);
-                    createDrinkHistory({
-                      drinkDate: formattedDate,
-                      isDrink: true,
-                    });
-
-                    fetchPuppyInfo();
-                  }}
+                  onPress={() => handleRecordDrinkHistory(true)}
                 >
                   술 마셨어!
                 </SpeechBubble>
                 <ThemedView className='w-[10px] bg-transparent' />
                 <SpeechBubble
                   variant='user'
-                  onPress={() => {
-                    setMessageKey('archiveSuccess');
-                    setRecordMode(false);
-                    setRecordType(null);
-
-                    const drinkDate = new Date();
-                    if (recordType === 'yesterday') {
-                      drinkDate.setDate(drinkDate.getDate() - 1);
-                    } else if (recordType === 'today') {
-                      drinkDate.setDate(drinkDate.getDate());
-                    }
-                    const formattedDate = drinkDate.toISOString().slice(0, 10);
-                    createDrinkHistory({
-                      drinkDate: formattedDate,
-                      isDrink: false,
-                    });
-
-                    fetchPuppyInfo();
-                  }}
+                  onPress={() => handleRecordDrinkHistory(false)}
                 >
                   술 안 마셨어!
                 </SpeechBubble>
@@ -415,7 +412,9 @@ export default function HomeScreen() {
 
                   <ControlButton
                     label='+'
-                    onPress={() => setGoalCount((n) => n + 1)}
+                    onPress={() =>
+                      setGoalCount((n) => Math.min(maxDaysInMonth, n + 1))
+                    }
                     style={{
                       opacity: 0.9,
                     }}
@@ -450,7 +449,7 @@ export default function HomeScreen() {
                 {showGoalOptions ? (
                   <View className='flex-1 flex-row justify-between space-x-2 bg-transparent mb-4'>
                     <IconButton
-                      icon={<CalendarIcon width={24} height={24} />}
+                      icon={<PastGoalIcon width={24} height={24} />}
                       text='지난 달이랑 똑같아!'
                       variant={goalType === 'same' ? 'primary' : 'lightgreen'}
                       onPress={() => {
@@ -464,6 +463,7 @@ export default function HomeScreen() {
 
                         fetchPuppyInfo();
                       }}
+                      disabled={!recentGoal}
                     />
                     <IconButton
                       icon={<NewGoalIcon width={24} height={24} />}
@@ -529,7 +529,7 @@ export default function HomeScreen() {
                   onPress={handleAdviceClick}
                 />
 
-                {puppyInfo?.isGoal === false && goal30daysPassed === false ? (
+                {puppyInfo?.isGoal === false ? (
                   <IconButton
                     icon={<SetGoalIcon width={24} height={24} />}
                     text='목표 설정하기'
