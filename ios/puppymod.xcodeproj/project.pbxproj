@@ -12,7 +12,6 @@
 		73AC41257FE0150405AAA4B6 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3DEEC49290A5F565482C73 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		BE4748C63BBFEF6567A5FE6F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 085A9A788CF523DAF893E3ED /* PrivacyInfo.xcprivacy */; };
-		C8F5A6492E71AA0D0011BAC8 /* SwiftBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F5A6482E71AA0D0011BAC8 /* SwiftBridge.swift */; };
 		E994EED0E0D2D00D36AF1B03 /* libPods-puppymod.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EFEEE9E80A4B08BE0A460C86 /* libPods-puppymod.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
@@ -27,7 +26,6 @@
 		8DDDF50459BAF43428D8AECE /* Pods-puppymod.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-puppymod.release.xcconfig"; path = "Target Support Files/Pods-puppymod/Pods-puppymod.release.xcconfig"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = puppymod/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		C8F5A6482E71AA0D0011BAC8 /* SwiftBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SwiftBridge.swift; path = /Users/parkjunseok/Documents/SwiftBridge.swift; sourceTree = "<absolute>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		EFEEE9E80A4B08BE0A460C86 /* libPods-puppymod.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-puppymod.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = puppymod/AppDelegate.swift; sourceTree = "<group>"; };
@@ -95,7 +93,6 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				C8F5A6482E71AA0D0011BAC8 /* SwiftBridge.swift */,
 				13B07FAE1A68108700A75B9A /* puppymod */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
@@ -332,7 +329,6 @@
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
 				73AC41257FE0150405AAA4B6 /* ExpoModulesProvider.swift in Sources */,
-				C8F5A6492E71AA0D0011BAC8 /* SwiftBridge.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -460,10 +456,7 @@
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -518,10 +511,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
