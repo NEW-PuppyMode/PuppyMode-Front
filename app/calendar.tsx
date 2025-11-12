@@ -419,7 +419,12 @@ export default function CalendarPage() {
         <View className='absolute w-full p-5 bottom-11'>
           <TouchableOpacity
             className='bg-[#1EBE71] rounded-[10px] p-[18px] items-center'
-            onPress={() => router.push('/report')}
+            onPress={() =>
+              router.push({
+                pathname: '/report',
+                params: { year: selectedYear, month: selectedMonth },
+              })
+            }
           >
             <Text className='text-white text-[18px] font-bold'>
               음주 리포트 보기

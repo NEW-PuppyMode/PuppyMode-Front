@@ -1,5 +1,5 @@
 import { ReportApi } from '@/services/reportData';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -24,18 +24,24 @@ const Report = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ReportResultDTO | null>(null);
 
+  const { year, month } = useLocalSearchParams<{
+    year: string;
+    month: string;
+  }>();
   const now = useMemo(() => new Date(), []);
-  const month = now.getMonth() + 1; // 1~12
-  const year = now.getFullYear();
+
   const daysInMonth = useMemo(
-    () => new Date(year, month, 0).getDate(),
+    () => new Date(Number(year), Number(month), 0).getDate(),
     [year, month],
   );
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        const result = await ReportApi.lookupReport(); // Authorization 헤더는 axiosInstance 인터셉터로 주입되어야 함
+        const result = await ReportApi.lookupReport(
+          Number(year),
+          Number(month),
+        ); // Authorization 헤더는 axiosInstance 인터셉터로 주입되어야 함
         setData(result);
       } catch (e: any) {
         Alert.alert('알림', e?.message || '리포트 조회에 실패했어요.');

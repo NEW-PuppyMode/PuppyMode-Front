@@ -16,8 +16,10 @@ type ReportResponse = {
 };
 
 export const ReportApi = {
-  lookupReport: async () => {
-    const response = await axiosInstance.get<ReportResponse>('/report');
+  lookupReport: async (year: number, month: number) => {
+    const response = await axiosInstance.get<ReportResponse>('/report', {
+      params: { year, month }, // ✅ 쿼리 파라미터 추가
+    });
     if (!response.data?.isSuccess) {
       throw new Error(response.data?.message || '리포트 조회 실패');
     }
