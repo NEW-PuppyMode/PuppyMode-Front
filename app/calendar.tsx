@@ -217,15 +217,15 @@ const DayComponent = ({
   }
 
   if (isToday) {
-    textStyles.push(styles.todayText);
+    textStyles.push({ ...styles.todayText, fontSize: 16 });
   } else if (!isCurrentMonth) {
-    textStyles.push(styles.otherMonthText);
+    textStyles.push({ ...styles.otherMonthText, fontSize: 16 });
   } else {
     // 🟢 여기서 미래 날짜 처리
     if (date.dateString > today) {
-      textStyles.push(styles.otherMonthText); // 회색 처리
+      textStyles.push({ ...styles.otherMonthText, fontSize: 16 }); // 회색 처리
     } else if (!marked) {
-      textStyles.push(styles.currentMonthText);
+      textStyles.push({ ...styles.currentMonthText, fontSize: 16 });
     }
   }
 
@@ -319,7 +319,7 @@ export default function CalendarPage() {
 
   const renderMonths = () => {
     const months = LocaleConfig.locales['ko'].monthNamesShort;
-    return months.map((month, index) => (
+    return months.map((month: string, index: number) => (
       <TouchableOpacity
         key={index}
         style={[

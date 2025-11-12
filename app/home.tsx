@@ -216,9 +216,11 @@ export default function HomeScreen() {
 
   const level = puppyInfo?.puppyLevel ?? 0;
   const percent = puppyInfo?.puppyLevelPercent ?? 0;
-  const displayName = puppyInfo?.isPuppyName
-    ? puppyInfo.puppyLevelName
-    : '눈송이 비숑';
+  const displayName = puppyInfo?.puppyLevelName;
+
+  // const displayName = puppyInfo?.puppyLevelName
+  //   ? puppyInfo.puppyLevelName
+  //   : '눈송이 비숑';
 
   const currentValue = inputType === 'dog' ? dogName : userName;
   const currentSetValue = inputType === 'dog' ? setDogName : setUserName;
@@ -267,7 +269,7 @@ export default function HomeScreen() {
       style={styles.background}
       resizeMode='cover'
     >
-      <TopBar level={level} displayName={displayName} percent={percent} />
+      <TopBar level={level} displayName={displayName ?? ''} percent={percent} />
 
       <ThemedView className='flex-1 px-4 bg-transparent'>
         <View className='h-44 pt-4 justify-center'>
