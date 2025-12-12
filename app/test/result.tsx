@@ -18,7 +18,8 @@ const TestResult = () => {
     result: string;
   }>();
 
-  const { type, puppyBreed, description, imageUrl } = JSON.parse(result);
+  const { type, puppyBreedKo, puppyBreedEn, description, imageUrl } =
+    JSON.parse(result);
   return (
     <View style={styles.container}>
       <ResultBG style={styles.background} />
@@ -33,8 +34,8 @@ const TestResult = () => {
       <View style={styles.outerBox}>
         <View style={styles.innerBox}>
           <ExpoImage
-            source={{ uri: imageUrl }} 
-            style={{ width: 148, height: 160 }} 
+            source={{ uri: imageUrl }}
+            style={{ width: 148, height: 160 }}
             contentFit='cover'
             cachePolicy='disk'
             onError={(e) => {
@@ -45,8 +46,8 @@ const TestResult = () => {
         </View>
       </View>
 
-      <Text style={styles.korText}>{puppyBreed}</Text>
-      <Text style={styles.engText}>{description}</Text>
+      <Text style={styles.korText}>{puppyBreedKo}</Text>
+      <Text style={styles.engText}>{puppyBreedEn}</Text>
 
       <View style={{ paddingHorizontal: 16, width: '100%' }}>
         <TouchableOpacity

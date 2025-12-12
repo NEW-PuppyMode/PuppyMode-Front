@@ -217,15 +217,15 @@ const DayComponent = ({
   }
 
   if (isToday) {
-    textStyles.push(styles.todayText);
+    textStyles.push({ ...styles.todayText, fontSize: 16 });
   } else if (!isCurrentMonth) {
-    textStyles.push(styles.otherMonthText);
+    textStyles.push({ ...styles.otherMonthText, fontSize: 16 });
   } else {
     // 🟢 여기서 미래 날짜 처리
     if (date.dateString > today) {
-      textStyles.push(styles.otherMonthText); // 회색 처리
+      textStyles.push({ ...styles.otherMonthText, fontSize: 16 }); // 회색 처리
     } else if (!marked) {
-      textStyles.push(styles.currentMonthText);
+      textStyles.push({ ...styles.currentMonthText, fontSize: 16 });
     }
   }
 
@@ -319,7 +319,7 @@ export default function CalendarPage() {
 
   const renderMonths = () => {
     const months = LocaleConfig.locales['ko'].monthNamesShort;
-    return months.map((month, index) => (
+    return months.map((month: string, index: number) => (
       <TouchableOpacity
         key={index}
         style={[
@@ -358,7 +358,7 @@ export default function CalendarPage() {
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.container}>
         {/* 상단 헤더 */}
-        <View className='px-4 mt-12 h-[60px] justify-center'>
+        <View className='px-[26px] mt-12 h-[60px] justify-center'>
           <TouchableOpacity onPress={() => router.back()} className='w-[8px]'>
             <Image
               className='w-[8px] h-[16px]'
@@ -419,7 +419,12 @@ export default function CalendarPage() {
         <View className='absolute w-full p-5 bottom-11'>
           <TouchableOpacity
             className='bg-[#1EBE71] rounded-[10px] p-[18px] items-center'
-            onPress={() => router.push('/report')}
+            onPress={() =>
+              router.push({
+                pathname: '/report',
+                params: { year: selectedYear, month: selectedMonth },
+              })
+            }
           >
             <Text className='text-white text-[18px] font-bold'>
               음주 리포트 보기

@@ -11,7 +11,8 @@ export type TestSubmitResponse = {
   message: string;
   result: {
     type: string;
-    puppyBreed: string;
+    puppyBreedKo: string;
+    puppyBreedEn: string;
     description: string;
     imageUrl: string;
   };
@@ -30,6 +31,6 @@ export const TestApi = {
     if (!res.data?.isSuccess) {
       throw new Error(res.data?.message || '검사 제출 실패');
     }
-    return res.data; 
+    return res.data;
   },
 };

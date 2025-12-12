@@ -88,6 +88,7 @@ const SignIn = () => {
             ) : (
               <Text>카카오로 로그인</Text>
             )}
+            
             <View />
           </TouchableOpacity>
           <TouchableOpacity
@@ -179,7 +180,7 @@ const btnStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingLeft: 14,
+    paddingLeft: 27,
     width: '100%',
     height: 54,
     borderRadius: 6,
