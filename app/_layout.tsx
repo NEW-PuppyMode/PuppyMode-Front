@@ -11,13 +11,14 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import 'react-native-reanimated';
 import {
   Text as RNText,
   TextInput as RNTextInput,
   type StyleProp,
   type TextStyle,
 } from 'react-native';
+import 'react-native-gesture-handler';
+import 'react-native-reanimated';
 
 function setGlobalFontFamily(fontFamily: string) {
   const TextComp = RNText as unknown as {
