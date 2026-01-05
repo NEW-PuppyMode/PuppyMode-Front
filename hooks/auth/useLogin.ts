@@ -1,7 +1,7 @@
 import { KEYS } from '@/constants/storage';
 import { KakaoLoginResult, loginAPI } from '@/services/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { login as kakaoLoginSDK } from '@react-native-seoul/kakao-login';
+import { login as loginWithKakaoAccount } from '@react-native-seoul/kakao-login';
 import { useCallback, useState } from 'react';
 
 export interface UseLoginReturn {
@@ -22,7 +22,7 @@ export const useLogin = (): UseLoginReturn => {
     setIsLoading(true);
     setError(null);
     try {
-      const sdkResult = await kakaoLoginSDK();
+      const sdkResult = await loginWithKakaoAccount();
 
       const { accessToken, refreshToken } = sdkResult;
 
