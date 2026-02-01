@@ -1,4 +1,4 @@
-package com.anonymous.puppymod
+package com.anonymous.puppymode
 
 import android.app.Application
 import android.content.res.Configuration

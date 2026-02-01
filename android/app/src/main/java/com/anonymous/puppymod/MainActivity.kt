@@ -1,4 +1,4 @@
-package com.anonymous.puppymod
+package com.anonymous.puppymode
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build
