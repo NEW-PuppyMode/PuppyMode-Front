@@ -70,7 +70,7 @@ export default function RootLayout() {
     }
 
     enableMocking();
-  }, []);
+  }, [loaded]);
 
   if (!loaded || !mockReady) {
     return null;
