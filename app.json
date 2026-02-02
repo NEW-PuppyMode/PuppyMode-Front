@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "puppymod",
-    "slug": "puppymod",
+    "name": "puppymode",
+    "slug": "puppymode",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.puppymod"
+      "bundleIdentifier": "com.anonymous.puppymode"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +18,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.puppymod"
+      "package": "com.anonymous.puppymode"
     },
     "web": {
       "bundler": "metro",
