@@ -8,28 +8,28 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		3CF818DA87E69E76B4B92670 /* libPods-puppymode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B63D5D9E59425CF1B8847B44 /* libPods-puppymode.a */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		73AC41257FE0150405AAA4B6 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3DEEC49290A5F565482C73 /* ExpoModulesProvider.swift */; };
+		A8E0A0D3627637B1238BA28A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C01721E46EE32C77AD7416C7 /* PrivacyInfo.xcprivacy */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		BE4748C63BBFEF6567A5FE6F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 085A9A788CF523DAF893E3ED /* PrivacyInfo.xcprivacy */; };
-		E994EED0E0D2D00D36AF1B03 /* libPods-puppymod.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EFEEE9E80A4B08BE0A460C86 /* libPods-puppymod.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
+		F325B8AE57103DB4F67B4648 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D27C8D5FA4EAFFC51C5F82C8 /* ExpoModulesProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		074B49C06DBC9897F65A3F39 /* Pods-puppymod.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-puppymod.debug.xcconfig"; path = "Target Support Files/Pods-puppymod/Pods-puppymod.debug.xcconfig"; sourceTree = "<group>"; };
-		085A9A788CF523DAF893E3ED /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = puppymod/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* puppymod.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = puppymod.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = puppymod/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = puppymod/Info.plist; sourceTree = "<group>"; };
-		2E3DEEC49290A5F565482C73 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-puppymod/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		8DDDF50459BAF43428D8AECE /* Pods-puppymod.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-puppymod.release.xcconfig"; path = "Target Support Files/Pods-puppymod/Pods-puppymod.release.xcconfig"; sourceTree = "<group>"; };
-		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = puppymod/SplashScreen.storyboard; sourceTree = "<group>"; };
+		13B07F961A680F5B00A75B9A /* puppymode.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = puppymode.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = puppymode/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = puppymode/Info.plist; sourceTree = "<group>"; };
+		A5337478F36D1C9657DA31DB /* Pods-puppymode.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-puppymode.release.xcconfig"; path = "Target Support Files/Pods-puppymode/Pods-puppymode.release.xcconfig"; sourceTree = "<group>"; };
+		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = puppymode/SplashScreen.storyboard; sourceTree = "<group>"; };
+		B63D5D9E59425CF1B8847B44 /* libPods-puppymode.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-puppymode.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
+		C01721E46EE32C77AD7416C7 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = puppymode/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		D27C8D5FA4EAFFC51C5F82C8 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-puppymode/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		EB792679CC128237AD8AB19D /* Pods-puppymode.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-puppymode.debug.xcconfig"; path = "Target Support Files/Pods-puppymode/Pods-puppymode.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		EFEEE9E80A4B08BE0A460C86 /* libPods-puppymod.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-puppymod.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = puppymod/AppDelegate.swift; sourceTree = "<group>"; };
-		F11748442D0722820044C1D9 /* puppymod-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "puppymod-Bridging-Header.h"; path = "puppymod/puppymod-Bridging-Header.h"; sourceTree = "<group>"; };
+		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = puppymode/AppDelegate.swift; sourceTree = "<group>"; };
+		F11748442D0722820044C1D9 /* puppymode-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "puppymode-Bridging-Header.h"; path = "puppymode/puppymode-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,50 +37,42 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E994EED0E0D2D00D36AF1B03 /* libPods-puppymod.a in Frameworks */,
+				3CF818DA87E69E76B4B92670 /* libPods-puppymode.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		13B07FAE1A68108700A75B9A /* puppymod */ = {
+		13B07FAE1A68108700A75B9A /* puppymode */ = {
 			isa = PBXGroup;
 			children = (
 				F11748412D0307B40044C1D9 /* AppDelegate.swift */,
-				F11748442D0722820044C1D9 /* puppymod-Bridging-Header.h */,
+				F11748442D0722820044C1D9 /* puppymode-Bridging-Header.h */,
 				BB2F792B24A3F905000567C9 /* Supporting */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				085A9A788CF523DAF893E3ED /* PrivacyInfo.xcprivacy */,
+				C01721E46EE32C77AD7416C7 /* PrivacyInfo.xcprivacy */,
 			);
-			name = puppymod;
+			name = puppymode;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				EFEEE9E80A4B08BE0A460C86 /* libPods-puppymod.a */,
+				B63D5D9E59425CF1B8847B44 /* libPods-puppymode.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		4F62EB59DAA0136C9ACB47E2 /* puppymod */ = {
+		6051B4560412446C55D21493 /* puppymode */ = {
 			isa = PBXGroup;
 			children = (
-				2E3DEEC49290A5F565482C73 /* ExpoModulesProvider.swift */,
+				D27C8D5FA4EAFFC51C5F82C8 /* ExpoModulesProvider.swift */,
 			);
-			name = puppymod;
-			sourceTree = "<group>";
-		};
-		7789DE38087A9DF06DB7B8B9 /* ExpoModulesProviders */ = {
-			isa = PBXGroup;
-			children = (
-				4F62EB59DAA0136C9ACB47E2 /* puppymod */,
-			);
-			name = ExpoModulesProviders;
+			name = puppymode;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -93,12 +85,12 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				13B07FAE1A68108700A75B9A /* puppymod */,
+				13B07FAE1A68108700A75B9A /* puppymode */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				DD808CC86BD32BE527A05CD2 /* Pods */,
-				7789DE38087A9DF06DB7B8B9 /* ExpoModulesProviders */,
+				F8C4B5A8D9372E15A73B8E7D /* Pods */,
+				A37F99CC3CFA310EEAE762A1 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -108,9 +100,17 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* puppymod.app */,
+				13B07F961A680F5B00A75B9A /* puppymode.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A37F99CC3CFA310EEAE762A1 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				6051B4560412446C55D21493 /* puppymode */,
+			);
+			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -119,14 +119,14 @@
 				BB2F792C24A3F905000567C9 /* Expo.plist */,
 			);
 			name = Supporting;
-			path = puppymod/Supporting;
+			path = puppymode/Supporting;
 			sourceTree = "<group>";
 		};
-		DD808CC86BD32BE527A05CD2 /* Pods */ = {
+		F8C4B5A8D9372E15A73B8E7D /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				074B49C06DBC9897F65A3F39 /* Pods-puppymod.debug.xcconfig */,
-				8DDDF50459BAF43428D8AECE /* Pods-puppymod.release.xcconfig */,
+				EB792679CC128237AD8AB19D /* Pods-puppymode.debug.xcconfig */,
+				A5337478F36D1C9657DA31DB /* Pods-puppymode.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -134,26 +134,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		13B07F861A680F5B00A75B9A /* puppymod */ = {
+		13B07F861A680F5B00A75B9A /* puppymode */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "puppymod" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "puppymode" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				9305A6BEF97ED10021B82C8D /* [Expo] Configure project */,
+				15CE6742FFB860CB802093CF /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				67D309F32117DCC66A443AEE /* [CP] Embed Pods Frameworks */,
+				4E53A10C5E495F11D47AF8C4 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = puppymod;
-			productName = puppymod;
-			productReference = 13B07F961A680F5B00A75B9A /* puppymod.app */;
+			name = puppymode;
+			productName = puppymode;
+			productReference = 13B07F961A680F5B00A75B9A /* puppymode.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -169,7 +169,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "puppymod" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "puppymode" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -182,7 +182,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* puppymod */,
+				13B07F861A680F5B00A75B9A /* puppymode */,
 			);
 		};
 /* End PBXProject section */
@@ -195,7 +195,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				BE4748C63BBFEF6567A5FE6F /* PrivacyInfo.xcprivacy in Resources */,
+				A8E0A0D3627637B1238BA28A /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,20 +232,39 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-puppymod-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-puppymode-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		67D309F32117DCC66A443AEE /* [CP] Embed Pods Frameworks */ = {
+		15CE6742FFB860CB802093CF /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-puppymode/expo-configure-project.sh\"\n";
+		};
+		4E53A10C5E495F11D47AF8C4 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-puppymod/Pods-puppymod-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-puppymode/Pods-puppymode-frameworks.sh",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -254,7 +273,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-puppymod/Pods-puppymod-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-puppymode/Pods-puppymode-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
@@ -263,7 +282,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-puppymod/Pods-puppymod-resources.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-puppymode/Pods-puppymode-resources.sh",
 				"${PODS_CONFIGURATION_BUILD_DIR}/Alamofire/Alamofire.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/EXConstants/EXConstants.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/EXConstants/ExpoConstants_privacy.bundle",
@@ -298,27 +317,8 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-puppymod/Pods-puppymod-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-puppymode/Pods-puppymode-resources.sh\"\n";
 			showEnvVarsInLog = 0;
-		};
-		9305A6BEF97ED10021B82C8D /* [Expo] Configure project */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "[Expo] Configure project";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-puppymod/expo-configure-project.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -328,7 +328,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				73AC41257FE0150405AAA4B6 /* ExpoModulesProvider.swift in Sources */,
+				F325B8AE57103DB4F67B4648 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -337,33 +337,34 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 074B49C06DBC9897F65A3F39 /* Pods-puppymod.debug.xcconfig */;
+			baseConfigurationReference = EB792679CC128237AD8AB19D /* Pods-puppymode.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = puppymod/puppymod.entitlements;
+				CODE_SIGN_ENTITLEMENTS = puppymode/puppymode.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = AGQJU3FNWG;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"FB_SONARKIT_ENABLED=1",
 				);
-				INFOPLIST_FILE = puppymod/Info.plist;
+				INFOPLIST_FILE = puppymode/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.puppymode.app;
-				PRODUCT_NAME = puppymod;
-				SWIFT_OBJC_BRIDGING_HEADER = "puppymod/puppymod-Bridging-Header.h";
+				PRODUCT_BUNDLE_IDENTIFIER = com.anonymous.puppymode;
+				PRODUCT_NAME = puppymode;
+				SWIFT_OBJC_BRIDGING_HEADER = "puppymode/puppymode-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -373,28 +374,29 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8DDDF50459BAF43428D8AECE /* Pods-puppymod.release.xcconfig */;
+			baseConfigurationReference = A5337478F36D1C9657DA31DB /* Pods-puppymode.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = puppymod/puppymod.entitlements;
+				CODE_SIGN_ENTITLEMENTS = puppymode/puppymode.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				INFOPLIST_FILE = puppymod/Info.plist;
+				DEVELOPMENT_TEAM = AGQJU3FNWG;
+				INFOPLIST_FILE = puppymode/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = com.puppymode.app;
-				PRODUCT_NAME = puppymod;
-				SWIFT_OBJC_BRIDGING_HEADER = "puppymod/puppymod-Bridging-Header.h";
+				PRODUCT_BUNDLE_IDENTIFIER = com.anonymous.puppymode;
+				PRODUCT_NAME = puppymode;
+				SWIFT_OBJC_BRIDGING_HEADER = "puppymode/puppymode-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -456,7 +458,10 @@
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -511,7 +516,10 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -522,7 +530,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "puppymod" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "puppymode" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -531,7 +539,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "puppymod" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "puppymode" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,

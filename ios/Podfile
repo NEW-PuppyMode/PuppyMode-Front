@@ -4,13 +4,8 @@ require File.join(File.dirname(`node --print "require.resolve('react-native/pack
 require 'json'
 podfile_properties = JSON.parse(File.read(File.join(__dir__, 'Podfile.properties.json'))) rescue {}
 
-KAKAO_SDK_VERSION = '2.22.0'
-
 ENV['RCT_NEW_ARCH_ENABLED'] = '0' if podfile_properties['newArchEnabled'] == 'false'
 ENV['EX_DEV_CLIENT_NETWORK_INSPECTOR'] = podfile_properties['EX_DEV_CLIENT_NETWORK_INSPECTOR']
-
-# source 'https://github.com/CocoaPods/Specs.git'
-# source 'https://devrepo.kakao.com/nexus/content/groups/public/'
 
 platform :ios, podfile_properties['ios.deploymentTarget'] || '15.1'
 install! 'cocoapods',
@@ -18,7 +13,7 @@ install! 'cocoapods',
 
 prepare_react_native_project!
 
-target 'puppymod' do
+target 'puppymode' do
   use_expo_modules!
 
   if ENV['EXPO_USE_COMMUNITY_AUTOLINKING'] == '1'
@@ -47,10 +42,6 @@ target 'puppymod' do
     :privacy_file_aggregation_enabled => podfile_properties['apple.privacyManifestAggregationEnabled'] != 'false',
   )
 
-  pod 'KakaoSDKCommon', KAKAO_SDK_VERSION
-  pod 'KakaoSDKAuth',   KAKAO_SDK_VERSION
-  pod 'KakaoSDKUser',   KAKAO_SDK_VERSION
-
   post_install do |installer|
     react_native_post_install(
       installer,
@@ -71,4 +62,4 @@ target 'puppymod' do
     end
   end
 end
-KAKAO_SDK_VERSION = '2.20.1'
+$KakaoSDKVersion="2.22.7"

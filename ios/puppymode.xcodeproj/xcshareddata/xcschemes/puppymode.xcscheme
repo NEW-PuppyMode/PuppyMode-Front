@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "puppymod.app"
-               BlueprintName = "puppymod"
-               ReferencedContainer = "container:puppymod.xcodeproj">
+               BuildableName = "puppymode.app"
+               BlueprintName = "puppymode"
+               ReferencedContainer = "container:puppymode.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "puppymodTests.xctest"
-               BlueprintName = "puppymodTests"
-               ReferencedContainer = "container:puppymod.xcodeproj">
+               BuildableName = "puppymodeTests.xctest"
+               BlueprintName = "puppymodeTests"
+               ReferencedContainer = "container:puppymode.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "puppymod.app"
-            BlueprintName = "puppymod"
-            ReferencedContainer = "container:puppymod.xcodeproj">
+            BuildableName = "puppymode.app"
+            BlueprintName = "puppymode"
+            ReferencedContainer = "container:puppymode.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "puppymod.app"
-            BlueprintName = "puppymod"
-            ReferencedContainer = "container:puppymod.xcodeproj">
+            BuildableName = "puppymode.app"
+            BlueprintName = "puppymode"
+            ReferencedContainer = "container:puppymode.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
