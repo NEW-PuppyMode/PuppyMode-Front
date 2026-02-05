@@ -1,14 +1,14 @@
 import { KEYS } from '@/constants/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios, { InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
-const baseUrl =
+const baseURL =
   process.env.MOCK_ACTIVATE === 'enable'
     ? process.env.EXPO_PUBLIC_MOCK_API_URL
     : process.env.EXPO_PUBLIC_API_URL;
 
 export const axiosInstance = axios.create({
-  baseURL: baseUrl,
+  baseURL,
   withCredentials: true,
   timeout: 10000,
 });
@@ -28,72 +28,36 @@ function attachAccessToken(
 ): InternalAxiosRequestConfig {
   config.headers = config.headers ?? {};
   config.headers[KEYS.AUTH_HEADER_KEY] = `Bearer ${token}`;
-
   return config;
 }
 
-axiosInstance.interceptors.request.use((config) => {
-  console.log(
-    '[REQ]',
-    config.method?.toUpperCase(),
-    `${config.baseURL ?? ''}${config.url}`,
-  );
-  return config;
-});
-
-axiosInstance.interceptors.response.use(
-  (res) => {
-    console.log(
-      '[RES]',
-      res.status,
-      `${res.config.baseURL ?? ''}${res.config.url}`,
-    );
-    return res;
-  },
-  (err) => {
-    console.log(
-      '[ERR]',
-      err.response?.status,
-      `${err.config?.baseURL ?? ''}${err.config?.url}`,
-    );
-    console.log('[ERR DATA]', err.response?.data);
-    return Promise.reject(err);
-  },
-);
-
+/** REQUEST */
 axiosInstance.interceptors.request.use(
   async (config) => {
+    const url = `${config.baseURL ?? ''}${config.url ?? ''}`;
+    console.log('[REQ]', config.method?.toUpperCase(), url);
+
     const token = await getAccessToken();
     return token ? attachAccessToken(config, token) : config;
   },
   (error) => Promise.reject(error),
 );
 
+/** RESPONSE */
 axiosInstance.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    // const originalRequest = error.config;
+  (res) => {
+    const url = `${res.config.baseURL ?? ''}${res.config.url ?? ''}`;
+    console.log('[RES]', res.status, url);
+    return res;
+  },
+  async (error: AxiosError) => {
+    const status = error.response?.status;
+    const url = `${error.config?.baseURL ?? ''}${error.config?.url ?? ''}`;
 
-    // if (
-    //   error.response?.status === 401 &&
-    //   !originalRequest._retry
-    //   // && originalRequest.url !== '/auth/refresh'
-    // ) {
-    //   originalRequest._retry = true;
+    console.log('[ERR]', status, url);
+    console.log('[ERR DATA]', error.response?.data);
 
-    //   try {
-    //     const { result: newAccessToken } = await loginAPI.refresh();
-
-    //     await AsyncStorage.setItem(KEYS.ACCESS_TOKEN, newAccessToken);
-    //     return axiosInstance(
-    //       attachAccessToken(originalRequest, newAccessToken),
-    //     );
-    //   } catch (refreshError) {
-    //     await AsyncStorage.removeItem(KEYS.ACCESS_TOKEN);
-    //     router.navigate('/');
-    //     return Promise.reject(refreshError);
-    //   }
-    // }
+    // 여기서 나중에 401 refresh 로직 넣기 좋음
     return Promise.reject(error);
   },
 );
