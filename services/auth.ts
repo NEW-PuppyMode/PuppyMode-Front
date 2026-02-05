@@ -1,5 +1,6 @@
+import { KEYS } from '@/constants/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { axiosInstance } from '.';
-
 export interface KakaoLoginResult {
   accessToken: string;
   refreshToken: string;
@@ -16,6 +17,12 @@ export interface KakaoLoginResponse {
   result: KakaoLoginResult;
 }
 
+export interface WithdrawResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+}
+
 export const loginAPI = {
   kakaoLogin: async (
     accessToken: string,
@@ -30,6 +37,8 @@ export const loginAPI = {
         refreshToken,
       },
     );
+    await AsyncStorage.setItem(KEYS.ACCESS_TOKEN, accessToken);
+    await AsyncStorage.setItem(KEYS.PROVIDER, 'kakao');
 
     if (!response.data.isSuccess) {
       throw new Error(response.data.message);
@@ -41,6 +50,11 @@ export const loginAPI = {
 
   logout: async (): Promise<void> => {
     await axiosInstance.post('/auth/logout');
+    await AsyncStorage.multiRemove([
+      KEYS.ACCESS_TOKEN,
+      KEYS.REFRESH_TOKEN,
+      KEYS.PROVIDER,
+    ]);
   },
 
   me: async (): Promise<KakaoLoginResult['userInfo']> => {
@@ -50,8 +64,20 @@ export const loginAPI = {
     }
     return response.data.result.userInfo;
   },
+  withdrawApple: async (): Promise<WithdrawResponse> => {
+    const response = await axiosInstance.delete<WithdrawResponse>(
+      '/auth/apple/withdraw',
+    );
+
+    if (!response.data.isSuccess) {
+      throw new Error(response.data.message);
+    }
+
+    return response.data;
+  },
+
   // ✅ 카카오 소셜 회원 탈퇴
-  withdraw: async (): Promise<void> => {
+  withdrawKakao: async (): Promise<void> => {
     const response = await axiosInstance.post('/users/withdraw', {});
     if (!response.data.isSuccess) {
       throw new Error(response.data.message);

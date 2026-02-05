@@ -32,6 +32,35 @@ function attachAccessToken(
   return config;
 }
 
+axiosInstance.interceptors.request.use((config) => {
+  console.log(
+    '[REQ]',
+    config.method?.toUpperCase(),
+    `${config.baseURL ?? ''}${config.url}`,
+  );
+  return config;
+});
+
+axiosInstance.interceptors.response.use(
+  (res) => {
+    console.log(
+      '[RES]',
+      res.status,
+      `${res.config.baseURL ?? ''}${res.config.url}`,
+    );
+    return res;
+  },
+  (err) => {
+    console.log(
+      '[ERR]',
+      err.response?.status,
+      `${err.config?.baseURL ?? ''}${err.config?.url}`,
+    );
+    console.log('[ERR DATA]', err.response?.data);
+    return Promise.reject(err);
+  },
+);
+
 axiosInstance.interceptors.request.use(
   async (config) => {
     const token = await getAccessToken();
