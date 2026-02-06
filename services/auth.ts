@@ -37,7 +37,10 @@ export const loginAPI = {
         refreshToken,
       },
     );
-    await AsyncStorage.setItem(KEYS.ACCESS_TOKEN, accessToken);
+    await AsyncStorage.setItem(
+      KEYS.ACCESS_TOKEN,
+      response.data.result.accessToken,
+    );
     await AsyncStorage.setItem(KEYS.PROVIDER, 'kakao');
 
     if (!response.data.isSuccess) {
