@@ -57,4 +57,13 @@ expo.useLegacyPackaging=false
 
 # Whether the app is configured to use edge-to-edge via the app config or `react-native-edge-to-edge` plugin
 expo.edgeToEdgeEnabled=true
-android.kotlinVersion=1.5.10
+
+
+#kakao
+KAKAO_NATIVE_APP_KEY=
+
+# ==== Android signing (DO NOT COMMIT REAL VALUES) ====
+MYAPP_RELEASE_STORE_FILE=
+MYAPP_RELEASE_STORE_PASSWORD=
+MYAPP_RELEASE_KEY_ALIAS=
+MYAPP_RELEASE_KEY_PASSWORD=

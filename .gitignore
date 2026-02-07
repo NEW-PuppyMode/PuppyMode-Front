@@ -38,3 +38,10 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+
+# android
+*.keystore
+android/app/*.keystore
+android/gradle.properties
+*.cer

@@ -31,8 +31,8 @@ import {
   Text,
   View,
 } from 'react-native';
-import Gif from 'react-native-gif';
-
+// import Gif from 'react-native-gif';
+import { Image as Gif } from 'expo-image';
 export default function HomeScreen() {
   const {
     renamePuppy,
@@ -287,7 +287,8 @@ export default function HomeScreen() {
           <Gif
             source={getPuppyGifSource(puppyName ?? '', level)}
             style={{ width: 240, height: 240, position: 'absolute' }}
-            resizeMode='contain'
+            contentFit='contain'
+            autoplay
           />
         </ThemedView>
 

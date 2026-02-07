@@ -1,7 +1,7 @@
 import { KEYS } from '@/constants/storage';
 import { KakaoLoginResult, loginAPI } from '@/services/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { login as kakaoLoginSDK } from '@react-native-seoul/kakao-login';
+import { login as loginWithKakaoAccount } from '@react-native-seoul/kakao-login';
 import { useCallback, useState } from 'react';
 
 export interface UseLoginReturn {
@@ -22,7 +22,9 @@ export const useLogin = (): UseLoginReturn => {
     setIsLoading(true);
     setError(null);
     try {
-      const { accessToken, refreshToken } = await kakaoLoginSDK();
+      const sdkResult = await loginWithKakaoAccount();
+
+      const { accessToken, refreshToken } = sdkResult;
 
       const result: KakaoLoginResult = await loginAPI.kakaoLogin(
         accessToken,
@@ -33,7 +35,7 @@ export const useLogin = (): UseLoginReturn => {
 
       setUserInfo(result.userInfo);
     } catch (err: any) {
-      console.error('로그인 에러:', err);
+      console.error('[KAKAO] 로그인 에러:', err);
       setError(err.message ?? '로그인에 실패했습니다.');
     } finally {
       setIsLoading(false);

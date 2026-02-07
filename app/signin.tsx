@@ -43,13 +43,17 @@ const SignIn = () => {
       <View style={styles.titleContainer}>
         <Text style={styles.title}>어차피 못지킬 약속,</Text>
         <View style={{ position: 'relative', alignSelf: 'flex-start' }}>
-          <Text style={[styles.title, { color: '#3C3C3C', zIndex: 10 }]}>
-            <Text style={{ color: '#00A775' }}>강아지 모드</Text>가
-            도와드립니다.
+          <Text
+            className='relative'
+            style={[styles.title, { color: '#3C3C3C', zIndex: 10 }]}
+          >
+            <Text style={{ color: '#00A775' }}>멍뭉이</Text>가 도와드립니다.
           </Text>
-
           <View style={styles.titleBox} />
         </View>
+        <Text style={[styles.title, { color: '#00A775' }]}>
+          멍멍멍머엄어어머엄머엉
+        </Text>
 
         <Text style={styles.description}>
           올바른 음주 습관을 가질 수 있도록 도와드릴게요.
@@ -157,8 +161,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    width: 137,
-    height: 17,
+    height: '50%',
+    width: 63,
     backgroundColor: '#E4FAE8',
   },
   description: {

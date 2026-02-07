@@ -15,7 +15,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/ic_launcher.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -31,7 +31,6 @@
         "@react-native-seoul/kakao-login",
         {
           "kakaoAppKey": "c3e8f77f2c2654beb51541c4161ff1aa",
-
         }
       ],
       "expo-router",
