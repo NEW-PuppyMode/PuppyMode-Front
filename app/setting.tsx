@@ -17,6 +17,10 @@ const Setting = () => {
 
   const { logout } = useAuth();
 
+  // useEffect(() => {
+  //   crashlytics().log('screen: /setting mounted');
+  // }, []);
+
   return (
     <View style={styles.container}>
       <View
@@ -29,7 +33,7 @@ const Setting = () => {
           height: 60,
         }}
       >
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => router.replace('/home')}>
           <Image
             className='w-[8px] h-[16px]'
             source={require('@/assets/images/chevron_left.png')}

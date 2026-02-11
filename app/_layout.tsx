@@ -1,8 +1,9 @@
-import ErrorBoundary from '@/components/common/ErrorBoundary';
+import { CrashlyticsRouteTracker } from '@/components/common/CrashlyticsRouteTracker';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import theme from '@/styles/theme';
 import { ThemeProvider as EmotionThemeProvider } from '@emotion/react';
+import crashlytics from '@react-native-firebase/crashlytics';
 import {
   DarkTheme,
   DefaultTheme,
@@ -46,6 +47,10 @@ export default function RootLayout() {
   });
   const [mockReady, setMockReady] = useState(false);
 
+  // useEffect(() => {
+  //   crashlytics().log('App started');
+  // }, []);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -78,6 +83,18 @@ export default function RootLayout() {
 
   const ready = loaded && mockReady;
 
+  useEffect(() => {
+    crashlytics().setAttribute('ready', ready ? '1' : '0');
+  }, [ready]);
+
+  useEffect(() => {
+    if (!ready) {
+      crashlytics().log(
+        `RootLayout not ready (loaded=${loaded ? 1 : 0}, mockReady=${mockReady ? 1 : 0})`,
+      );
+    }
+  }, [ready, loaded, mockReady]);
+
   if (!ready) {
     return (
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -92,37 +109,31 @@ export default function RootLayout() {
     <AuthProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <EmotionThemeProvider theme={theme}>
-          <ErrorBoundary>
-            <Stack>
-              <Stack.Screen name='signin' options={{ headerShown: false }} />
-              <Stack.Screen
-                name='home'
-                options={{ title: '홈', headerShown: false }}
-              />
-              <Stack.Screen
-                name='test/start'
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name='test/proceeding'
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name='test/result'
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen name='report' options={{ headerShown: false }} />
-              <Stack.Screen name='calendar' options={{ headerShown: false }} />
-              <Stack.Screen name='setting' options={{ headerShown: false }} />
-              <Stack.Screen
-                name='delete_account'
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen name='+not-found' />
-            </Stack>
-          </ErrorBoundary>
-
+          {/* <ErrorBoundary> */}
+          <CrashlyticsRouteTracker />
+          <Stack>
+            <Stack.Screen name='signin' options={{ headerShown: false }} />
+            <Stack.Screen
+              name='home'
+              options={{ title: '홈', headerShown: false }}
+            />
+            <Stack.Screen name='test/start' options={{ headerShown: false }} />
+            <Stack.Screen
+              name='test/proceeding'
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name='test/result' options={{ headerShown: false }} />
+            <Stack.Screen name='report' options={{ headerShown: false }} />
+            <Stack.Screen name='calendar' options={{ headerShown: false }} />
+            <Stack.Screen name='setting' options={{ headerShown: false }} />
+            <Stack.Screen
+              name='delete_account'
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name='+not-found' />
+          </Stack>
           <StatusBar style='auto' />
+          {/* </ErrorBoundary> */}
         </EmotionThemeProvider>
       </ThemeProvider>
     </AuthProvider>
