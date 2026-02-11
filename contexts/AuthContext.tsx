@@ -13,7 +13,7 @@ type AuthContextValue = {
   isLoggedIn: boolean;
   userInfo: KakaoLoginResult['userInfo'] | null;
   login: () => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);

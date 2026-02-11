@@ -1,12 +1,13 @@
 import NavHeader from '@/components/common/NavHeader';
+import { KEYS } from '@/constants/storage';
 import { useAuth } from '@/contexts/AuthContext';
 import { loginAPI } from '@/services/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const DeleteAccount = () => {
   const { logout } = useAuth();
@@ -16,7 +17,16 @@ const DeleteAccount = () => {
     if (isWithdrawing) return;
     setIsWithdrawing(true);
     try {
-      await loginAPI.withdraw();
+      const provider = await AsyncStorage.getItem(KEYS.PROVIDER);
+
+      if (provider === 'apple') {
+        await loginAPI.withdrawApple();
+      } else if (provider === 'kakao') {
+        await loginAPI.withdrawKakao();
+      } else {
+        throw new Error('알 수 없는 로그인 방식입니다.');
+      }
+
       await logout();
       router.replace('/signin');
     } catch (err: any) {

@@ -8,6 +8,7 @@ export interface IPuppyInfo {
   isPuppyName: boolean;
   isMyName: boolean;
   isGoal: boolean;
+  currentPuppyName?: string;
 }
 
 export interface IsRecorded {

@@ -1,3 +1,4 @@
+import { useAppleLogin } from '@/hooks/auth/useAppleLogin';
 import { useLogin } from '@/hooks/auth/useLogin';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
@@ -21,6 +22,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const SignIn = () => {
   const { isLoading, error, userInfo, loginWithKakao } = useLogin();
+  const { handleSignInApple } = useAppleLogin();
 
   useEffect(() => {
     if (userInfo?.isNewUser) {
@@ -105,9 +107,9 @@ const SignIn = () => {
               },
             ]}
             activeOpacity={0.8}
-            onPress={() =>
-              Alert.alert('준비중', 'Apple 로그인 기능은 준비중입니다.')
-            }
+            onPress={() => {
+              handleSignInApple();
+            }}
           >
             <Apple width={18} height={18} />
             <Text>Apple로 로그인</Text>

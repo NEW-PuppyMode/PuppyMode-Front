@@ -1,16 +1,17 @@
 {
   "expo": {
-    "name": "puppymod",
-    "slug": "puppymod",
+    "name": "puppymode",
+    "slug": "puppymode",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "puppymod",
+    "scheme": "puppymode",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.puppymod"
+      "bundleIdentifier": "com.anonymous.puppymode",
+      "appleTeamId": "AGQJU3FNWG"
     },
     "android": {
       "adaptiveIcon": {
@@ -30,7 +31,6 @@
         "@react-native-seoul/kakao-login",
         {
           "kakaoAppKey": "c3e8f77f2c2654beb51541c4161ff1aa",
-          "overrideKakaoSDKVersion": "2.20.1"
         }
       ],
       "expo-router",
