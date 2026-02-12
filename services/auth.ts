@@ -28,8 +28,8 @@ export const loginAPI = {
     accessToken: string,
     refreshToken: string,
   ): Promise<KakaoLoginResult> => {
-    console.log('accessToken: ', accessToken);
-    console.log('refreshToken: ', refreshToken);
+    // console.log('accessToken: ', accessToken);
+    // console.log('refreshToken: ', refreshToken);
     const response = await axiosInstance.post<KakaoLoginResponse>(
       '/auth/kakao/login',
       {
@@ -47,7 +47,7 @@ export const loginAPI = {
       throw new Error(response.data.message);
     }
 
-    console.log('response.data.result: ', response.data.result);
+    // console.log('response.data.result: ', response.data.result);
     return response.data.result;
   },
 

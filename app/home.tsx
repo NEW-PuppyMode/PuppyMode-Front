@@ -214,6 +214,12 @@ export default function HomeScreen() {
     [],
   );
 
+  useEffect(() => {
+    return () => {
+      (handleAdviceClick as any).cancel?.();
+    };
+  }, [handleAdviceClick]);
+
   const level = puppyInfo?.puppyLevel ?? 0;
   const percent = puppyInfo?.puppyLevelPercent ?? 0;
   const displayName = puppyInfo?.puppyLevelName;

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "261096337243",
+    "project_id": "puppy-mode-215c4",
+    "storage_bucket": "puppy-mode-215c4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261096337243:android:dfe3a5b413a024c1f3f47e",
+        "android_client_info": {
+          "package_name": "com.anonymous.puppymode"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_HWxFIVvn9Y_E2rSk-4QKXPRoRnnSVtk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

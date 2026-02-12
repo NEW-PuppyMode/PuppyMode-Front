@@ -39,13 +39,17 @@ export function TopBar({ level, displayName, percent }: Props) {
       <ThemedView className='fixed top-[-10px] right-0 flex-row ml-4 gap-1 bg-transparent'>
         <TouchableOpacity
           className='w-10 h-10 justify-center items-center bg-white rounded-full shadow-sm'
-          onPress={() => router.push('/calendar')}
+          onPress={() => router.replace('/calendar')}
         >
           <CalendarIcon width={20} height={20} />
         </TouchableOpacity>
         <TouchableOpacity
           className='w-10 h-10 justify-center items-center bg-white rounded-full shadow-sm'
-          onPress={() => router.push('/setting')}
+          onPress={() => {
+            // crashlytics().setAttribute('route_intent', '/setting');
+            // crashlytics().log('navigate: settings (Home/TopBar)');
+            router.replace('/setting');
+          }}
         >
           <SettingIcon width={20} height={20} color='#10B981' />
         </TouchableOpacity>

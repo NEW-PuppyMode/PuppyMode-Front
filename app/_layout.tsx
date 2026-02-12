@@ -1,7 +1,9 @@
+import { CrashlyticsRouteTracker } from '@/components/common/CrashlyticsRouteTracker';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import theme from '@/styles/theme';
 import { ThemeProvider as EmotionThemeProvider } from '@emotion/react';
+import crashlytics from '@react-native-firebase/crashlytics';
 import {
   DarkTheme,
   DefaultTheme,
@@ -43,43 +45,72 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     pretendard: require('../assets/fonts/PretendardVariable.ttf'),
   });
-
   const [mockReady, setMockReady] = useState(false);
 
+  // useEffect(() => {
+  //   crashlytics().log('App started');
+  // }, []);
+
   useEffect(() => {
-    if (loaded) {
-      setGlobalFontFamily('pretendard');
-    }
+    let cancelled = false;
 
-    async function enableMocking() {
-      if (!__DEV__) {
-        setMockReady(true);
-        return;
+    async function init() {
+      if (loaded) setGlobalFontFamily('pretendard');
+
+      const mockEnabled =
+        __DEV__ && process.env.EXPO_PUBLIC_MOCK_ACTIVATE === 'enable';
+
+      if (mockEnabled) {
+        await import('../msw.polyfills');
+        const { server } = await import('../mocks/server');
+        try {
+          server.listen({ onUnhandledRequest: 'bypass' });
+          console.log('[MSW] server.listen(native) ON');
+        } catch (e) {
+          // StrictMode에서 중복 listen 등 방어
+          console.log('[MSW] listen skipped', e);
+        }
       }
 
-      if (process.env.NEXT_PUBLIC_MOCK_ACTIVATE !== 'enable') {
-        setMockReady(true);
-        return;
-      }
-
-      await import('../msw.polyfills');
-      const { server } = await import('../mocks/server');
-      server.listen({ onUnhandledRequest: 'bypass' });
-      console.log('[MSW] server.listen(native) ON');
-      setMockReady(true);
+      if (!cancelled) setMockReady(true);
     }
 
-    enableMocking();
-  }, []);
+    init();
+    return () => {
+      cancelled = true;
+    };
+  }, [loaded]);
 
-  if (!loaded || !mockReady) {
-    return null;
+  const ready = loaded && mockReady;
+
+  useEffect(() => {
+    crashlytics().setAttribute('ready', ready ? '1' : '0');
+  }, [ready]);
+
+  useEffect(() => {
+    if (!ready) {
+      crashlytics().log(
+        `RootLayout not ready (loaded=${loaded ? 1 : 0}, mockReady=${mockReady ? 1 : 0})`,
+      );
+    }
+  }, [ready, loaded, mockReady]);
+
+  if (!ready) {
+    return (
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <EmotionThemeProvider theme={theme}>
+          <StatusBar style='auto' />
+        </EmotionThemeProvider>
+      </ThemeProvider>
+    );
   }
 
   return (
     <AuthProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <EmotionThemeProvider theme={theme}>
+          {/* <ErrorBoundary> */}
+          <CrashlyticsRouteTracker />
           <Stack>
             <Stack.Screen name='signin' options={{ headerShown: false }} />
             <Stack.Screen
@@ -93,6 +124,7 @@ export default function RootLayout() {
             />
             <Stack.Screen name='test/result' options={{ headerShown: false }} />
             <Stack.Screen name='report' options={{ headerShown: false }} />
+            <Stack.Screen name='calendar' options={{ headerShown: false }} />
             <Stack.Screen name='setting' options={{ headerShown: false }} />
             <Stack.Screen
               name='delete_account'
@@ -101,6 +133,7 @@ export default function RootLayout() {
             <Stack.Screen name='+not-found' />
           </Stack>
           <StatusBar style='auto' />
+          {/* </ErrorBoundary> */}
         </EmotionThemeProvider>
       </ThemeProvider>
     </AuthProvider>
