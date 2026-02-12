@@ -223,6 +223,7 @@ export default function HomeScreen() {
   const level = puppyInfo?.puppyLevel ?? 0;
   const percent = puppyInfo?.puppyLevelPercent ?? 0;
   const displayName = puppyInfo?.puppyLevelName;
+  const puppyName = puppyInfo?.currentPuppyName;
 
   // const displayName = puppyInfo?.puppyLevelName
   //   ? puppyInfo.puppyLevelName
@@ -278,7 +279,7 @@ export default function HomeScreen() {
       <TopBar level={level} displayName={displayName ?? ''} percent={percent} />
 
       <ThemedView className='flex-1 px-4 bg-transparent'>
-        <View className='h-44 pt-4 justify-center'>
+        <View className='justify-center pt-4 h-44'>
           {showMessage && (
             <View className='absolute top-0 w-full'>
               <SpeechBubble>
@@ -288,22 +289,16 @@ export default function HomeScreen() {
           )}
         </View>
 
-        <ThemedView className='absolute left-0 right-0 bottom-24 flex-1 justify-center items-center relative bg-transparent'>
-          {/* <DogShadowImage
-            width={150}
-            height={150}
-            style={{ position: 'absolute', bottom: 120, left: 105 }}
-          /> */}
-
+        <ThemedView className='relative left-0 right-0 items-center justify-center flex-1 bg-transparent bottom-24'>
           <Gif
-            source={getPuppyGifSource(puppyInfo?.puppyLevelName ?? '', level)}
+            source={getPuppyGifSource(puppyName ?? '', level)}
             style={{ width: 240, height: 240, position: 'absolute' }}
             contentFit='contain'
             autoplay
           />
         </ThemedView>
 
-        <ThemedView className='rounded-2xl bg-transparent shadow-lg'>
+        <ThemedView className='bg-transparent shadow-lg rounded-2xl'>
           {/* 이름 설정 */}
           {showNameInput && (
             <KeyboardAvoidingView
@@ -316,8 +311,8 @@ export default function HomeScreen() {
                 zIndex: 10,
               }}
             >
-              <ThemedView className='mb-6 bg-transparent rounded-xl p-4'>
-                <ThemedView className='flex-row bg-transparent justify-between mb-2'>
+              <ThemedView className='p-4 mb-6 bg-transparent rounded-xl'>
+                <ThemedView className='flex-row justify-between mb-2 bg-transparent'>
                   <ChoiceButton label='취소' onPress={handleCancel} />
                   <ChoiceButton
                     label='작성 완료'
@@ -339,7 +334,7 @@ export default function HomeScreen() {
           {/* 음주 기록 */}
           {recordMode && recordType && (
             <ThemedView
-              className='bg-transparent rounded-xl p-4'
+              className='p-4 bg-transparent rounded-xl'
               style={{
                 position: 'absolute',
                 top: -300,
@@ -349,7 +344,7 @@ export default function HomeScreen() {
               }}
             >
               <ThemedView
-                className='flex-row bg-transparent mb-2'
+                className='flex-row mb-2 bg-transparent'
                 style={{
                   justifyContent:
                     recordType === 'yesterday' ? 'flex-start' : 'flex-end',
@@ -375,7 +370,7 @@ export default function HomeScreen() {
           {/* 목표 설정 */}
           {showGoalOptions && showGoalInput && (
             <ThemedView
-              className='mb-6 bg-transparent rounded-xl p-4'
+              className='p-4 mb-6 bg-transparent rounded-xl'
               style={{
                 position: 'absolute',
                 top: -270,
@@ -384,7 +379,7 @@ export default function HomeScreen() {
                 zIndex: 10,
               }}
             >
-              <ThemedView className='flex-row bg-transparent justify-between items-center mb-2'>
+              <ThemedView className='flex-row items-center justify-between mb-2 bg-transparent'>
                 <ChoiceButton
                   label='취소'
                   onPress={() => {
@@ -406,7 +401,7 @@ export default function HomeScreen() {
                     }}
                   />
 
-                  <ThemedView className='bg-green-100 rounded-2xl px-6 py-3 mx-1 shadow-sm'>
+                  <ThemedView className='px-6 py-3 mx-1 bg-green-100 shadow-sm rounded-2xl'>
                     <ThemedText
                       style={{
                         color: '#21D08A',
@@ -452,11 +447,11 @@ export default function HomeScreen() {
             </ThemedView>
           )}
 
-          <ThemedView className='absolute left-0 right-0 bottom-10 bg-transparent justify-center h-40'>
-            <ThemedView className='flex-col rounded-2xl p-5 px-4 bg-cream-200 border border-gray-200'>
+          <ThemedView className='absolute left-0 right-0 justify-center h-40 bg-transparent bottom-10'>
+            <ThemedView className='flex-col p-5 px-4 border border-gray-200 rounded-2xl bg-cream-200'>
               <ThemedView className='flex-row justify-between bg-transparent'>
                 {showGoalOptions ? (
-                  <View className='flex-1 flex-row justify-between space-x-2 bg-transparent mb-4'>
+                  <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
                     <IconButton
                       icon={<PastGoalIcon width={24} height={24} />}
                       text='지난 달이랑 똑같아!'
@@ -483,7 +478,7 @@ export default function HomeScreen() {
                   </View>
                 ) : !recordMode &&
                   !(puppyInfo?.isPuppyName && puppyInfo?.isMyName) ? (
-                  <View className='flex-1 flex-row justify-between space-x-2 bg-transparent mb-4'>
+                  <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
                     <IconButton
                       icon={<PawIcon width={24} height={24} />}
                       text='강아지 이름 지어주기'
@@ -500,7 +495,7 @@ export default function HomeScreen() {
                     />
                   </View>
                 ) : recordMode ? (
-                  <View className='flex-1 flex-row justify-between space-x-2 bg-transparent mb-4'>
+                  <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
                     <IconButton
                       icon={<CalendarYesterdayIcon width={24} height={24} />}
                       text='어제 거 기록할래!'

@@ -1,8 +1,7 @@
 import Expo
+import kakao_login
 import React
 import ReactAppDependencyProvider
-import KakaoSDKCommon
-import KakaoSDKAuth
 
 @UIApplicationMain
 public class AppDelegate: ExpoAppDelegate {
@@ -23,10 +22,6 @@ public class AppDelegate: ExpoAppDelegate {
     reactNativeFactory = factory
     bindReactNativeFactory(factory)
 
-    if let appKey = Bundle.main.object(forInfoDictionaryKey: "KAKAO_APP_KEY") as? String {
-      KakaoSDK.initSDK(appKey: appKey)
-    }
-
 #if os(iOS) || os(tvOS)
     window = UIWindow(frame: UIScreen.main.bounds)
     factory.startReactNative(
@@ -44,12 +39,7 @@ public class AppDelegate: ExpoAppDelegate {
     open url: URL,
     options: [UIApplication.OpenURLOptionsKey: Any] = [:]
   ) -> Bool {
-    // 3. 카카오 로그인 후 앱으로 돌아왔을 때 URL 처리
-    // 이 URL이 카카오 로그인 관련 URL인지 확인하고 맞다면 SDK에 전달합니다.
-    if (AuthApi.isKakaoTalkLoginUrl(url)) {
-        return AuthController.handleOpenUrl(url: url)
-    }
-
+  if kakao_login.RNKakaoLogins.isKakaoTalkLoginUrl(url) { return kakao_login.RNKakaoLogins.handleOpen(url) }
     return super.application(app, open: url, options: options) || RCTLinkingManager.application(app, open: url, options: options)
   }
 

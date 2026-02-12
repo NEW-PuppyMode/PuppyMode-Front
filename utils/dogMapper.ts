@@ -27,19 +27,18 @@ export const getPuppyGifSource = (
   levelName: string,
   level: number,
 ): ImageSourcePropType => {
+  const name = (levelName ?? '').trim();
+
   let breedKey: keyof typeof puppyGifs = 'bichon';
+  if (name.includes('웰시코기')) breedKey = 'welshcorgi';
+  else if (name.includes('시바')) breedKey = 'siba';
+  else if (name.includes('푸들')) breedKey = 'poodle';
 
-  if (levelName?.endsWith('웰시코기')) {
-    breedKey = 'welshcorgi';
-  } else if (levelName?.endsWith('시바')) {
-    breedKey = 'siba';
-  } else if (levelName?.endsWith('푸들')) {
-    breedKey = 'poodle';
-  }
+  const safeLevel = (level === 1 || level === 2 || level === 3 ? level : 1) as
+    | 1
+    | 2
+    | 3;
 
-  return (
-    puppyGifs[breedKey]?.[level as 1 | 2 | 3] ||
-    puppyGifs[breedKey]?.[1] ||
-    puppyGifs.bichon[1]
-  );
+  console.log(puppyGifs[breedKey][1]);
+  return puppyGifs[breedKey][safeLevel] ?? puppyGifs[breedKey][1];
 };

@@ -1,5 +1,5 @@
 {
-  "name": "puppymod",
+  "name": "puppymode",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -63,7 +63,10 @@
     "react-native-webview": "13.13.5",
     "tailwindcss": "3.3.2",
     "zod": "^3.25.55",
-    "zustand": "^5.0.5"
+    "zustand": "^5.0.5",
+    "expo-apple-authentication": "~7.2.4",
+    "expo-application": "~6.1.5",
+    "expo-build-properties": "~0.14.8"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
