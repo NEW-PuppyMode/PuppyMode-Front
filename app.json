@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "강아지모드",
+    "name": "멍멍멍멍멍",
     "slug": "puppymode",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,8 +9,9 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.anonymous.puppymode",
+      "googleServicesFile": "./GoogleService-Info.plist",
       "appleTeamId": "AGQJU3FNWG"
     },
     "android": {
@@ -27,6 +28,8 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-firebase/crashlytics",
       [
         "@react-native-seoul/kakao-login",
         {
