@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -85,178 +86,188 @@ const Report = () => {
         </View>
       </View>
 
-      <View
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: 22,
-          marginBottom: 31,
-          width: '100%',
-        }}
+      <ScrollView
+        contentContainerStyle={{ alignItems: 'center' }}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={{ alignItems: 'center' }}>
-          <Text style={styles.summaryTitle}>
-            <Text style={{ color: '#0FD380' }}>{month}월의 나</Text>는
-          </Text>
-          <Text style={styles.summaryTitle}>이렇게 살았다</Text>
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 22,
+            marginBottom: 31,
+            width: '100%',
+          }}
+        >
+          <View style={{ alignItems: 'center' }}>
+            <Text style={styles.summaryTitle}>
+              <Text style={{ color: '#0FD380' }}>{month}월의 나</Text>는
+            </Text>
+            <Text style={styles.summaryTitle}>이렇게 살았다</Text>
+          </View>
         </View>
-      </View>
 
-      <View style={{ flexDirection: 'row', gap: 16, width: '100%' }}>
+        <View style={{ flexDirection: 'row', gap: 16, width: '100%' }}>
+          <View
+            style={[
+              styles.contentBox,
+              {
+                flex: 1,
+                paddingTop: 21,
+                paddingLeft: 11,
+                paddingRight: 16,
+                paddingBottom: 20,
+                height: 256,
+              },
+            ]}
+          >
+            <Text style={styles.contentText}>음주 기록 횟수</Text>
+            <View style={{ alignItems: 'flex-end', width: '100%' }}>
+              <View
+                style={[styles.contentGreenBlock, { flexDirection: 'row' }]}
+              >
+                <View
+                  className='flex-row items-end'
+                  style={{ flexDirection: 'row', alignItems: 'flex-end' }}
+                >
+                  <Text style={styles.contentBlockCommonText}>
+                    {data.drinkRecordCount}
+                  </Text>
+                  <Text
+                    className='text-base'
+                    style={{
+                      color: '#A6DCCC',
+                      fontSize: 16,
+                      fontWeight: '700',
+                    }}
+                  >
+                    /{daysInMonth}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+          <View style={{ flex: 1, gap: 16 }}>
+            <View
+              style={[
+                styles.contentBox,
+                {
+                  flex: 1,
+                  paddingTop: 21,
+                  paddingLeft: 14,
+                  paddingRight: 16,
+                  paddingBottom: 20,
+                },
+              ]}
+            >
+              <Text style={styles.contentText}>술 마신 날</Text>
+              <View style={{ alignItems: 'flex-end', width: '100%' }}>
+                <View
+                  style={[styles.contentGreenBlock, { flexDirection: 'row' }]}
+                >
+                  <Text style={styles.contentBlockCommonText}>
+                    {data.drinkDays}일
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View
+              style={[
+                styles.contentBox,
+                {
+                  flex: 1,
+                  paddingTop: 21,
+                  paddingLeft: 14,
+                  paddingRight: 16,
+                  paddingBottom: 20,
+                },
+              ]}
+            >
+              <Text style={styles.contentText}>이번 달 목표!</Text>
+              <View style={{ alignItems: 'flex-end', width: '100%' }}>
+                <View
+                  style={[styles.contentGreenBlock, { flexDirection: 'row' }]}
+                >
+                  <Text style={styles.contentBlockCommonText}>
+                    {data.goal}번
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+
         <View
           style={[
             styles.contentBox,
             {
-              flex: 1,
+              flexDirection: 'row',
+              marginTop: 16,
+              width: '100%',
+              height: 120,
               paddingTop: 21,
-              paddingLeft: 11,
+              paddingLeft: 13,
               paddingRight: 16,
-              paddingBottom: 20,
-              height: 256,
+              paddingBottom: 16,
             },
           ]}
         >
-          <Text style={styles.contentText}>음주 기록 횟수</Text>
-          <View style={{ alignItems: 'flex-end', width: '100%' }}>
-            <View style={[styles.contentGreenBlock, { flexDirection: 'row' }]}>
-              <View
-                className='flex-row items-end'
-                style={{ flexDirection: 'row', alignItems: 'flex-end' }}
-              >
-                <Text style={styles.contentBlockCommonText}>
-                  {data.drinkRecordCount}
-                </Text>
-                <Text
-                  className='text-base'
-                  style={{
-                    color: '#A6DCCC',
-                    fontSize: 16,
-                    fontWeight: '700',
-                  }}
-                >
-                  /{daysInMonth}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-        <View style={{ flex: 1, gap: 16 }}>
-          <View
-            style={[
-              styles.contentBox,
-              {
-                flex: 1,
-                paddingTop: 21,
-                paddingLeft: 14,
-                paddingRight: 16,
-                paddingBottom: 20,
-              },
-            ]}
-          >
-            <Text style={styles.contentText}>술 마신 날</Text>
-            <View style={{ alignItems: 'flex-end', width: '100%' }}>
-              <View
-                style={[styles.contentGreenBlock, { flexDirection: 'row' }]}
-              >
-                <Text style={styles.contentBlockCommonText}>
-                  {data.drinkDays}일
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View
-            style={[
-              styles.contentBox,
-              {
-                flex: 1,
-                paddingTop: 21,
-                paddingLeft: 14,
-                paddingRight: 16,
-                paddingBottom: 20,
-              },
-            ]}
-          >
-            <Text style={styles.contentText}>이번 달 목표!</Text>
-            <View style={{ alignItems: 'flex-end', width: '100%' }}>
-              <View
-                style={[styles.contentGreenBlock, { flexDirection: 'row' }]}
-              >
-                <Text style={styles.contentBlockCommonText}>{data.goal}번</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-      </View>
-
-      <View
-        style={[
-          styles.contentBox,
-          {
-            flexDirection: 'row',
-            marginTop: 16,
-            width: '100%',
-            height: 120,
-            paddingTop: 21,
-            paddingLeft: 13,
-            paddingRight: 16,
-            paddingBottom: 16,
-          },
-        ]}
-      >
-        <Text style={styles.contentText}>
-          이번 달 {'\n'}목표 달성 {'\n'}확률
-        </Text>
-        <View style={{ justifyContent: 'flex-end' }}>
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              width: 108,
-              height: 54,
-              borderRadius: 15,
-              backgroundColor: '#0FD380',
-            }}
-          >
-            <Text
+          <Text style={styles.contentText}>
+            이번 달 {'\n'}목표 달성 {'\n'}확률
+          </Text>
+          <View style={{ justifyContent: 'flex-end' }}>
+            <View
               style={{
-                color: '#FFF',
-                textAlign: 'center',
-                fontSize: 30,
-                fontWeight: '800',
-                lineHeight: 40,
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: 108,
+                height: 54,
+                borderRadius: 15,
+                backgroundColor: '#0FD380',
               }}
             >
-              {data.achievementRate}%
-            </Text>
+              <Text
+                style={{
+                  color: '#FFF',
+                  textAlign: 'center',
+                  fontSize: 30,
+                  fontWeight: '800',
+                  lineHeight: 40,
+                }}
+              >
+                {data.achievementRate}%
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
-      <View
-        style={[
-          styles.contentBox,
-          {
-            flexDirection: 'row',
-            marginTop: 16,
-            width: '100%',
-            height: 120,
-            paddingTop: 21,
-            paddingLeft: 13,
-            paddingRight: 16,
-            paddingBottom: 16,
-          },
-        ]}
-      >
-        <Text style={styles.contentText}>
-          이번 달 {'\n'}한마디 {'\n'}들은 횟수
-        </Text>
-        <View style={{ justifyContent: 'flex-end' }}>
-          <View style={styles.contentGreenBlock}>
-            <Text style={styles.contentBlockCommonText}>
-              {data.scoldedCount}번
-            </Text>
+        <View
+          style={[
+            styles.contentBox,
+            {
+              flexDirection: 'row',
+              marginTop: 16,
+              marginBottom: 80,
+              width: '100%',
+              height: 120,
+              paddingTop: 21,
+              paddingLeft: 13,
+              paddingRight: 16,
+              paddingBottom: 16,
+            },
+          ]}
+        >
+          <Text style={styles.contentText}>
+            이번 달 {'\n'}한마디 {'\n'}들은 횟수
+          </Text>
+          <View style={{ justifyContent: 'flex-end' }}>
+            <View style={styles.contentGreenBlock}>
+              <Text style={styles.contentBlockCommonText}>
+                {data.scoldedCount}번
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
