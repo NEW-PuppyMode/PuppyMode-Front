@@ -112,6 +112,7 @@ export default function RootLayout() {
           {/* <ErrorBoundary> */}
           <CrashlyticsRouteTracker />
           <Stack>
+            <Stack.Screen name='index' options={{ headerShown: false }} />
             <Stack.Screen name='signin' options={{ headerShown: false }} />
             <Stack.Screen
               name='home'
