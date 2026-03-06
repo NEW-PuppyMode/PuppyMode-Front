@@ -12,7 +12,6 @@ export default function Index() {
   useEffect(() => {
     async function checkToken() {
       const token = await AsyncStorage.getItem(KEYS.ACCESS_TOKEN);
-      console.log('맨처음 인덱스에서 token:', token);
       setHasToken(!!token);
     }
 
