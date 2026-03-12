@@ -36,7 +36,7 @@ const TestStart = () => {
             borderRadius: 10,
             backgroundColor: '#0FD380',
           }}
-          onPress={() => router.push('/test/proceeding')}
+          onPress={() => router.replace('/test/proceeding')}
         >
           <Text
             style={{

@@ -52,7 +52,7 @@ const TestResult = () => {
       <View style={{ paddingHorizontal: 16, width: '100%' }}>
         <TouchableOpacity
           style={styles.bottomBtn}
-          onPress={() => router.push('/home')}
+          onPress={() => router.replace('/home')}
         >
           <Text className='font-medium text-white'>시작하기</Text>
         </TouchableOpacity>

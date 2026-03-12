@@ -132,7 +132,7 @@ export default function TestProceeding() {
 
         console.log('제출 성공:', res.message);
         console.log('제출 성공:', res.result);
-        router.push({
+        router.replace({
           pathname: '/test/result',
           params: { result: JSON.stringify(res.result) },
         });
@@ -156,9 +156,7 @@ export default function TestProceeding() {
           <TouchableOpacity
             style={{ width: '100%' }}
             onPress={() => {
-              if (step === 1) {
-                router.back();
-              } else {
+              if (step !== 1) {
                 setStep((s) => Math.max(1, s - 1));
               }
             }}

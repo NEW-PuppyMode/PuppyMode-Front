@@ -164,7 +164,7 @@ export default function HomeScreen() {
                 {dogName}
               </Text>
               이라니..
-              <Text>{'\n'}나쁘지 않지만.. 좋진 않아요..</Text>
+              <Text>{'\n'}너무 좋아요!</Text>
             </>
           );
           setRenameMessage(coloredMessage);
