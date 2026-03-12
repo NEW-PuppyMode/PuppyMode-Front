@@ -15,7 +15,7 @@ const TestStart = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>나에게 딱 맞는</Text>
-      <Text style={styles.title}>강아지를 분양 받아요!</Text>
+      <Text style={styles.title}>강아지를 입양 받아요!</Text>
 
       <View style={styles.outerBox}>
         <View style={styles.innerBox}>

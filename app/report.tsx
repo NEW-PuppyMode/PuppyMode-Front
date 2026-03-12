@@ -73,7 +73,7 @@ const Report = () => {
     <View style={styles.container}>
       <View className='relative flex-row justify-center w-full py-4 mt-12 '>
         <TouchableOpacity
-          className='absolute left-0 self-center '
+          className='px-[8px] py-[6px] absolute left-[-12px] self-center '
           onPress={() => router.back()}
         >
           <Image

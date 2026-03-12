@@ -28,12 +28,16 @@ const Setting = () => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           marginTop: 48,
-          padding: 16,
+          paddingHorizontal: 8,
+          paddingVertical: 16,
           width: '100%',
           height: 60,
         }}
       >
-        <TouchableOpacity onPress={() => router.replace('/home')}>
+        <TouchableOpacity
+          onPress={() => router.replace('/home')}
+          className='px-[8px]'
+        >
           <Image
             className='w-[8px] h-[16px]'
             source={require('@/assets/images/chevron_left.png')}
@@ -50,7 +54,7 @@ const Setting = () => {
         >
           설정
         </Text>
-        <View style={{ width: 24 }} />
+        <View style={{ width: 40 }} />
       </View>
 
       <SettingBtn
