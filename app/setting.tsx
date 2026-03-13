@@ -74,7 +74,7 @@ const Setting = () => {
       <SettingBtn
         title='탈퇴하기'
         onPress={() => {
-          router.replace('/delete_account');
+          router.push('/delete_account');
         }}
       />
       <SettingBtn
