@@ -30,7 +30,7 @@ export const getPuppyGifSource = (
   const name = (levelName ?? '').trim();
 
   let breedKey: keyof typeof puppyGifs = 'bichon';
-  if (name.includes('웰시코기')) breedKey = 'welshcorgi';
+  if (name.includes('코기')) breedKey = 'welshcorgi';
   else if (name.includes('시바')) breedKey = 'siba';
   else if (name.includes('푸들')) breedKey = 'poodle';
 
