@@ -12,6 +12,17 @@ const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DeleteAccount = () => {
   const { logout } = useAuth();
   const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [puppyName, setPuppyName] = useState('멍뭉이');
+
+  // 받침 유무 확인
+  const hasFinalConsonant = (word: string) => {
+    const lastChar = word[word.length - 1];
+    const code = lastChar.charCodeAt(0) - 44032;
+
+    if (code < 0 || code > 11171) return false;
+
+    return code % 28 !== 0;
+  };
 
   const handleDeleteAccount = async () => {
     if (isWithdrawing) return;
@@ -51,7 +62,9 @@ const DeleteAccount = () => {
             정말 떠나시나요?
           </Text>
           <Text className='text-[#C1C1C1] text-[18px] font-medium'>
-            OOO이는 이제 볼 수 없을지도 몰라요..
+            {hasFinalConsonant(puppyName)
+              ? `${puppyName}이는 이제 볼 수 없을지도 몰라요..`
+              : `${puppyName}는 이제 볼 수 없을지도 몰라요..`}
           </Text>
         </View>
         <TouchableOpacity
