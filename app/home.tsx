@@ -164,7 +164,7 @@ export default function HomeScreen() {
                 {dogName}
               </Text>
               이라니..
-              <Text>{'\n'}나쁘지 않지만.. 좋진 않아요..</Text>
+              <Text>{'\n'}너무 좋아요!</Text>
             </>
           );
           setRenameMessage(coloredMessage);
@@ -222,8 +222,8 @@ export default function HomeScreen() {
 
   const level = puppyInfo?.puppyLevel ?? 0;
   const percent = puppyInfo?.puppyLevelPercent ?? 0;
-  const displayName = puppyInfo?.puppyLevelName;
-  const puppyName = puppyInfo?.currentPuppyName;
+  const displayName = puppyInfo?.puppyLevelName; // 강아지 종 ex)눈송이 비숑
+  const puppyName = puppyInfo?.currentPuppyName; // 강아지 이름
 
   // const displayName = puppyInfo?.puppyLevelName
   //   ? puppyInfo.puppyLevelName
@@ -291,7 +291,7 @@ export default function HomeScreen() {
 
         <ThemedView className='relative left-0 right-0 items-center justify-center flex-1 bg-transparent bottom-24'>
           <Gif
-            source={getPuppyGifSource(puppyName ?? '', level)}
+            source={getPuppyGifSource(displayName ?? '', level)}
             style={{ width: 240, height: 240, position: 'absolute' }}
             contentFit='contain'
             autoplay

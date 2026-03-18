@@ -358,10 +358,10 @@ export default function CalendarPage() {
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.container}>
         {/* 상단 헤더 */}
-        <View className='px-[26px] mt-12 h-[60px] justify-center'>
+        <View className='px-[20px] mt-12 h-[60px] justify-center'>
           <TouchableOpacity
             onPress={() => router.replace('/home')}
-            className='w-[8px]'
+            className='px-[8px] py-[6px]'
           >
             <Image
               className='w-[8px] h-[16px]'

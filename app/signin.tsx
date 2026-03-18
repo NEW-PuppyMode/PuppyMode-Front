@@ -11,7 +11,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 import Apple from '../assets/icons/signin/ic_apple.svg';
 import Kakao from '../assets/icons/signin/ic_kakao.svg';
@@ -30,7 +33,8 @@ const SignIn = () => {
 
   useEffect(() => {
     if (userInfo?.isNewUser) router.replace('/test/start');
-    else if (userInfo?.isNewUser === false && userInfo?.username) router.replace('/home');
+    else if (userInfo?.isNewUser === false && userInfo?.username)
+      router.replace('/home');
   }, [userInfo]);
 
   useEffect(() => {
@@ -93,14 +97,23 @@ const SignIn = () => {
             disabled={isLoading}
           >
             <Kakao width={17} height={16} />
-            {isLoading ? <ActivityIndicator color="#3C1E1E" /> : <Text>카카오로 로그인</Text>}
+            {isLoading ? (
+              <ActivityIndicator color='#3C1E1E' />
+            ) : (
+              <Text>카카오로 로그인</Text>
+            )}
             <View />
           </TouchableOpacity>
 
+          {/* android는 아래 버튼 삭제 */}
           <TouchableOpacity
             style={[
               btnStyles.btn,
-              { backgroundColor: '#ffffff', borderWidth: 1, borderColor: '#C1C1C1' },
+              {
+                backgroundColor: '#ffffff',
+                borderWidth: 1,
+                borderColor: '#C1C1C1',
+              },
             ]}
             activeOpacity={0.8}
             onPress={handleSignInApple}
@@ -114,7 +127,7 @@ const SignIn = () => {
       </View>
 
       {/* 배경 */}
-      <View pointerEvents="none" style={styles.bg}>
+      <View pointerEvents='none' style={styles.bg}>
         <View style={{ flex: 1, position: 'relative' }}>
           <Footprint2
             style={{
@@ -155,7 +168,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center', // ✅ 가운데 고정
     minHeight: 0,
-    
   },
 
   bottomBlock: {
@@ -193,7 +205,7 @@ const styles = StyleSheet.create({
 });
 
 const btnStyles = StyleSheet.create({
-  btn: { 
+  btn: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

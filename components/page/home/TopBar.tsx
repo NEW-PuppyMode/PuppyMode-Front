@@ -14,8 +14,8 @@ interface Props {
 export function TopBar({ level, displayName, percent }: Props) {
   return (
     <ThemedView className='relative flex-row justify-between items-center gap-12 px-4 pt-20 bg-transparent'>
-      <ThemedView className='flex-1 px-4 py-3 rounded-2xl'>
-        <ThemedView className='flex-row items-center mb-2'>
+      <ThemedView className='flex-1 px-4 py-3 rounded-2xl bg-cream-200'>
+        <ThemedView className='flex-row items-center mb-2 bg-transparent'>
           <ThemedView className='bg-green-500 px-2 py-1 rounded-full'>
             <ThemedText className='text-white text-xs font-semibold'>
               Level {level}
