@@ -23,7 +23,8 @@ export default function Index() {
   }
 
   if (hasToken) {
-    return <Redirect href='/home' />;
+    return <Redirect href='/signin' />;
+    // return <Redirect href='/home' />;
   }
 
   return <Redirect href='/signin' />;
