@@ -13,7 +13,8 @@ interface Props {
 
 export function TopBar({ level, displayName, percent }: Props) {
   return (
-    <ThemedView className='relative flex-row justify-between items-center gap-12 px-4 pt-20 bg-transparent'>
+    <ThemedView className='relative flex-row justify-between gap-6 px-4 pt-4 bg-transparent'>
+      {/* 좌측 컴포넌트바 */}
       <ThemedView className='flex-1 px-4 py-3 rounded-2xl bg-cream-200'>
         <ThemedView className='flex-row items-center mb-2 bg-transparent'>
           <ThemedView className='bg-green-500 px-2 py-1 rounded-full'>
@@ -36,7 +37,8 @@ export function TopBar({ level, displayName, percent }: Props) {
         </ThemedView>
       </ThemedView>
 
-      <ThemedView className='fixed top-[-10px] right-0 flex-row ml-4 gap-1 bg-transparent'>
+      {/* 원형 아이콘 */}
+      <ThemedView className='flex-row ml-4 gap-x-2.5 bg-transparent'>
         <TouchableOpacity
           className='w-10 h-10 justify-center items-center bg-white rounded-full shadow-sm'
           onPress={() => router.replace('/calendar')}

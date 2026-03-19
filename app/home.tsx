@@ -33,6 +33,7 @@ import {
 } from 'react-native';
 // import Gif from 'react-native-gif';
 import { Image as Gif } from 'expo-image';
+import { SafeAreaView } from 'react-native-safe-area-context';
 export default function HomeScreen() {
   const {
     renamePuppy,
@@ -270,289 +271,290 @@ export default function HomeScreen() {
     }
   };
 
+  // F3 검색용(임시, 차후 삭제)
+  // 01(TopBar), 02(동기부여), 03(강아지), 04(하단 컴포넌트)
   return (
     <ImageBackground
-      source={require('../assets/images/home_background.png')}
-      style={styles.background}
-      resizeMode='cover'
+    source={require('../assets/images/home_background.png')}
+    style={styles.background}
+    resizeMode='cover'
     >
-      <TopBar level={level} displayName={displayName ?? ''} percent={percent} />
+      <SafeAreaView style={styles.background} className='flex flex-column justify-between items-center'>
+        <TopBar level={level} displayName={displayName ?? ''} percent={percent} />
 
-      <ThemedView className='flex-1 px-4 bg-transparent'>
-        <View className='justify-center pt-4 h-44'>
-          {showMessage && (
-            <View className='absolute top-0 w-full'>
-              <SpeechBubble>
-                {renameMessage || adviceMessage || PUPPY_MESSAGES[messageKey]}
-              </SpeechBubble>
-            </View>
-          )}
-        </View>
+        <ThemedView className='flex-1 w-full h-full px-4 bg-transparent'>
+          {/* ===== 동기부여 메시지 ===== */}
+          <View className='justify-center pt-4 h-20 bg-transparent'>
+            {showMessage && (
+              <View className='absolute top-0 w-full'>
+                <SpeechBubble>
+                  {renameMessage || adviceMessage || PUPPY_MESSAGES[messageKey]}
+                </SpeechBubble>
+              </View>
+            )}
+          </View>
+          
+          {/* ===== 강아지 Gif ===== */}
+          <ThemedView className='relative items-center w-full h-20 bg-transparent'>
+            <Gif
+              source={getPuppyGifSource(displayName ?? '', level)}
+              style={{ width: 240, height: 240, position: 'absolute', top: 216 }}
+              contentFit='contain'
+              autoplay
+            />
+          </ThemedView>
 
-        <ThemedView className='relative left-0 right-0 items-center justify-center flex-1 bg-transparent bottom-24'>
-          <Gif
-            source={getPuppyGifSource(displayName ?? '', level)}
-            style={{ width: 240, height: 240, position: 'absolute' }}
-            contentFit='contain'
-            autoplay
-          />
-        </ThemedView>
-
-        <ThemedView className='bg-transparent shadow-lg rounded-2xl'>
-          {/* 이름 설정 */}
-          {showNameInput && (
-            <KeyboardAvoidingView
-              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-              style={{
-                position: 'absolute',
-                top: -320,
-                left: -15,
-                right: -15,
-                zIndex: 10,
-              }}
-            >
-              <ThemedView className='p-4 mb-6 bg-transparent rounded-xl'>
-                <ThemedView className='flex-row justify-between mb-2 bg-transparent'>
-                  <ChoiceButton label='취소' onPress={handleCancel} />
-                  <ChoiceButton
-                    label='작성 완료'
-                    variant={currentValue.trim() ? 'primary' : 'ghost'}
-                    onPress={handleRenameComplete}
-                  />
-                </ThemedView>
-
-                <TextInput
-                  placeholder={currentPlaceholder}
-                  value={currentValue}
-                  onChangeText={currentSetValue}
-                  autoFocus={true}
-                />
-              </ThemedView>
-            </KeyboardAvoidingView>
-          )}
-
-          {/* 음주 기록 */}
-          {recordMode && recordType && (
-            <ThemedView
-              className='p-4 bg-transparent rounded-xl'
-              style={{
-                position: 'absolute',
-                top: -300,
-                left: -15,
-                right: -15,
-                zIndex: 10,
-              }}
-            >
-              <ThemedView
-                className='flex-row mb-2 bg-transparent'
+          {/* ===== 하단 컴포넌트 묶음 ===== */}
+          {/* shadow-lg */}
+          <ThemedView className='flex-1 w-full h-full flex-column justify-between justify-end bg-transparent'>
+            {/* ===== 이름 설정 입력창 ===== */}
+            {showNameInput && (
+              <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                keyboardVerticalOffset={0}
                 style={{
-                  justifyContent:
-                    recordType === 'yesterday' ? 'flex-start' : 'flex-end',
+                  flex: 1,
+                  zIndex: 10,
                 }}
               >
-                <SpeechBubble
-                  variant='user'
-                  onPress={() => handleRecordDrinkHistory(true)}
-                >
-                  술 마셨어!
-                </SpeechBubble>
-                <ThemedView className='w-[10px] bg-transparent' />
-                <SpeechBubble
-                  variant='user'
-                  onPress={() => handleRecordDrinkHistory(false)}
-                >
-                  술 안 마셨어!
-                </SpeechBubble>
-              </ThemedView>
-            </ThemedView>
-          )}
+                <ThemedView className='p-4 mb-6 bg-transparent rounded-xl justify-end'>
+                  <ThemedView className='flex-row justify-between mb-2 bg-transparent'>
+                    <ChoiceButton label='취소' onPress={handleCancel} />
+                    <ChoiceButton
+                      label='작성 완료'
+                      variant={currentValue.trim() ? 'primary' : 'ghost'}
+                      onPress={handleRenameComplete}
+                    />
+                  </ThemedView>
 
-          {/* 목표 설정 */}
-          {showGoalOptions && showGoalInput && (
-            <ThemedView
-              className='p-4 mb-6 bg-transparent rounded-xl'
-              style={{
-                position: 'absolute',
-                top: -270,
-                left: -15,
-                right: -15,
-                zIndex: 10,
-              }}
-            >
-              <ThemedView className='flex-row items-center justify-between mb-2 bg-transparent'>
-                <ChoiceButton
-                  label='취소'
-                  onPress={() => {
-                    setShowGoalInput(false);
-                    setShowGoalOptions(false);
-                    setGoalCount(10);
-                  }}
+                  <TextInput
+                    placeholder={currentPlaceholder}
+                    value={currentValue}
+                    onChangeText={currentSetValue}
+                    autoFocus={true}
+                  />
+                </ThemedView>
+              </KeyboardAvoidingView>
+            )}
+
+            {/* ===== 음주 기록 - 술 섭취 유무 ===== */}
+            {recordMode && recordType && (
+              <ThemedView
+                className='bg-transparent rounded-xl pb-3'
+                style={{
+                  width: '100%',
+                  zIndex: 10,
+                }}
+              >
+                <ThemedView
+                  className='flex-row mb-2 bg-transparent'
                   style={{
-                    opacity: 0.9,
+                    justifyContent:
+                      recordType === 'yesterday' ? 'flex-start' : 'flex-end',
                   }}
-                />
+                >
+                  <SpeechBubble
+                    variant='user'
+                    onPress={() => handleRecordDrinkHistory(true)}
+                  >
+                    술 마셨어!
+                  </SpeechBubble>
+                  <ThemedView className='w-[10px] bg-transparent' />
+                  <SpeechBubble
+                    variant='user'
+                    onPress={() => handleRecordDrinkHistory(false)}
+                  >
+                    술 안 마셨어!
+                  </SpeechBubble>
+                </ThemedView>
+              </ThemedView>
+            )}
 
+            {/* ===== 술 목표 설정 ===== */}
+            {showGoalOptions && showGoalInput && (
+              <ThemedView
+                className='mb-16 bg-transparent rounded-xl'
+                style={{
+                  width: '100%',
+                  zIndex: 10,
+                }}
+              >
                 <ThemedView className='flex-row items-center justify-between bg-transparent'>
-                  <ControlButton
-                    label='-'
-                    onPress={() => setGoalCount((n) => Math.max(1, n - 1))}
+                  <ChoiceButton
+                    label='취소'
+                    onPress={() => {
+                      setShowGoalInput(false);
+                      setShowGoalOptions(false);
+                      setGoalCount(10);
+                    }}
                     style={{
                       opacity: 0.9,
                     }}
                   />
 
-                  <ThemedView className='px-6 py-3 mx-1 bg-green-100 shadow-sm rounded-2xl'>
-                    <ThemedText
+                  <ThemedView className='flex-row items-center justify-between bg-transparent'>
+                    <ControlButton
+                      label='-'
+                      onPress={() => setGoalCount((n) => Math.max(1, n - 1))}
                       style={{
-                        color: '#21D08A',
-                        fontWeight: '600',
-                        fontSize: 16,
+                        opacity: 0.9,
                       }}
-                      className='text-green-500'
-                    >
-                      {goalCount}번
-                    </ThemedText>
+                    />
+
+                    <ThemedView className='px-6 py-3 mx-1 bg-green-100 shadow-sm rounded-2xl'>
+                      <ThemedText
+                        style={{
+                          color: '#21D08A',
+                          fontWeight: '600',
+                          fontSize: 16,
+                        }}
+                        className='text-green-500'
+                      >
+                        {goalCount}번
+                      </ThemedText>
+                    </ThemedView>
+
+                    <ControlButton
+                      label='+'
+                      onPress={() =>
+                        setGoalCount((n) => Math.min(maxDaysInMonth, n + 1))
+                      }
+                      style={{
+                        opacity: 0.9,
+                      }}
+                    />
                   </ThemedView>
 
-                  <ControlButton
-                    label='+'
-                    onPress={() =>
-                      setGoalCount((n) => Math.min(maxDaysInMonth, n + 1))
-                    }
+                  <ChoiceButton
+                    label='작성 완료'
+                    variant='primary'
+                    onPress={() => {
+                      createGoal({
+                        goal: goalCount,
+                        isNew: true,
+                      });
+                      setShowGoalInput(false);
+                      setShowGoalOptions(false);
+                      setGoalCount(0);
+
+                      fetchPuppyInfo();
+                    }}
                     style={{
-                      opacity: 0.9,
+                      opacity: 0.7,
                     }}
                   />
                 </ThemedView>
-
-                <ChoiceButton
-                  label='작성 완료'
-                  variant='primary'
-                  onPress={() => {
-                    createGoal({
-                      goal: goalCount,
-                      isNew: true,
-                    });
-                    setShowGoalInput(false);
-                    setShowGoalOptions(false);
-                    setGoalCount(0);
-
-                    fetchPuppyInfo();
-                  }}
-                  style={{
-                    opacity: 0.7,
-                  }}
-                />
               </ThemedView>
-            </ThemedView>
-          )}
+            )}
 
-          <ThemedView className='absolute left-0 right-0 justify-center h-40 bg-transparent bottom-10'>
-            <ThemedView className='flex-col p-5 px-4 border border-gray-200 rounded-2xl bg-cream-200'>
-              <ThemedView className='flex-row justify-between bg-transparent'>
-                {showGoalOptions ? (
-                  <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
-                    <IconButton
-                      icon={<PastGoalIcon width={24} height={24} />}
-                      text='지난 달이랑 똑같아!'
-                      variant={goalType === 'same' ? 'primary' : 'lightgreen'}
-                      onPress={() => {
-                        setGoalType('same');
-                        setShowGoalInput(false);
-                        setShowGoalOptions(false);
-                        createGoal({
-                          goal: 0,
-                          isNew: false,
-                        });
+            {/* ===== 하단 컴포넌트 버튼 ===== */}
+            <ThemedView className='justify-end w-full h-40 bg-transparent pb-3'>
+              <ThemedView className='flex-col p-5 px-4 border border-gray-200 rounded-2xl bg-cream-200'>
+                <ThemedView className='flex-row justify-between bg-transparent'>
+                  {showGoalOptions ? (
+                    <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
+                      <IconButton
+                        icon={<PastGoalIcon width={24} height={24} />}
+                        text='지난 달이랑 똑같아!'
+                        variant={goalType === 'same' ? 'primary' : 'lightgreen'}
+                        onPress={() => {
+                          setGoalType('same');
+                          setShowGoalInput(false);
+                          setShowGoalOptions(false);
+                          createGoal({
+                            goal: 0,
+                            isNew: false,
+                          });
 
-                        fetchPuppyInfo();
-                      }}
-                      disabled={!recentGoal}
-                    />
-                    <IconButton
-                      icon={<NewGoalIcon width={24} height={24} />}
-                      text='새로운 목표로 가자!'
-                      variant={goalType === 'new' ? 'primary' : 'lightgreen'}
-                      onPress={handleNewGoalClick}
-                    />
-                  </View>
-                ) : !recordMode &&
-                  !(puppyInfo?.isPuppyName && puppyInfo?.isMyName) ? (
-                  <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
-                    <IconButton
-                      icon={<PawIcon width={24} height={24} />}
-                      text='강아지 이름 지어주기'
-                      variant={inputType === 'dog' ? 'primary' : 'ghost'}
-                      onPress={handleDogNameButtonPress}
-                      disabled={puppyInfo?.isPuppyName === true}
-                    />
-                    <IconButton
-                      icon={<PersonIcon width={24} height={24} />}
-                      text='내 이름 알려주기'
-                      variant={inputType === 'user' ? 'primary' : 'ghost'}
-                      onPress={handleUserNameButtonPress}
-                      disabled={puppyInfo?.isMyName === true}
-                    />
-                  </View>
-                ) : recordMode ? (
-                  <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
-                    <IconButton
-                      icon={<CalendarYesterdayIcon width={24} height={24} />}
-                      text='어제 거 기록할래!'
-                      variant={
-                        recordType === 'yesterday' ? 'primary' : 'lightgreen'
-                      }
-                      onPress={() => {
-                        setRecordType('yesterday');
-                        setMessageKey('archiveYesterday');
-                      }}
-                      disabled={
-                        isRecorded && isRecorded.yesterdayRecorded === true
-                      }
-                    />
-                    <IconButton
-                      icon={<CalendarTodayIcon width={24} height={24} />}
-                      text='오늘 기록할래!'
-                      variant={
-                        recordType === 'today' ? 'primary' : 'lightgreen'
-                      }
-                      onPress={() => {
-                        setRecordType('today');
-                        setMessageKey('archiveToday');
-                      }}
-                      disabled={isRecorded && isRecorded.todayRecorded === true}
-                    />
-                  </View>
-                ) : null}
-              </ThemedView>
+                          fetchPuppyInfo();
+                        }}
+                        disabled={!recentGoal}
+                      />
+                      <IconButton
+                        icon={<NewGoalIcon width={24} height={24} />}
+                        text='새로운 목표로 가자!'
+                        variant={goalType === 'new' ? 'primary' : 'lightgreen'}
+                        onPress={handleNewGoalClick}
+                      />
+                    </View>
+                  ) : !recordMode &&
+                    !(puppyInfo?.isPuppyName && puppyInfo?.isMyName) ? (
+                    <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
+                      <IconButton
+                        icon={<PawIcon width={24} height={24} />}
+                        text='강아지 이름 지어주기'
+                        variant={inputType === 'dog' ? 'primary' : 'ghost'}
+                        onPress={handleDogNameButtonPress}
+                        disabled={puppyInfo?.isPuppyName === true}
+                      />
+                      <IconButton
+                        icon={<PersonIcon width={24} height={24} />}
+                        text='내 이름 알려주기'
+                        variant={inputType === 'user' ? 'primary' : 'ghost'}
+                        onPress={handleUserNameButtonPress}
+                        disabled={puppyInfo?.isMyName === true}
+                      />
+                    </View>
+                  ) : recordMode ? (
+                    <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
+                      <IconButton
+                        icon={<CalendarYesterdayIcon width={24} height={24} />}
+                        text='어제 거 기록할래!'
+                        variant={
+                          recordType === 'yesterday' ? 'primary' : 'lightgreen'
+                        }
+                        onPress={() => {
+                          setRecordType('yesterday');
+                          setMessageKey('archiveYesterday');
+                        }}
+                        disabled={
+                          isRecorded && isRecorded.yesterdayRecorded === true
+                        }
+                      />
+                      <IconButton
+                        icon={<CalendarTodayIcon width={24} height={24} />}
+                        text='오늘 기록할래!'
+                        variant={
+                          recordType === 'today' ? 'primary' : 'lightgreen'
+                        }
+                        onPress={() => {
+                          setRecordType('today');
+                          setMessageKey('archiveToday');
+                        }}
+                        disabled={isRecorded && isRecorded.todayRecorded === true}
+                      />
+                    </View>
+                  ) : null}
+                </ThemedView>
 
-              <ThemedView className='flex-row justify-between space-x-2 bg-transparent'>
-                <IconButton
-                  icon={<MessageIcon width={24} height={24} />}
-                  text='나한테 한마디만 해줘'
-                  onPress={handleAdviceClick}
-                />
-
-                {puppyInfo?.isGoal === false ? (
+                <ThemedView className='flex-row justify-between space-x-2 bg-transparent'>
                   <IconButton
-                    icon={<SetGoalIcon width={24} height={24} />}
-                    text='목표 설정하기'
-                    variant={showGoalOptions ? 'primary' : 'ghost'}
-                    onPress={handleShowGoalOptions}
+                    icon={<MessageIcon width={24} height={24} />}
+                    text='나한테 한마디만 해줘'
+                    onPress={handleAdviceClick}
                   />
-                ) : (
-                  <IconButton
-                    icon={<CalendarVIcon width={24} height={24} />}
-                    text='음주 기록 할래!'
-                    variant={recordMode ? 'primary' : 'ghost'}
-                    onPress={handleDrinkRecordPress}
-                  />
-                )}
+
+                  {puppyInfo?.isGoal === false ? (
+                    <IconButton
+                      icon={<SetGoalIcon width={24} height={24} />}
+                      text='목표 설정하기'
+                      variant={showGoalOptions ? 'primary' : 'ghost'}
+                      onPress={handleShowGoalOptions}
+                    />
+                  ) : (
+                    <IconButton
+                      icon={<CalendarVIcon width={24} height={24} />}
+                      text='음주 기록 할래!'
+                      variant={recordMode ? 'primary' : 'ghost'}
+                      onPress={handleDrinkRecordPress}
+                    />
+                  )}
+                </ThemedView>
               </ThemedView>
             </ThemedView>
           </ThemedView>
         </ThemedView>
-      </ThemedView>
+      </SafeAreaView>
     </ImageBackground>
   );
 }
