@@ -22,10 +22,11 @@ import { IsRecorded, RecentGoal } from '@/types/models/puppy';
 import { maxDaysInMonth } from '@/utils/dateUtils';
 import { getPuppyGifSource } from '@/utils/dogMapper';
 import { throttle } from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Animated,
   ImageBackground,
-  KeyboardAvoidingView,
+  Keyboard,
   Platform,
   StyleSheet,
   Text,
@@ -97,6 +98,10 @@ export default function HomeScreen() {
   const [goalType, setGoalType] = useState<'same' | 'new' | null>(null);
   const [goalCount, setGoalCount] = useState(10);
 
+  // 키보드용 상태 변수
+  const [bottomPanelHeight, setBottomPanelHeight] = useState(0);
+  const keyboardAnim = useRef(new Animated.Value(0)).current;
+
   const handleNewGoalClick = () => {
     setShowMessage(true);
     setShowGoalInput(true);
@@ -129,6 +134,7 @@ export default function HomeScreen() {
   };
 
   const handleCancel = () => {
+    Keyboard.dismiss();
     setShowNameInput(false);
     setInputType(null);
     setRecordType(null);
@@ -136,6 +142,7 @@ export default function HomeScreen() {
   };
 
   const handleShowGoalOptions = () => {
+    setShowNameInput(false);
     setShowMessage(true);
     setAdviceMessage('');
     setRenameMessage('');
@@ -271,6 +278,35 @@ export default function HomeScreen() {
     }
   };
 
+  // 입력창 키보드 애니메이션
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      Animated.timing(keyboardAnim, {
+        toValue: e.endCoordinates.height - bottomPanelHeight,
+        duration: e.duration ?? 250,
+        useNativeDriver: true,
+      }).start();
+    });
+
+    const hideSub = Keyboard.addListener(hideEvent, (e) => {
+      Animated.timing(keyboardAnim, {
+        toValue: 0,
+        duration: e.duration ?? 250,
+        useNativeDriver: true,
+      }).start();
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, [bottomPanelHeight, keyboardAnim]);
+
   // F3 검색용(임시, 차후 삭제)
   // 01(TopBar), 02(동기부여), 03(강아지), 04(하단 컴포넌트)
   return (
@@ -305,17 +341,23 @@ export default function HomeScreen() {
           {/* ===== 하단 컴포넌트 묶음 ===== */}
           {/* shadow-lg */}
           <ThemedView className='flex-1 w-full h-full flex-column justify-between justify-end bg-transparent'>
-            {/* ===== 이름 설정 입력창 ===== */}
+            {/* ===== 키보드 - 이름 설정 입력창 ===== */}
             {showNameInput && (
-              <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                keyboardVerticalOffset={0}
+              <Animated.View
                 style={{
-                  flex: 1,
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  bottom: bottomPanelHeight + 12,
                   zIndex: 10,
+                  transform: [
+                    {
+                      translateY: Animated.multiply(keyboardAnim, -1),
+                    },
+                  ],
                 }}
               >
-                <ThemedView className='p-4 mb-6 bg-transparent rounded-xl justify-end'>
+                <ThemedView className='p-0 mb-6 bg-transparent rounded-xl justify-end'>
                   <ThemedView className='flex-row justify-between mb-2 bg-transparent'>
                     <ChoiceButton label='취소' onPress={handleCancel} />
                     <ChoiceButton
@@ -332,7 +374,7 @@ export default function HomeScreen() {
                     autoFocus={true}
                   />
                 </ThemedView>
-              </KeyboardAvoidingView>
+              </Animated.View>
             )}
 
             {/* ===== 음주 기록 - 술 섭취 유무 ===== */}
@@ -447,7 +489,12 @@ export default function HomeScreen() {
 
             {/* ===== 하단 컴포넌트 버튼 ===== */}
             <ThemedView className='justify-end w-full h-40 bg-transparent pb-4'>
-              <ThemedView className='flex-col p-5 px-4 border border-gray-200 rounded-2xl bg-cream-200'>
+              <ThemedView
+                className='flex-col p-5 px-4 border border-gray-200 rounded-2xl bg-cream-200'
+                onLayout={(e) => {
+                  setBottomPanelHeight(e.nativeEvent.layout.height);
+                }}
+              >
                 <ThemedView className='flex-row justify-between bg-transparent'>
                   {showGoalOptions ? (
                     <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
