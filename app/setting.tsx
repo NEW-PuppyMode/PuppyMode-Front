@@ -85,7 +85,7 @@ const Setting = () => {
       />
       <View style={styles.view}>
         <Text style={styles.text}>앱 버전</Text>
-        <Text style={styles.text}>1.0.0</Text>
+        <Text style={styles.text}>1.0.1</Text>
       </View>
 
       <PolicyModal
