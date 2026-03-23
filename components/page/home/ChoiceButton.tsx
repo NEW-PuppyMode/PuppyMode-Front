@@ -15,7 +15,7 @@ export function ChoiceButton({
   variant = 'ghost',
   style,
 }: ChoiceButtonProps) {
-  const base = 'px-2 py-3 rounded-xl items-center justify-center min-w-[88px]';
+  const base = 'px-3 py-3 rounded-xl items-center justify-center min-w-[64px]';
   const variants = {
     primary: 'border border-green-500 bg-white',
     ghost: 'border border-grayscale-200 bg-white bg-opacity-50',

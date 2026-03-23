@@ -275,12 +275,20 @@ export default function HomeScreen() {
   // 01(TopBar), 02(동기부여), 03(강아지), 04(하단 컴포넌트)
   return (
     <ImageBackground
-    source={require('../assets/images/home_background.png')}
-    style={styles.background}
-    resizeMode='cover'
+      source={require('../assets/images/home_background.png')}
+      style={styles.background}
+      resizeMode='cover'
     >
-      <SafeAreaView style={styles.background} className='flex flex-column justify-between items-center'>
-        <TopBar level={level} displayName={displayName ?? ''} percent={percent} />
+      <SafeAreaView
+        style={styles.background}
+        className='flex flex-column justify-between items-center'
+      >
+        {/* ===== 실제 UI 레이어 ===== */}
+        <TopBar
+          level={level}
+          displayName={displayName ?? ''}
+          percent={percent}
+        />
 
         <ThemedView className='flex-1 w-full h-full px-4 bg-transparent'>
           {/* ===== 동기부여 메시지 ===== */}
@@ -293,16 +301,6 @@ export default function HomeScreen() {
               </View>
             )}
           </View>
-          
-          {/* ===== 강아지 Gif ===== */}
-          <ThemedView className='relative items-center w-full h-20 bg-transparent'>
-            <Gif
-              source={getPuppyGifSource(displayName ?? '', level)}
-              style={{ width: 240, height: 240, position: 'absolute', top: 216 }}
-              contentFit='contain'
-              autoplay
-            />
-          </ThemedView>
 
           {/* ===== 하단 컴포넌트 묶음 ===== */}
           {/* shadow-lg */}
@@ -401,7 +399,7 @@ export default function HomeScreen() {
                       }}
                     />
 
-                    <ThemedView className='px-6 py-3 mx-1 bg-green-100 shadow-sm rounded-2xl'>
+                    <ThemedView className='px-5 py-3 mx-1 bg-green-100 shadow-sm rounded-2xl'>
                       <ThemedText
                         style={{
                           color: '#21D08A',
@@ -448,7 +446,7 @@ export default function HomeScreen() {
             )}
 
             {/* ===== 하단 컴포넌트 버튼 ===== */}
-            <ThemedView className='justify-end w-full h-40 bg-transparent pb-3'>
+            <ThemedView className='justify-end w-full h-40 bg-transparent pb-4'>
               <ThemedView className='flex-col p-5 px-4 border border-gray-200 rounded-2xl bg-cream-200'>
                 <ThemedView className='flex-row justify-between bg-transparent'>
                   {showGoalOptions ? (
@@ -521,7 +519,9 @@ export default function HomeScreen() {
                           setRecordType('today');
                           setMessageKey('archiveToday');
                         }}
-                        disabled={isRecorded && isRecorded.todayRecorded === true}
+                        disabled={
+                          isRecorded && isRecorded.todayRecorded === true
+                        }
                       />
                     </View>
                   ) : null}
@@ -554,6 +554,19 @@ export default function HomeScreen() {
             </ThemedView>
           </ThemedView>
         </ThemedView>
+
+        {/* ===== 강아지 Gif 레이어 ===== */}
+        <View pointerEvents='none' style={styles.gifLayer}>
+          <Gif
+            source={getPuppyGifSource(displayName ?? '', level)}
+            style={{
+              width: 240,
+              height: 240,
+            }}
+            contentFit='contain'
+            autoplay
+          />
+        </View>
       </SafeAreaView>
     </ImageBackground>
   );
@@ -564,5 +577,16 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
+  },
+  gifLayer: {
+    position: 'absolute',
+    top: '12%',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
   },
 });

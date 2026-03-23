@@ -13,7 +13,7 @@ interface Props {
 
 export function TopBar({ level, displayName, percent }: Props) {
   return (
-    <ThemedView className='relative flex-row justify-between gap-6 px-4 pt-4 bg-transparent'>
+    <ThemedView className='relative flex-row justify-between gap-6 px-4 pt-6 bg-transparent'>
       {/* 좌측 컴포넌트바 */}
       <ThemedView className='flex-1 px-4 py-3 rounded-2xl bg-cream-200'>
         <ThemedView className='flex-row items-center mb-2 bg-transparent'>
