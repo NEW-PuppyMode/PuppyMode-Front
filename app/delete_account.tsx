@@ -3,7 +3,8 @@ import { KEYS } from '@/constants/storage';
 import { useAuth } from '@/contexts/AuthContext';
 import { loginAPI } from '@/services/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router } from 'expo-router';
+import { CommonActions } from '@react-navigation/native';
+import { useNavigation } from 'expo-router';
 import { useState } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,6 +14,7 @@ const DeleteAccount = () => {
   const { logout } = useAuth();
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [puppyName, setPuppyName] = useState('멍뭉이');
+  const navigation = useNavigation();
 
   // 받침 유무 확인
   const hasFinalConsonant = (word: string) => {
@@ -22,6 +24,16 @@ const DeleteAccount = () => {
     if (code < 0 || code > 11171) return false;
 
     return code % 28 !== 0;
+  };
+
+  // 라우팅 - 스택 초기화
+  const goHomeAndClearStack = () => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'signin' }],
+      }),
+    );
   };
 
   const handleDeleteAccount = async () => {
@@ -39,7 +51,7 @@ const DeleteAccount = () => {
       }
 
       await logout();
-      router.replace('/signin');
+      goHomeAndClearStack();
     } catch (err: any) {
       await logout();
     } finally {
