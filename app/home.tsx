@@ -34,6 +34,7 @@ import {
 } from 'react-native';
 // import Gif from 'react-native-gif';
 import { Image as Gif } from 'expo-image';
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 export default function HomeScreen() {
   const {
@@ -202,6 +203,15 @@ export default function HomeScreen() {
       fetchPuppyInfo();
     }
   };
+
+  // onboarded 라우팅
+  useEffect(() => {
+    if (!puppyInfo) return;
+
+    if (puppyInfo?.onboarded === false) {
+      router.replace('/test/start');
+    }
+  }, [puppyInfo]);
 
   const _handleAdviceClick = async () => {
     setShowMessage(true);
