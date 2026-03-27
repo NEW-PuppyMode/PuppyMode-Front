@@ -18,6 +18,8 @@ const DeleteAccount = () => {
 
   // 받침 유무 확인
   const hasFinalConsonant = (word: string) => {
+    if (!word) return false;
+
     const lastChar = word[word.length - 1];
     const code = lastChar.charCodeAt(0) - 44032;
 
