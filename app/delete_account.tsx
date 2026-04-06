@@ -1,20 +1,28 @@
 import NavHeader from '@/components/common/NavHeader';
 import { KEYS } from '@/constants/storage';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  PUPPY_QUERY_KEYS,
+  usePuppyInfoQuery,
+} from '@/hooks/queries/usePuppyInfoQuery';
 import { loginAPI } from '@/services/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommonActions } from '@react-navigation/native';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigation } from 'expo-router';
 import { useState } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const DeleteAccount = () => {
+  const queryClient = useQueryClient();
   const { logout } = useAuth();
   const [isWithdrawing, setIsWithdrawing] = useState(false);
-  const [puppyName, setPuppyName] = useState('멍뭉이');
   const navigation = useNavigation();
+  const { data: puppyInfo } = usePuppyInfoQuery();
+  const puppyName = puppyInfo?.currentPuppyName ?? '멍뭉이';
 
   // 받침 유무 확인
   const hasFinalConsonant = (word: string) => {
@@ -53,9 +61,14 @@ const DeleteAccount = () => {
       }
 
       await logout();
+      queryClient.removeQueries({
+        queryKey: PUPPY_QUERY_KEYS.puppyInfo,
+      });
       goHomeAndClearStack();
     } catch (err: any) {
       await logout();
+      console.log('logout error: ', err);
+      // goHomeAndClearStack();
     } finally {
       setIsWithdrawing(false);
     }

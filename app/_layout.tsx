@@ -9,6 +9,7 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from '@react-navigation/native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -46,6 +47,18 @@ export default function RootLayout() {
     pretendard: require('../assets/fonts/PretendardVariable.ttf'),
   });
   const [mockReady, setMockReady] = useState(false);
+
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: 1,
+            staleTime: 1000 * 60 * 5,
+          },
+        },
+      }),
+  );
 
   // useEffect(() => {
   //   crashlytics().log('App started');
@@ -106,37 +119,47 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <EmotionThemeProvider theme={theme}>
-          {/* <ErrorBoundary> */}
-          <CrashlyticsRouteTracker />
-          <Stack>
-            <Stack.Screen name='index' options={{ headerShown: false }} />
-            <Stack.Screen name='signin' options={{ headerShown: false }} />
-            <Stack.Screen
-              name='home'
-              options={{ title: '홈', headerShown: false }}
-            />
-            <Stack.Screen name='test/start' options={{ headerShown: false }} />
-            <Stack.Screen
-              name='test/proceeding'
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name='test/result' options={{ headerShown: false }} />
-            <Stack.Screen name='report' options={{ headerShown: false }} />
-            <Stack.Screen name='calendar' options={{ headerShown: false }} />
-            <Stack.Screen name='setting' options={{ headerShown: false }} />
-            <Stack.Screen
-              name='delete_account'
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name='+not-found' />
-          </Stack>
-          <StatusBar style='auto' />
-          {/* </ErrorBoundary> */}
-        </EmotionThemeProvider>
-      </ThemeProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <ThemeProvider
+          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+        >
+          <EmotionThemeProvider theme={theme}>
+            {/* <ErrorBoundary> */}
+            <CrashlyticsRouteTracker />
+            <Stack>
+              <Stack.Screen name='index' options={{ headerShown: false }} />
+              <Stack.Screen name='signin' options={{ headerShown: false }} />
+              <Stack.Screen
+                name='home'
+                options={{ title: '홈', headerShown: false }}
+              />
+              <Stack.Screen
+                name='test/start'
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name='test/proceeding'
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name='test/result'
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name='report' options={{ headerShown: false }} />
+              <Stack.Screen name='calendar' options={{ headerShown: false }} />
+              <Stack.Screen name='setting' options={{ headerShown: false }} />
+              <Stack.Screen
+                name='delete_account'
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name='+not-found' />
+            </Stack>
+            <StatusBar style='auto' />
+            {/* </ErrorBoundary> */}
+          </EmotionThemeProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }

@@ -3,11 +3,14 @@ import PolicyModal from '@/components/page/setting/PolicyModal';
 import SettingBtn from '@/components/page/setting/SettingBtn';
 import { POLICY_MESSAGES } from '@/constants/messages';
 import { useAuth } from '@/contexts/AuthContext';
+import { PUPPY_QUERY_KEYS } from '@/hooks/queries/usePuppyInfoQuery';
+import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const Setting = () => {
+  const queryClient = useQueryClient();
   const [policyModalVisible, setPolicyModalVisible] = useState(false);
   const [policyModalType, setPolicyModalType] = useState<
     'terms_of_uses' | 'privacy_policies'
@@ -107,10 +110,14 @@ const Setting = () => {
 
           <View className='flex-row justify-between'>
             <TouchableOpacity
-              onPress={() => {
+              onPress={async () => {
                 setSignOutModalVisible(false);
-                logout();
+                await logout();
                 router.replace('/signin');
+
+                queryClient.removeQueries({
+                  queryKey: PUPPY_QUERY_KEYS.puppyInfo,
+                });
               }}
               className='justify-center items-center w-[148px] h-[48px] border-[1px] border-[#0FD380] bg-white rounded-[5px]'
             >
