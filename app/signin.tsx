@@ -112,7 +112,7 @@ const SignIn = () => {
             <View />
           </TouchableOpacity>
 
-          {/* android는 애플 로그인 삭제 */}
+          {/* android는 애플 로그인 삭제(주석) */}
           <TouchableOpacity
             style={[
               btnStyles.btn,
