@@ -28,8 +28,6 @@ export const loginAPI = {
     accessToken: string,
     refreshToken: string,
   ): Promise<KakaoLoginResult> => {
-    // console.log('accessToken: ', accessToken);
-    // console.log('refreshToken: ', refreshToken);
     const response = await axiosInstance.post<KakaoLoginResponse>(
       '/auth/kakao/login',
       {
@@ -37,17 +35,17 @@ export const loginAPI = {
         refreshToken,
       },
     );
-    await AsyncStorage.setItem(
-      KEYS.ACCESS_TOKEN,
-      response.data.result.accessToken,
-    );
-    await AsyncStorage.setItem(KEYS.PROVIDER, 'kakao');
 
     if (!response.data.isSuccess) {
       throw new Error(response.data.message);
     }
 
-    // console.log('response.data.result: ', response.data.result);
+    await AsyncStorage.multiSet([
+      [KEYS.ACCESS_TOKEN, response.data.result.accessToken],
+      [KEYS.REFRESH_TOKEN, response.data.result.refreshToken],
+      [KEYS.PROVIDER, 'kakao'],
+    ]);
+
     return response.data.result;
   },
 
