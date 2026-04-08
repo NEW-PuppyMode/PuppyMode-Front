@@ -150,6 +150,7 @@ axiosInstance.interceptors.response.use(
     const isAuthRoute =
       requestUrl.includes('/auth/reissue') ||
       requestUrl.includes('/auth/kakao/login') ||
+      requestUrl.includes('/auth/apple/login') ||
       requestUrl.includes('/auth/logout');
 
     if (status === 401 && !originalRequest._retry && !isAuthRoute) {

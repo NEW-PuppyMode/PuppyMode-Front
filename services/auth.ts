@@ -1,6 +1,7 @@
 import { KEYS } from '@/constants/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { axiosInstance } from '.';
+
 export interface KakaoLoginResult {
   accessToken: string;
   refreshToken: string;
@@ -58,13 +59,6 @@ export const loginAPI = {
     ]);
   },
 
-  me: async (): Promise<KakaoLoginResult['userInfo']> => {
-    const response = await axiosInstance.get<KakaoLoginResponse>('/auth/me');
-    if (!response.data.isSuccess) {
-      throw new Error(response.data.message);
-    }
-    return response.data.result.userInfo;
-  },
   withdrawApple: async (): Promise<WithdrawResponse> => {
     const response = await axiosInstance.delete<WithdrawResponse>(
       '/auth/apple/withdraw',
@@ -77,7 +71,6 @@ export const loginAPI = {
     return response.data;
   },
 
-  // ✅ 카카오 소셜 회원 탈퇴
   withdrawKakao: async (): Promise<void> => {
     const response = await axiosInstance.post('/users/withdraw', {});
     if (!response.data.isSuccess) {

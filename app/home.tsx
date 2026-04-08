@@ -54,7 +54,12 @@ export default function HomeScreen() {
     createGoal,
   } = usePuppyData();
 
-  const { data: puppyInfo } = usePuppyInfoQuery();
+  const {
+    data: puppyInfo,
+    isLoading,
+    isFetching,
+    isError,
+  } = usePuppyInfoQuery();
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -327,6 +332,14 @@ export default function HomeScreen() {
       hideSub.remove();
     };
   }, [bottomPanelHeight, keyboardAnim]);
+
+  if (isLoading) {
+    return null; // 추후 로딩 UI 추가
+  }
+  if (isError) {
+    return null;
+    // 추후 에러 UI 추가 (문제가 생겼습니다, 로그인 화면으로 이동? 상의 필요)
+  }
 
   // F3 검색용(임시, 차후 삭제)
   // 01(TopBar), 02(동기부여), 03(강아지), 04(하단 컴포넌트)
@@ -629,6 +642,8 @@ export default function HomeScreen() {
         </ThemedView>
 
         {/* ===== 강아지 Gif 레이어 ===== */}
+        {/* {isFetching && <LoadingOverlay />} */}
+        {/* 이런식으로 추후에 데이터 패칭 중 -> 로딩 UI 추가하기 */}
         <View pointerEvents='none' style={styles.gifLayer}>
           <Gif
             source={getPuppyGifSource(displayName ?? '', level)}
