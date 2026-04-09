@@ -1,6 +1,7 @@
 import { KEYS } from '@/constants/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { axiosInstance } from '.';
+
 export interface KakaoLoginResult {
   accessToken: string;
   refreshToken: string;
@@ -28,8 +29,6 @@ export const loginAPI = {
     accessToken: string,
     refreshToken: string,
   ): Promise<KakaoLoginResult> => {
-    // console.log('accessToken: ', accessToken);
-    // console.log('refreshToken: ', refreshToken);
     const response = await axiosInstance.post<KakaoLoginResponse>(
       '/auth/kakao/login',
       {
@@ -37,17 +36,17 @@ export const loginAPI = {
         refreshToken,
       },
     );
-    await AsyncStorage.setItem(
-      KEYS.ACCESS_TOKEN,
-      response.data.result.accessToken,
-    );
-    await AsyncStorage.setItem(KEYS.PROVIDER, 'kakao');
 
     if (!response.data.isSuccess) {
       throw new Error(response.data.message);
     }
 
-    // console.log('response.data.result: ', response.data.result);
+    await AsyncStorage.multiSet([
+      [KEYS.ACCESS_TOKEN, response.data.result.accessToken],
+      [KEYS.REFRESH_TOKEN, response.data.result.refreshToken],
+      [KEYS.PROVIDER, 'kakao'],
+    ]);
+
     return response.data.result;
   },
 
@@ -60,13 +59,6 @@ export const loginAPI = {
     ]);
   },
 
-  me: async (): Promise<KakaoLoginResult['userInfo']> => {
-    const response = await axiosInstance.get<KakaoLoginResponse>('/auth/me');
-    if (!response.data.isSuccess) {
-      throw new Error(response.data.message);
-    }
-    return response.data.result.userInfo;
-  },
   withdrawApple: async (): Promise<WithdrawResponse> => {
     const response = await axiosInstance.delete<WithdrawResponse>(
       '/auth/apple/withdraw',
@@ -79,7 +71,6 @@ export const loginAPI = {
     return response.data;
   },
 
-  // ✅ 카카오 소셜 회원 탈퇴
   withdrawKakao: async (): Promise<void> => {
     const response = await axiosInstance.post('/users/withdraw', {});
     if (!response.data.isSuccess) {

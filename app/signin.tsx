@@ -16,6 +16,8 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
+import { PUPPY_QUERY_KEYS } from '@/hooks/queries/usePuppyInfoQuery';
+import { useQueryClient } from '@tanstack/react-query';
 import Apple from '../assets/icons/signin/ic_apple.svg';
 import Kakao from '../assets/icons/signin/ic_kakao.svg';
 import Background from '../assets/images/signin/background.svg';
@@ -27,14 +29,19 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const IS_SMALL = SCREEN_HEIGHT <= 700; // iPhone 7(667)
 
 const SignIn = () => {
+  const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
   const { isLoading, error, userInfo, loginWithKakao } = useLogin();
   const { handleSignInApple } = useAppleLogin();
 
   useEffect(() => {
     if (userInfo?.isNewUser) router.replace('/test/start');
-    else if (userInfo?.isNewUser === false && userInfo?.username)
+    else if (userInfo?.isNewUser === false && userInfo?.username) {
+      queryClient.removeQueries({
+        queryKey: PUPPY_QUERY_KEYS.puppyInfo,
+      });
       router.replace('/home');
+    }
   }, [userInfo]);
 
   useEffect(() => {
@@ -105,7 +112,7 @@ const SignIn = () => {
             <View />
           </TouchableOpacity>
 
-          {/* android는 애플 로그인 삭제 */}
+          {/* android는 애플 로그인 삭제(주석) */}
           <TouchableOpacity
             style={[
               btnStyles.btn,

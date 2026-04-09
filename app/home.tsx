@@ -33,15 +33,19 @@ import {
   View,
 } from 'react-native';
 // import Gif from 'react-native-gif';
+import {
+  PUPPY_QUERY_KEYS,
+  usePuppyInfoQuery,
+} from '@/hooks/queries/usePuppyInfoQuery';
+import { useQueryClient } from '@tanstack/react-query';
 import { Image as Gif } from 'expo-image';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 export default function HomeScreen() {
   const {
     renamePuppy,
     renameUser,
-    fetchPuppyInfo,
-    puppyInfo,
     advicePuppy,
     fetchIsRecorded,
     fetchRecentGoal,
@@ -50,9 +54,16 @@ export default function HomeScreen() {
     createGoal,
   } = usePuppyData();
 
+  const {
+    data: puppyInfo,
+    isLoading,
+    isFetching,
+    isError,
+  } = usePuppyInfoQuery();
+  const queryClient = useQueryClient();
+
   useEffect(() => {
     const fetchData = async () => {
-      fetchPuppyInfo();
       const recentGoal = await fetchRecentGoal();
       const goal30daysPassed = await fetchGoal30daysPassed();
       const isRecorded = await fetchIsRecorded();
@@ -198,9 +209,11 @@ export default function HomeScreen() {
         }
       }
     } catch (error) {
-      console.log('error');
+      console.log('Error: ', error);
     } finally {
-      fetchPuppyInfo();
+      await queryClient.invalidateQueries({
+        queryKey: PUPPY_QUERY_KEYS.puppyInfo,
+      });
     }
   };
 
@@ -280,7 +293,10 @@ export default function HomeScreen() {
         isDrink: didDrink,
       });
 
-      await fetchPuppyInfo();
+      await queryClient.invalidateQueries({
+        queryKey: PUPPY_QUERY_KEYS.puppyInfo,
+      });
+
       const updatedIsRecorded = await fetchIsRecorded();
       setIsRecorded(updatedIsRecorded);
     } catch (error) {
@@ -316,6 +332,14 @@ export default function HomeScreen() {
       hideSub.remove();
     };
   }, [bottomPanelHeight, keyboardAnim]);
+
+  if (isLoading) {
+    return null; // 추후 로딩 UI 추가
+  }
+  if (isError) {
+    return null;
+    // 추후 에러 UI 추가 (문제가 생겼습니다, 로그인 화면으로 이동? 상의 필요)
+  }
 
   // F3 검색용(임시, 차후 삭제)
   // 01(TopBar), 02(동기부여), 03(강아지), 04(하단 컴포넌트)
@@ -478,8 +502,8 @@ export default function HomeScreen() {
                   <ChoiceButton
                     label='작성 완료'
                     variant='primary'
-                    onPress={() => {
-                      createGoal({
+                    onPress={async () => {
+                      await createGoal({
                         goal: goalCount,
                         isNew: true,
                       });
@@ -487,7 +511,9 @@ export default function HomeScreen() {
                       setShowGoalOptions(false);
                       setGoalCount(0);
 
-                      fetchPuppyInfo();
+                      await queryClient.invalidateQueries({
+                        queryKey: PUPPY_QUERY_KEYS.puppyInfo,
+                      });
                     }}
                     style={{
                       opacity: 0.7,
@@ -512,16 +538,19 @@ export default function HomeScreen() {
                         icon={<PastGoalIcon width={24} height={24} />}
                         text='지난 달이랑 똑같아!'
                         variant={goalType === 'same' ? 'primary' : 'lightgreen'}
-                        onPress={() => {
+                        onPress={async () => {
                           setGoalType('same');
                           setShowGoalInput(false);
                           setShowGoalOptions(false);
-                          createGoal({
+
+                          await createGoal({
                             goal: 0,
                             isNew: false,
                           });
 
-                          fetchPuppyInfo();
+                          await queryClient.invalidateQueries({
+                            queryKey: PUPPY_QUERY_KEYS.puppyInfo,
+                          });
                         }}
                         disabled={!recentGoal}
                       />
@@ -613,6 +642,8 @@ export default function HomeScreen() {
         </ThemedView>
 
         {/* ===== 강아지 Gif 레이어 ===== */}
+        {/* {isFetching && <LoadingOverlay />} */}
+        {/* 이런식으로 추후에 데이터 패칭 중 -> 로딩 UI 추가하기 */}
         <View pointerEvents='none' style={styles.gifLayer}>
           <Gif
             source={getPuppyGifSource(displayName ?? '', level)}
