@@ -95,7 +95,7 @@ android {
         applicationId 'com.anonymous.puppymode'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 11
+        versionCode 12
         versionName "1.0.4"
     }
     signingConfigs {
