@@ -221,7 +221,7 @@ export default function HomeScreen() {
   useEffect(() => {
     if (!puppyInfo) return;
 
-    if (puppyInfo?.onboarded === false) {
+    if (puppyInfo?.isOnboarded === false) {
       router.replace('/test/start');
     }
   }, [puppyInfo]);
