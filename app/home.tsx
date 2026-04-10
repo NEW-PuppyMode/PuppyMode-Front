@@ -217,14 +217,16 @@ export default function HomeScreen() {
     }
   };
 
-  // onboarded 라우팅
+  // onboarded 라우팅 (한 번만 실행, 서버 응답 확정 후에만)
+  const hasRedirectedRef = useRef(false);
   useEffect(() => {
-    if (!puppyInfo) return;
+    if (!puppyInfo || isFetching || hasRedirectedRef.current) return;
 
-    if (puppyInfo?.onboarded === false) {
+    if (puppyInfo.isOnboarded === false) {
+      hasRedirectedRef.current = true;
       router.replace('/test/start');
     }
-  }, [puppyInfo]);
+  }, [puppyInfo, isFetching]);
 
   const _handleAdviceClick = async () => {
     setShowMessage(true);
