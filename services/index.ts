@@ -71,7 +71,7 @@ async function clearTokens() {
 // 중복 재발급 방지용
 let refreshPromise: Promise<string> | null = null;
 
-async function reissueAccessToken(): Promise<string> {
+export async function reissueAccessToken(): Promise<string> {
   if (refreshPromise) return refreshPromise;
 
   refreshPromise = (async () => {
