@@ -6,9 +6,11 @@ import {
   usePuppyInfoQuery,
 } from '@/hooks/queries/usePuppyInfoQuery';
 import { loginAPI } from '@/services/auth';
+import { getPuppyGifSource } from '@/utils/dogMapper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommonActions } from '@react-navigation/native';
 import { useQueryClient } from '@tanstack/react-query';
+import { Image as Gif } from 'expo-image';
 import { useNavigation } from 'expo-router';
 import { useState } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
@@ -23,6 +25,8 @@ const DeleteAccount = () => {
   const navigation = useNavigation();
   const { data: puppyInfo } = usePuppyInfoQuery();
   const puppyName = puppyInfo?.currentPuppyName ?? '멍뭉이';
+  const puppyLevel = puppyInfo?.puppyLevel ?? 1;
+  const puppyLevelName = puppyInfo?.puppyLevelName ?? '';
 
   // 받침 유무 확인
   const hasFinalConsonant = (word: string) => {
@@ -93,6 +97,12 @@ const DeleteAccount = () => {
               ? `${puppyName}이는 이제 볼 수 없을지도 몰라요..`
               : `${puppyName}는 이제 볼 수 없을지도 몰라요..`}
           </Text>
+          <Gif
+            source={getPuppyGifSource(puppyLevelName, puppyLevel)}
+            style={{ width: 200, height: 200, alignSelf: 'center' }}
+            contentFit='contain'
+            autoplay
+          />
         </View>
         <TouchableOpacity
           className='justify-center items-center w-full h-[60px] rounded-[10px] bg-[#0FD380]'
