@@ -100,9 +100,14 @@ export async function reissueAccessToken(): Promise<string> {
       throw new Error('리프레시 토큰이 없습니다.');
     }
 
-    const response = await reissueInstance.post('/auth/reissue', {
-      refreshToken,
-    });
+    const accessToken = await getAccessToken();
+    const response = await reissueInstance.post(
+      '/auth/reissue',
+      { refreshToken },
+      accessToken
+        ? { headers: { [KEYS.AUTH_HEADER_KEY]: `Bearer ${accessToken}` } }
+        : undefined,
+    );
 
     const data = response.data;
 
@@ -166,7 +171,9 @@ axiosInstance.interceptors.response.use(
     const requestUrl = originalRequest.url ?? '';
 
     // 재발급 API나 로그인 API 자체는 재시도 대상에서 제외
+    // /auth/me는 index.tsx의 resolveAuthState()에서 직접 reissue 처리
     const isAuthRoute =
+      requestUrl.includes('/auth/me') ||
       requestUrl.includes('/auth/reissue') ||
       requestUrl.includes('/auth/kakao/login') ||
       requestUrl.includes('/auth/apple/login') ||

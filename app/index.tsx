@@ -2,6 +2,7 @@ import { KEYS } from '@/constants/storage';
 import { loginAPI } from '@/services/auth';
 import { reissueAccessToken } from '@/services/index';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
 
@@ -10,22 +11,42 @@ import 'react-native-reanimated';
 
 type AuthState = 'checking' | 'authenticated' | 'onboarding' | 'unauthenticated';
 
+function toAuthResult(isOnboarded: boolean): 'authenticated' | 'onboarding' {
+  return isOnboarded ? 'authenticated' : 'onboarding';
+}
+
 async function resolveAuthState(): Promise<'authenticated' | 'onboarding'> {
-  const meData = await loginAPI.me();
+  try {
+    const meData = await loginAPI.me();
 
-  if (meData.isSuccess) {
-    return meData.result.isOnboarded ? 'authenticated' : 'onboarding';
+    if (meData.isSuccess) {
+      return toAuthResult(meData.result.isOnboarded);
+    }
+
+    // HTTP 200이지만 isSuccess: false → 수동 재발급 후 재시도
+    await reissueAccessToken();
+    const meAfterReissue = await loginAPI.me();
+
+    if (!meAfterReissue.isSuccess) {
+      throw new Error('재발급 후에도 인증 실패');
+    }
+
+    return toAuthResult(meAfterReissue.result.isOnboarded);
+  } catch (error) {
+    // HTTP 401 → 토큰 만료 → 재발급 후 재시도
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      await reissueAccessToken();
+      const meAfterReissue = await loginAPI.me();
+
+      if (!meAfterReissue.isSuccess) {
+        throw new Error('재발급 후에도 인증 실패');
+      }
+
+      return toAuthResult(meAfterReissue.result.isOnboarded);
+    }
+
+    throw error;
   }
-
-  // HTTP 200이지만 isSuccess: false → 수동 재발급 후 재시도
-  await reissueAccessToken();
-  const meAfterReissue = await loginAPI.me();
-
-  if (!meAfterReissue.isSuccess) {
-    throw new Error('재발급 후에도 인증 실패');
-  }
-
-  return meAfterReissue.result.isOnboarded ? 'authenticated' : 'onboarding';
 }
 
 export default function Index() {
@@ -48,7 +69,7 @@ export default function Index() {
         }
 
         // /auth/me로 토큰 유효성 확인 + 온보딩 여부 판단
-        // 401이면 인터셉터가 자동 재발급, isSuccess: false이면 수동 재발급
+        // HTTP 401 → 재발급 후 재시도, isSuccess: false → 수동 재발급
         const state = await resolveAuthState();
 
         if (isMounted) setAuthState(state);
