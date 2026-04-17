@@ -23,6 +23,25 @@ const reissueInstance = axios.create({
   timeout: 10000,
 });
 
+reissueInstance.interceptors.request.use((config) => {
+  const url = `${config.baseURL ?? ''}${config.url ?? ''}`;
+  console.log('[REISSUE REQ]', config.method?.toUpperCase(), url);
+  return config;
+});
+
+reissueInstance.interceptors.response.use(
+  (res) => {
+    const url = `${res.config.baseURL ?? ''}${res.config.url ?? ''}`;
+    console.log('[REISSUE RES]', res.status, url, res.data);
+    return res;
+  },
+  (error: AxiosError) => {
+    const url = `${error.config?.baseURL ?? ''}${error.config?.url ?? ''}`;
+    console.log('[REISSUE ERR]', error.response?.status, url, error.response?.data);
+    return Promise.reject(error);
+  },
+);
+
 async function getAccessToken(): Promise<string | null> {
   try {
     return await AsyncStorage.getItem(KEYS.ACCESS_TOKEN);
