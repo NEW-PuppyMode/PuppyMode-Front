@@ -1,11 +1,9 @@
 import NavHeader from '@/components/common/NavHeader';
 import { KEYS } from '@/constants/storage';
 import { useAuth } from '@/contexts/AuthContext';
-import {
-  PUPPY_QUERY_KEYS,
-  usePuppyInfoQuery,
-} from '@/hooks/queries/usePuppyInfoQuery';
+import { PUPPY_QUERY_KEYS } from '@/hooks/queries/usePuppyInfoQuery';
 import { loginAPI } from '@/services/auth';
+import { IPuppyInfo } from '@/types/models/puppy';
 import { getPuppyGifSource } from '@/utils/dogMapper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommonActions } from '@react-navigation/native';
@@ -23,7 +21,9 @@ const DeleteAccount = () => {
   const { logout } = useAuth();
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const navigation = useNavigation();
-  const { data: puppyInfo } = usePuppyInfoQuery();
+
+  // 서버 재요청 없이 캐시에서만 읽기
+  const puppyInfo = queryClient.getQueryData<IPuppyInfo>(PUPPY_QUERY_KEYS.puppyInfo);
   const puppyName = puppyInfo?.currentPuppyName ?? '멍뭉이';
   const puppyLevel = puppyInfo?.puppyLevel ?? 1;
   const puppyLevelName = puppyInfo?.puppyLevelName ?? '';
@@ -69,10 +69,9 @@ const DeleteAccount = () => {
         queryKey: PUPPY_QUERY_KEYS.puppyInfo,
       });
       goHomeAndClearStack();
-    } catch (err: any) {
+    } catch (err: unknown) {
       await logout();
       console.log('logout error: ', err);
-      // goHomeAndClearStack();
     } finally {
       setIsWithdrawing(false);
     }

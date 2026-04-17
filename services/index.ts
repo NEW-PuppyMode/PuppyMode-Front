@@ -166,7 +166,13 @@ axiosInstance.interceptors.response.use(
 
         return axiosInstance(originalRequest);
       } catch (reissueError) {
-        await clearTokens();
+        // refresh token이 실제로 만료/무효일 때만 토큰 삭제
+        const reissueStatus = axios.isAxiosError(reissueError)
+          ? reissueError.response?.status
+          : null;
+        if (reissueStatus === 401 || reissueStatus === 403) {
+          await clearTokens();
+        }
         return Promise.reject(reissueError);
       }
     }
