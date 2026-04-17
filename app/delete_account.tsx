@@ -97,21 +97,23 @@ const DeleteAccount = () => {
               ? `${puppyName}이는 이제 볼 수 없을지도 몰라요..`
               : `${puppyName}는 이제 볼 수 없을지도 몰라요..`}
           </Text>
+        </View>
+        <View>
           <Gif
             source={getPuppyGifSource(puppyLevelName, puppyLevel)}
-            style={{ width: 200, height: 200, alignSelf: 'center' }}
+            style={{ width: 200, height: 200, alignSelf: 'flex-end' }}
             contentFit='contain'
             autoplay
           />
+          <TouchableOpacity
+            className='justify-center items-center w-full h-[60px] rounded-[10px] bg-[#0FD380]'
+            onPress={handleDeleteAccount}
+          >
+            <Text className='text-center text-[16px] font-medium leading-[24px] text-[#F2FFF4]'>
+              계정 삭제
+            </Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          className='justify-center items-center w-full h-[60px] rounded-[10px] bg-[#0FD380]'
-          onPress={handleDeleteAccount}
-        >
-          <Text className='text-center text-[16px] font-medium leading-[24px] text-[#F2FFF4]'>
-            계정 삭제
-          </Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
