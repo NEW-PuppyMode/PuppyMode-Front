@@ -44,4 +44,5 @@ app-example
 *.keystore
 android/app/*.keystore
 android/gradle.properties
+android/local.properties
 *.cer
