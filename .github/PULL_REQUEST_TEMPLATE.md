@@ -15,3 +15,6 @@ closes #이슈번호
 ## 체크리스트
 
 - [ ] 동작 확인
+- [ ] Assignees 지정
+- [ ] Labels 지정
+- [ ] Projects 지정
