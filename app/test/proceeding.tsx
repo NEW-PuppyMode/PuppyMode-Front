@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import * as Progress from 'react-native-progress';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const TOTAL_STEPS = 6;
 const BAR_HEIGHT = 5;
@@ -143,12 +144,11 @@ export default function TestProceeding() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View>
         <View
           style={{
             justifyContent: 'center',
-            marginTop: 48,
             width: '100%',
             height: 60,
           }}
@@ -234,7 +234,7 @@ export default function TestProceeding() {
       >
         <Text className='font-medium text-white'>다음</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -298,7 +298,6 @@ const styles = StyleSheet.create({
   bottomBtn: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 57 - 16,
     width: '100%',
     height: 60,
     borderRadius: 10,

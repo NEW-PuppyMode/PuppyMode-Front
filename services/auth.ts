@@ -18,6 +18,15 @@ export interface KakaoLoginResponse {
   result: KakaoLoginResult;
 }
 
+export interface MeResponse {
+  isSuccess: boolean;
+  code: string;
+  message: string;
+  result: {
+    isOnboarded: boolean;
+  };
+}
+
 export interface WithdrawResponse {
   isSuccess: boolean;
   code: string;
@@ -48,6 +57,11 @@ export const loginAPI = {
     ]);
 
     return response.data.result;
+  },
+
+  me: async (): Promise<MeResponse> => {
+    const response = await axiosInstance.get<MeResponse>('/auth/me');
+    return response.data;
   },
 
   logout: async (): Promise<void> => {

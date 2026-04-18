@@ -48,23 +48,10 @@ const SignIn = () => {
     if (error) Alert.alert('로그인 오류', error);
   }, [error]);
 
-  // ✅ 작은 기기에서만 영상 크기 살짝 줄여서 버튼 확보
-  const videoSize = SCREEN_WIDTH * (IS_SMALL ? 0.46 : 0.5191);
-
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      {/* ✅ 컨텐츠 전체를 화면 안에서 flex로 분배 */}
-      <View
-        style={[
-          styles.content,
-          {
-            paddingTop: 16,
-            paddingBottom: Math.max(16, insets.bottom + 8),
-            paddingHorizontal: SCREEN_WIDTH * 0.05,
-          },
-        ]}
-      >
-        {/* 1) 위: 타이틀/설명 */}
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        {/* ===== 상단 타이틀/설명 ===== */}
         <View style={styles.topBlock}>
           <Text style={styles.title}>어차피 못지킬 약속,</Text>
 
@@ -84,18 +71,18 @@ const SignIn = () => {
           </Text>
         </View>
 
-        {/* 2) 중간: 영상 (marginTop으로 밀지 말고 가운데 배치) */}
+        {/* ===== 강아지 Gif 영상 ===== */}
         <View style={styles.middleBlock}>
           <CircleExpoVideo
             source={require('../assets/videos/signin.mp4')}
-            size={videoSize}
+            size={192}
             translateX={0}
-            translateY={IS_SMALL ? 0 : 20}
+            translateY={0}
             scale={1.2}
           />
         </View>
 
-        {/* 3) 아래: 버튼 (항상 화면 안) */}
+        {/* ===== 하단 로그인 버튼 ===== */}
         <View style={styles.bottomBlock}>
           <TouchableOpacity
             style={[btnStyles.btn, { backgroundColor: '#FEE500' }]}
@@ -112,7 +99,7 @@ const SignIn = () => {
             <View />
           </TouchableOpacity>
 
-          {/* android는 애플 로그인 삭제(주석) */}
+          {/* ===== Android는 빌드할 때 애플 로그인 주석 처리하기 ===== */}
           <TouchableOpacity
             style={[
               btnStyles.btn,
@@ -130,10 +117,11 @@ const SignIn = () => {
             <Text>Apple로 로그인</Text>
             <View />
           </TouchableOpacity>
+          {/* ===== 주석 처리하기 ===== */}
         </View>
       </View>
 
-      {/* 배경 */}
+      {/* ===== 배경 ===== */}
       <View pointerEvents='none' style={styles.bg}>
         <View style={{ flex: 1, position: 'relative' }}>
           <Footprint2
@@ -158,22 +146,26 @@ const SignIn = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'white' },
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
 
-  // ✅ 화면을 3구역으로 "고정" 분배
   content: {
     flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-evenly',
+    padding: 16,
     zIndex: 10,
   },
 
   topBlock: {
-    flexShrink: 1, // ✅ 작은 기기에서 텍스트가 필요한 만큼만 차지하게
+    flexShrink: 1, // 작은 기기에서 텍스트가 필요한 만큼만 차지하게
   },
 
   middleBlock: {
-    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center', // ✅ 가운데 고정
+    justifyContent: 'center',
     minHeight: 0,
   },
 

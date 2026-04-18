@@ -1,13 +1,53 @@
 import { KEYS } from '@/constants/storage';
-import { PuppyDataAPI } from '@/services/puppyData';
+import { loginAPI } from '@/services/auth';
+import { reissueAccessToken } from '@/services/index';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
 
-type AuthState = 'checking' | 'authenticated' | 'unauthenticated';
+type AuthState = 'checking' | 'authenticated' | 'onboarding' | 'unauthenticated';
+
+function toAuthResult(isOnboarded: boolean): 'authenticated' | 'onboarding' {
+  return isOnboarded ? 'authenticated' : 'onboarding';
+}
+
+async function resolveAuthState(): Promise<'authenticated' | 'onboarding'> {
+  try {
+    const meData = await loginAPI.me();
+
+    if (meData.isSuccess) {
+      return toAuthResult(meData.result.isOnboarded);
+    }
+
+    // HTTP 200이지만 isSuccess: false → 수동 재발급 후 재시도
+    await reissueAccessToken();
+    const meAfterReissue = await loginAPI.me();
+
+    if (!meAfterReissue.isSuccess) {
+      throw new Error('재발급 후에도 인증 실패');
+    }
+
+    return toAuthResult(meAfterReissue.result.isOnboarded);
+  } catch (error) {
+    // HTTP 401 → 토큰 만료 → 재발급 후 재시도
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      await reissueAccessToken();
+      const meAfterReissue = await loginAPI.me();
+
+      if (!meAfterReissue.isSuccess) {
+        throw new Error('재발급 후에도 인증 실패');
+      }
+
+      return toAuthResult(meAfterReissue.result.isOnboarded);
+    }
+
+    throw error;
+  }
+}
 
 export default function Index() {
   const [authState, setAuthState] = useState<AuthState>('checking');
@@ -28,24 +68,18 @@ export default function Index() {
           return;
         }
 
-        // 세션 검증
-        // access token이 만료 시:
-        // 401 -> interceptor -> reissue -> 원요청 재시도
-        await PuppyDataAPI.fetchPuppyInfo();
+        // /auth/me로 토큰 유효성 확인 + 온보딩 여부 판단
+        // HTTP 401 → 재발급 후 재시도, isSuccess: false → 수동 재발급
+        const state = await resolveAuthState();
 
-        if (isMounted) {
-          setAuthState('authenticated');
-        }
-      } catch (error) {
+        if (isMounted) setAuthState(state);
+      } catch {
         await AsyncStorage.multiRemove([
           KEYS.ACCESS_TOKEN,
           KEYS.REFRESH_TOKEN,
           KEYS.PROVIDER,
         ]);
-
-        if (isMounted) {
-          setAuthState('unauthenticated');
-        }
+        if (isMounted) setAuthState('unauthenticated');
       }
     }
 
@@ -62,6 +96,10 @@ export default function Index() {
 
   if (authState === 'authenticated') {
     return <Redirect href='/home' />;
+  }
+
+  if (authState === 'onboarding') {
+    return <Redirect href='/test/start' />;
   }
 
   return <Redirect href='/signin' />;

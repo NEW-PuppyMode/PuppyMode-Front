@@ -1,14 +1,14 @@
 import NavHeader from '@/components/common/NavHeader';
 import { KEYS } from '@/constants/storage';
 import { useAuth } from '@/contexts/AuthContext';
-import {
-  PUPPY_QUERY_KEYS,
-  usePuppyInfoQuery,
-} from '@/hooks/queries/usePuppyInfoQuery';
+import { PUPPY_QUERY_KEYS } from '@/hooks/queries/usePuppyInfoQuery';
 import { loginAPI } from '@/services/auth';
+import { IPuppyInfo } from '@/types/models/puppy';
+import { getPuppyGifSource } from '@/utils/dogMapper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommonActions } from '@react-navigation/native';
 import { useQueryClient } from '@tanstack/react-query';
+import { Image as Gif } from 'expo-image';
 import { useNavigation } from 'expo-router';
 import { useState } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
@@ -21,8 +21,12 @@ const DeleteAccount = () => {
   const { logout } = useAuth();
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const navigation = useNavigation();
-  const { data: puppyInfo } = usePuppyInfoQuery();
+
+  // 서버 재요청 없이 캐시에서만 읽기
+  const puppyInfo = queryClient.getQueryData<IPuppyInfo>(PUPPY_QUERY_KEYS.puppyInfo);
   const puppyName = puppyInfo?.currentPuppyName ?? '멍뭉이';
+  const puppyLevel = puppyInfo?.puppyLevel ?? 1;
+  const puppyLevelName = puppyInfo?.puppyLevelName ?? '';
 
   // 받침 유무 확인
   const hasFinalConsonant = (word: string) => {
@@ -65,10 +69,9 @@ const DeleteAccount = () => {
         queryKey: PUPPY_QUERY_KEYS.puppyInfo,
       });
       goHomeAndClearStack();
-    } catch (err: any) {
+    } catch (err: unknown) {
       await logout();
       console.log('logout error: ', err);
-      // goHomeAndClearStack();
     } finally {
       setIsWithdrawing(false);
     }
@@ -94,14 +97,22 @@ const DeleteAccount = () => {
               : `${puppyName}는 이제 볼 수 없을지도 몰라요..`}
           </Text>
         </View>
-        <TouchableOpacity
-          className='justify-center items-center w-full h-[60px] rounded-[10px] bg-[#0FD380]'
-          onPress={handleDeleteAccount}
-        >
-          <Text className='text-center text-[16px] font-medium leading-[24px] text-[#F2FFF4]'>
-            계정 삭제
-          </Text>
-        </TouchableOpacity>
+        <View>
+          <Gif
+            source={getPuppyGifSource(puppyLevelName, puppyLevel)}
+            style={{ width: 200, height: 200, alignSelf: 'flex-end' }}
+            contentFit='contain'
+            autoplay
+          />
+          <TouchableOpacity
+            className='justify-center items-center w-full h-[60px] rounded-[10px] bg-[#0FD380]'
+            onPress={handleDeleteAccount}
+          >
+            <Text className='text-center text-[16px] font-medium leading-[24px] text-[#F2FFF4]'>
+              계정 삭제
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );

@@ -23,6 +23,25 @@ const reissueInstance = axios.create({
   timeout: 10000,
 });
 
+reissueInstance.interceptors.request.use((config) => {
+  const url = `${config.baseURL ?? ''}${config.url ?? ''}`;
+  console.log('[REISSUE REQ]', config.method?.toUpperCase(), url);
+  return config;
+});
+
+reissueInstance.interceptors.response.use(
+  (res) => {
+    const url = `${res.config.baseURL ?? ''}${res.config.url ?? ''}`;
+    console.log('[REISSUE RES]', res.status, url, res.data);
+    return res;
+  },
+  (error: AxiosError) => {
+    const url = `${error.config?.baseURL ?? ''}${error.config?.url ?? ''}`;
+    console.log('[REISSUE ERR]', error.response?.status, url, error.response?.data);
+    return Promise.reject(error);
+  },
+);
+
 async function getAccessToken(): Promise<string | null> {
   try {
     return await AsyncStorage.getItem(KEYS.ACCESS_TOKEN);
@@ -71,7 +90,7 @@ async function clearTokens() {
 // 중복 재발급 방지용
 let refreshPromise: Promise<string> | null = null;
 
-async function reissueAccessToken(): Promise<string> {
+export async function reissueAccessToken(): Promise<string> {
   if (refreshPromise) return refreshPromise;
 
   refreshPromise = (async () => {
@@ -81,9 +100,14 @@ async function reissueAccessToken(): Promise<string> {
       throw new Error('리프레시 토큰이 없습니다.');
     }
 
-    const response = await reissueInstance.post('/auth/reissue', {
-      refreshToken,
-    });
+    const accessToken = await getAccessToken();
+    const response = await reissueInstance.post(
+      '/auth/reissue',
+      { refreshToken },
+      accessToken
+        ? { headers: { [KEYS.AUTH_HEADER_KEY]: `Bearer ${accessToken}` } }
+        : undefined,
+    );
 
     const data = response.data;
 
@@ -147,7 +171,9 @@ axiosInstance.interceptors.response.use(
     const requestUrl = originalRequest.url ?? '';
 
     // 재발급 API나 로그인 API 자체는 재시도 대상에서 제외
+    // /auth/me는 index.tsx의 resolveAuthState()에서 직접 reissue 처리
     const isAuthRoute =
+      requestUrl.includes('/auth/me') ||
       requestUrl.includes('/auth/reissue') ||
       requestUrl.includes('/auth/kakao/login') ||
       requestUrl.includes('/auth/apple/login') ||
@@ -166,7 +192,13 @@ axiosInstance.interceptors.response.use(
 
         return axiosInstance(originalRequest);
       } catch (reissueError) {
-        await clearTokens();
+        // refresh token이 실제로 만료/무효일 때만 토큰 삭제
+        const reissueStatus = axios.isAxiosError(reissueError)
+          ? reissueError.response?.status
+          : null;
+        if (reissueStatus === 401 || reissueStatus === 403) {
+          await clearTokens();
+        }
         return Promise.reject(reissueError);
       }
     }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const puppyGifs = {
   bichon: {
     1: require('@/assets/videos/dogs/bichon_1.gif'),
@@ -39,6 +40,5 @@ export const getPuppyGifSource = (
     | 2
     | 3;
 
-  console.log(puppyGifs[breedKey][1]);
   return puppyGifs[breedKey][safeLevel] ?? puppyGifs[breedKey][1];
 };
