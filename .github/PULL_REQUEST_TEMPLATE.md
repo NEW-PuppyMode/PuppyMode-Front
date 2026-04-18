@@ -1,7 +1,17 @@
-## 개요
+## 관련 이슈
 
-<!-- A clear and concise description about the feature -->
+closes #이슈번호
 
-## 이슈
+## 작업 내용
 
-<!-- Add a issues that referenced this pull request -->
+-
+
+## 스크린샷 (UI 변경 시)
+
+| Before | After |
+| ------ | ----- |
+|        |       |
+
+## 체크리스트
+
+- [ ] 동작 확인
