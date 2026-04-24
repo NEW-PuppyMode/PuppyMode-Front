@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -18,7 +19,7 @@ const TestResult = () => {
     result: string;
   }>();
 
-  const { type, puppyBreedKo, puppyBreedEn, description, imageUrl } =
+  const { type, puppyBreedKo, puppyBreedEn, imageUrl } =
     JSON.parse(result);
   return (
     <View style={styles.container}>
@@ -49,14 +50,14 @@ const TestResult = () => {
       <Text style={styles.korText}>{puppyBreedKo}</Text>
       <Text style={styles.engText}>{puppyBreedEn}</Text>
 
-      <View style={{ paddingHorizontal: 16, width: '100%' }}>
+      <SafeAreaView style={{ paddingHorizontal: 16, width: '100%' }} edges={['bottom']}>
         <TouchableOpacity
           style={styles.bottomBtn}
           onPress={() => router.replace('/home')}
         >
           <Text className='font-medium text-white'>시작하기</Text>
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     </View>
   );
 };
@@ -83,8 +84,8 @@ const styles = StyleSheet.create({
     marginTop: (SCREEN_HEIGHT * 48) / 852,
     marginBottom: (SCREEN_HEIGHT * 21) / 852,
     padding: 9.5,
-    width: SCREEN_WIDTH * 0.65394402035623409669211195928753,
-    height: SCREEN_HEIGHT * 0.43779342723004694835680751173709,
+    width: (SCREEN_WIDTH * 257) / 393,
+    height: (SCREEN_HEIGHT * 373) / 852,
     flexShrink: 0,
     borderRadius: 10,
     backgroundColor: '#FFF',
