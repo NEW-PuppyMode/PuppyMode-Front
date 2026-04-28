@@ -39,10 +39,12 @@ yarn-error.*
 
 app-example
 
-
 # android
 *.keystore
 android/app/*.keystore
 android/gradle.properties
 android/local.properties
 *.cer
+
+# Claude
+.claude/

@@ -1,13 +1,17 @@
 import ResultBG from '@/assets/images/test/result-bg.svg';
 import { Image as ExpoImage } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useRef } from 'react';
 import {
+  Animated,
   Dimensions,
+  Easing,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -18,8 +22,21 @@ const TestResult = () => {
     result: string;
   }>();
 
-  const { type, puppyBreedKo, puppyBreedEn, description, imageUrl } =
-    JSON.parse(result);
+  const { type, puppyBreedKo, puppyBreedEn, imageUrl } = JSON.parse(result);
+
+  const cardSlideAnim = useRef(
+    new Animated.Value(-SCREEN_HEIGHT * 0.6),
+  ).current;
+
+  useEffect(() => {
+    Animated.timing(cardSlideAnim, {
+      toValue: 0,
+      duration: 600,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
   return (
     <View style={styles.container}>
       <ResultBG style={styles.background} />
@@ -31,7 +48,12 @@ const TestResult = () => {
         <Text style={styles.title}>딱 맞는 강아지는..</Text>
       </View>
 
-      <View style={styles.outerBox}>
+      <Animated.View
+        style={[
+          styles.outerBox,
+          { transform: [{ translateY: cardSlideAnim }] },
+        ]}
+      >
         <View style={styles.innerBox}>
           <ExpoImage
             source={{ uri: imageUrl }}
@@ -44,19 +66,28 @@ const TestResult = () => {
             }}
           />
         </View>
-      </View>
+      </Animated.View>
 
       <Text style={styles.korText}>{puppyBreedKo}</Text>
       <Text style={styles.engText}>{puppyBreedEn}</Text>
 
-      <View style={{ paddingHorizontal: 16, width: '100%' }}>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          paddingHorizontal: 16,
+          paddingBottom: 16,
+          width: '100%',
+          justifyContent: 'flex-end',
+        }}
+        edges={['bottom']}
+      >
         <TouchableOpacity
           style={styles.bottomBtn}
           onPress={() => router.replace('/home')}
         >
           <Text className='font-medium text-white'>시작하기</Text>
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     </View>
   );
 };
@@ -83,8 +114,8 @@ const styles = StyleSheet.create({
     marginTop: (SCREEN_HEIGHT * 48) / 852,
     marginBottom: (SCREEN_HEIGHT * 21) / 852,
     padding: 9.5,
-    width: SCREEN_WIDTH * 0.65394402035623409669211195928753,
-    height: SCREEN_HEIGHT * 0.43779342723004694835680751173709,
+    width: (SCREEN_WIDTH * 257) / 393,
+    height: (SCREEN_HEIGHT * 373) / 852,
     flexShrink: 0,
     borderRadius: 10,
     backgroundColor: '#FFF',
@@ -127,11 +158,5 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 10,
     backgroundColor: '#0FD380',
-    color: '#F2FFF4',
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: '500',
-    lineHeight: 24,
-    fontStyle: 'normal',
   },
 });
