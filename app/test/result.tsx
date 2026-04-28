@@ -19,8 +19,7 @@ const TestResult = () => {
     result: string;
   }>();
 
-  const { type, puppyBreedKo, puppyBreedEn, imageUrl } =
-    JSON.parse(result);
+  const { type, puppyBreedKo, puppyBreedEn, imageUrl } = JSON.parse(result);
   return (
     <View style={styles.container}>
       <ResultBG style={styles.background} />
@@ -50,7 +49,16 @@ const TestResult = () => {
       <Text style={styles.korText}>{puppyBreedKo}</Text>
       <Text style={styles.engText}>{puppyBreedEn}</Text>
 
-      <SafeAreaView style={{ paddingHorizontal: 16, width: '100%' }} edges={['bottom']}>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          paddingHorizontal: 16,
+          paddingBottom: 16,
+          width: '100%',
+          justifyContent: 'flex-end',
+        }}
+        edges={['bottom']}
+      >
         <TouchableOpacity
           style={styles.bottomBtn}
           onPress={() => router.replace('/home')}
@@ -128,11 +136,5 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 10,
     backgroundColor: '#0FD380',
-    color: '#F2FFF4',
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: '500',
-    lineHeight: 24,
-    fontStyle: 'normal',
   },
 });

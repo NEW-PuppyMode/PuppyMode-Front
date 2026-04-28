@@ -17,8 +17,8 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // side card constants
 const CARD_W = 191;
-const CARD_H = 277.21;
-const CARD_TOP = (SCREEN_HEIGHT * 323) / 852;
+const CARD_H = 276;
+const CARD_TOP = (SCREEN_HEIGHT * 308) / 852;
 // 76025 final state: left card left-edge ≈ -51px off-screen
 const CARD_EDGE_OFFSET = -51;
 // distance to shift from 76046 spread state → 76025 V-shape state
@@ -36,13 +36,13 @@ const TestStart = () => {
     Animated.sequence([
       Animated.timing(spreadAnim, {
         toValue: 0,
-        duration: 600,
+        duration: 800,
         easing: Easing.out(Easing.quad),
         useNativeDriver: true,
       }),
       Animated.timing(cardSlideAnim, {
         toValue: 1,
-        duration: 500,
+        duration: 400,
         easing: Easing.out(Easing.back(1.2)),
         useNativeDriver: true,
       }),
@@ -76,7 +76,7 @@ const TestStart = () => {
       <Text style={styles.title}>나에게 딱 맞는</Text>
       <Text style={styles.title}>강아지를 입양 받아요!</Text>
 
-      {/* step 1 — V-shape side cards */}
+      {/* ===== step 1: V-shape side cards ===== */}
       <Animated.View
         style={[
           styles.sideCard,
@@ -94,16 +94,22 @@ const TestStart = () => {
           styles.sideCard,
           {
             right: CARD_EDGE_OFFSET,
-            transform: [{ translateX: rightTranslateX }, { rotate: rightRotate }],
+            transform: [
+              { translateX: rightTranslateX },
+              { rotate: rightRotate },
+            ],
           },
         ]}
       >
         <View style={styles.sideCardInner} />
       </Animated.View>
 
-      {/* step 2 — center card slides up */}
+      {/* ===== step 2: center card slides up ===== */}
       <Animated.View
-        style={[styles.outerBox, { transform: [{ translateY: cardTranslateY }] }]}
+        style={[
+          styles.outerBox,
+          { transform: [{ translateY: cardTranslateY }] },
+        ]}
       >
         <View style={styles.innerBox}>
           <Image
@@ -150,7 +156,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.40)',
     shadowColor: '#539D5F',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.20,
+    shadowOpacity: 0.2,
     shadowRadius: 20,
     elevation: 3,
     padding: 7.43,
@@ -172,7 +178,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     shadowColor: '#539D5F',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.20,
+    shadowOpacity: 0.2,
     shadowRadius: 20,
     elevation: 5,
     zIndex: 20,
