@@ -22,7 +22,7 @@ const CARD_TOP = (SCREEN_HEIGHT * 308) / 852;
 // 76025 final state: left card left-edge ≈ -51px off-screen
 const CARD_EDGE_OFFSET = -51;
 // distance to shift from 76046 spread state → 76025 V-shape state
-const SPREAD_OFFSET = 120;
+const SPREAD_OFFSET = 300;
 
 const TestStart = () => {
   const router = useRouter();
@@ -36,7 +36,7 @@ const TestStart = () => {
     Animated.sequence([
       Animated.timing(spreadAnim, {
         toValue: 0,
-        duration: 800,
+        duration: 900,
         easing: Easing.out(Easing.quad),
         useNativeDriver: true,
       }),

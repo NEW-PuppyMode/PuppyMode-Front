@@ -1,8 +1,11 @@
 import ResultBG from '@/assets/images/test/result-bg.svg';
 import { Image as ExpoImage } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useRef } from 'react';
 import {
+  Animated,
   Dimensions,
+  Easing,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -20,6 +23,20 @@ const TestResult = () => {
   }>();
 
   const { type, puppyBreedKo, puppyBreedEn, imageUrl } = JSON.parse(result);
+
+  const cardSlideAnim = useRef(
+    new Animated.Value(-SCREEN_HEIGHT * 0.6),
+  ).current;
+
+  useEffect(() => {
+    Animated.timing(cardSlideAnim, {
+      toValue: 0,
+      duration: 600,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
   return (
     <View style={styles.container}>
       <ResultBG style={styles.background} />
@@ -31,7 +48,12 @@ const TestResult = () => {
         <Text style={styles.title}>딱 맞는 강아지는..</Text>
       </View>
 
-      <View style={styles.outerBox}>
+      <Animated.View
+        style={[
+          styles.outerBox,
+          { transform: [{ translateY: cardSlideAnim }] },
+        ]}
+      >
         <View style={styles.innerBox}>
           <ExpoImage
             source={{ uri: imageUrl }}
@@ -44,7 +66,7 @@ const TestResult = () => {
             }}
           />
         </View>
-      </View>
+      </Animated.View>
 
       <Text style={styles.korText}>{puppyBreedKo}</Text>
       <Text style={styles.engText}>{puppyBreedEn}</Text>
