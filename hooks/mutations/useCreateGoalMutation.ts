@@ -9,6 +9,7 @@ export const useCreateGoalMutation = () => {
     mutationFn: (goal: GoalDTO) => PuppyDataAPI.createGoal(goal),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.puppyInfo });
+      queryClient.invalidateQueries({ queryKey: ['report'] });
     },
   });
 };

@@ -13,7 +13,6 @@ export const usePuppyInfoQuery = () => {
       const data = await PuppyDataAPI.fetchPuppyInfo();
       return data.result;
     },
-    staleTime: 0,
-    refetchOnMount: 'always',
+    staleTime: 1000 * 60 * 5,
   });
 };

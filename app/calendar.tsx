@@ -1,7 +1,6 @@
-// import { useCalendarData } from '@/hooks/useCalendarData'; // Get screen dimensions for responsive modal sizing
-import { useCalendarData } from '@/hooks/useCalendarData';
+import { useCalendarQuery } from '@/hooks/queries/useCalendarQuery';
 import { Stack, useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -257,10 +256,10 @@ export default function CalendarPage() {
   );
 
   const router = useRouter();
-  const { lookupCalendar, isLoading } = useCalendarData();
 
-  // API 응답 → 캘린더 markedDates로 변환한 결과를 보관
-  const [markedDates, setMarkedDates] = useState<MarkedDatesMap>({});
+  const calendarYear = new Date(currentDate).getFullYear();
+  const calendarMonth = new Date(currentDate).getMonth() + 1;
+  const { data: calendarData, isLoading } = useCalendarQuery(calendarYear, calendarMonth);
 
   // API 배열을 markedDates 형태로 매핑
   const mapApiToMarkedDates = (
@@ -277,18 +276,10 @@ export default function CalendarPage() {
     return map;
   };
 
-  // 특정 연/월 데이터를 서버에서 가져와 상태에 반영
-  const fetchCalendar = async (y: number, m: number) => {
-    const data = await lookupCalendar(y, m); // ← 배열
-    setMarkedDates(data ? mapApiToMarkedDates(data) : {});
-  };
-
-  // 최초 마운트 시: 현재 연/월로 1회 로드
-  useEffect(() => {
-    const y = new Date(currentDate).getFullYear();
-    const m = new Date(currentDate).getMonth() + 1;
-    fetchCalendar(y, m);
-  }, []);
+  const markedDates = useMemo(
+    () => (calendarData ? mapApiToMarkedDates(calendarData) : {}),
+    [calendarData],
+  );
 
   const currentMonthName =
     LocaleConfig.locales['ko'].monthNames[new Date(currentDate).getMonth()];
@@ -299,12 +290,11 @@ export default function CalendarPage() {
     setModalVisible(true);
   };
 
-  // 모달 확인: currentDate 갱신 + 선택한 연/월로 API 재요청
-  const handleModalConfirm = async () => {
+  // 모달 확인: currentDate 갱신 → query key 변경으로 자동 재요청
+  const handleModalConfirm = () => {
     const newDate = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`;
     setCurrentDate(newDate);
     setModalVisible(false);
-    await fetchCalendar(selectedYear, selectedMonth); // ★ 연/월 바뀌면 바로 재요청
   };
 
   // 월/년 증감

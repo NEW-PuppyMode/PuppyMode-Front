@@ -11,6 +11,8 @@ export const useCreateDrinkHistoryMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.puppyInfo });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.isRecorded });
+      queryClient.invalidateQueries({ queryKey: ['calendar'] });
+      queryClient.invalidateQueries({ queryKey: ['report'] });
     },
   });
 };
