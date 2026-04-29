@@ -167,6 +167,48 @@ export default function HomeScreen() {
     });
   };
 
+  const DOG_NAME_MESSAGES = [
+    (name: string) => (
+      <>
+        <Text style={{ color: '#21D08A', fontWeight: 'bold' }}>{name}</Text>
+        <Text> 이라니 너무 마음에 들어요.</Text>
+      </>
+    ),
+    (name: string) => (
+      <>
+        <Text style={{ color: '#21D08A', fontWeight: 'bold' }}>{name}</Text>
+        <Text> 이라니 완전 감다살이네요.</Text>
+      </>
+    ),
+    (name: string) => (
+      <>
+        <Text style={{ color: '#21D08A', fontWeight: 'bold' }}>{name}</Text>
+        <Text>… 제게도 이제 이름이 생겼네요. 감사해요.</Text>
+      </>
+    ),
+  ];
+
+  const USER_NAME_MESSAGES = [
+    (name: string) => (
+      <>
+        <Text style={{ color: '#21D08A', fontWeight: 'bold' }}>{name}</Text>
+        <Text>이군요… 앞으로 쭉 기억할게요.</Text>
+      </>
+    ),
+    (name: string) => (
+      <>
+        <Text style={{ color: '#21D08A', fontWeight: 'bold' }}>{name}</Text>
+        <Text>… 이제야 제대로 부를 수 있겠네요.</Text>
+      </>
+    ),
+    (name: string) => (
+      <>
+        <Text style={{ color: '#21D08A', fontWeight: 'bold' }}>{name}</Text>
+        <Text>… 앞으로 더 소중히 부를게요.</Text>
+      </>
+    ),
+  ];
+
   const handleRenameComplete = async () => {
     try {
       if (inputType === 'dog' && dogName.trim()) {
@@ -177,17 +219,8 @@ export default function HomeScreen() {
           setDogName('');
           setShowNameInput(false);
           setInputType(null);
-          const coloredMessage = (
-            <>
-              <Text>허걱{'\n'}</Text>
-              <Text style={{ color: '#21D08A', fontWeight: 'bold' }}>
-                {dogName}
-              </Text>
-              이라니..
-              <Text>{'\n'}너무 좋아요!</Text>
-            </>
-          );
-          setRenameMessage(coloredMessage);
+          const randomIndex = Math.floor(Math.random() * DOG_NAME_MESSAGES.length);
+          setRenameMessage(DOG_NAME_MESSAGES[randomIndex](dogName));
         }
       } else if (inputType === 'user' && userName.trim()) {
         const success = await renameUser(userName);
@@ -196,16 +229,8 @@ export default function HomeScreen() {
           setUserName('');
           setShowNameInput(false);
           setInputType(null);
-          const coloredMessage = (
-            <>
-              <Text>와우 {'\n'}</Text>
-              <Text style={{ color: '#21D08A', fontWeight: 'bold' }}>
-                {userName}
-              </Text>
-              ?<Text>{'\n'}감다살이네요.</Text>
-            </>
-          );
-          setRenameMessage(coloredMessage);
+          const randomIndex = Math.floor(Math.random() * USER_NAME_MESSAGES.length);
+          setRenameMessage(USER_NAME_MESSAGES[randomIndex](userName));
         }
       }
     } catch (error) {
