@@ -17,8 +17,14 @@ import { TopBar } from '@/components/page/home/TopBar';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { PUPPY_MESSAGES } from '@/constants/messages';
-import { usePuppyData } from '@/hooks/usePuppyData';
-import { IsRecorded, RecentGoal } from '@/types/models/puppy';
+import { useAdvicePuppyMutation } from '@/hooks/mutations/useAdvicePuppyMutation';
+import { useCreateDrinkHistoryMutation } from '@/hooks/mutations/useCreateDrinkHistoryMutation';
+import { useCreateGoalMutation } from '@/hooks/mutations/useCreateGoalMutation';
+import { useRenamePuppyMutation } from '@/hooks/mutations/useRenamePuppyMutation';
+import { useRenameUserMutation } from '@/hooks/mutations/useRenameUserMutation';
+import { useIsRecordedQuery } from '@/hooks/queries/useIsRecordedQuery';
+import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
+import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
 import { maxDaysInMonth } from '@/utils/dateUtils';
 import { getPuppyGifSource } from '@/utils/dogMapper';
 import { throttle } from 'lodash';
@@ -33,26 +39,16 @@ import {
   View,
 } from 'react-native';
 // import Gif from 'react-native-gif';
-import {
-  PUPPY_QUERY_KEYS,
-  usePuppyInfoQuery,
-} from '@/hooks/queries/usePuppyInfoQuery';
-import { useQueryClient } from '@tanstack/react-query';
 import { Image as Gif } from 'expo-image';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
-  const {
-    renamePuppy,
-    renameUser,
-    advicePuppy,
-    fetchIsRecorded,
-    fetchRecentGoal,
-    fetchGoal30daysPassed,
-    createDrinkHistory,
-    createGoal,
-  } = usePuppyData();
+  const renamePuppyMutation = useRenamePuppyMutation();
+  const renameUserMutation = useRenameUserMutation();
+  const advicePuppyMutation = useAdvicePuppyMutation();
+  const createDrinkHistoryMutation = useCreateDrinkHistoryMutation();
+  const createGoalMutation = useCreateGoalMutation();
 
   const {
     data: puppyInfo,
@@ -60,27 +56,8 @@ export default function HomeScreen() {
     isFetching,
     isError,
   } = usePuppyInfoQuery();
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const recentGoal = await fetchRecentGoal();
-      const goal30daysPassed = await fetchGoal30daysPassed();
-      const isRecorded = await fetchIsRecorded();
-
-      setRecentGoal(recentGoal);
-      setGoal30daysPassed(goal30daysPassed);
-      setIsRecorded(isRecorded);
-    };
-
-    fetchData();
-  }, []);
-
-  const [isRecorded, setIsRecorded] = useState<IsRecorded | false>(false);
-  const [recentGoal, setRecentGoal] = useState<RecentGoal | false>(false);
-  const [goal30daysPassed, setGoal30daysPassed] = useState<boolean | false>(
-    false,
-  );
+  const { data: isRecorded } = useIsRecordedQuery();
+  const { data: recentGoal } = useRecentGoalQuery();
 
   const [messageKey, setMessageKey] = useState<
     | 'default'
@@ -212,33 +189,28 @@ export default function HomeScreen() {
   const handleRenameComplete = async () => {
     try {
       if (inputType === 'dog' && dogName.trim()) {
-        const success = await renamePuppy(dogName);
-
-        if (success) {
-          setShowMessage(true);
-          setDogName('');
-          setShowNameInput(false);
-          setInputType(null);
-          const randomIndex = Math.floor(Math.random() * DOG_NAME_MESSAGES.length);
-          setRenameMessage(DOG_NAME_MESSAGES[randomIndex](dogName));
-        }
+        await renamePuppyMutation.mutateAsync(dogName);
+        setShowMessage(true);
+        const randomIndex = Math.floor(
+          Math.random() * DOG_NAME_MESSAGES.length,
+        );
+        setRenameMessage(DOG_NAME_MESSAGES[randomIndex](dogName));
+        setDogName('');
+        setShowNameInput(false);
+        setInputType(null);
       } else if (inputType === 'user' && userName.trim()) {
-        const success = await renameUser(userName);
-        if (success) {
-          setShowMessage(true);
-          setUserName('');
-          setShowNameInput(false);
-          setInputType(null);
-          const randomIndex = Math.floor(Math.random() * USER_NAME_MESSAGES.length);
-          setRenameMessage(USER_NAME_MESSAGES[randomIndex](userName));
-        }
+        await renameUserMutation.mutateAsync(userName);
+        setShowMessage(true);
+        const randomIndex = Math.floor(
+          Math.random() * USER_NAME_MESSAGES.length,
+        );
+        setRenameMessage(USER_NAME_MESSAGES[randomIndex](userName));
+        setUserName('');
+        setShowNameInput(false);
+        setInputType(null);
       }
     } catch (error) {
       console.log('Error: ', error);
-    } finally {
-      await queryClient.invalidateQueries({
-        queryKey: PUPPY_QUERY_KEYS.puppyInfo,
-      });
     }
   };
 
@@ -255,8 +227,8 @@ export default function HomeScreen() {
 
   const _handleAdviceClick = async () => {
     setShowMessage(true);
-    const result = await advicePuppy();
-    setAdviceMessage(result || '');
+    const result = await advicePuppyMutation.mutateAsync();
+    setAdviceMessage(result.result.advice || '');
     setRenameMessage('');
     setShowGoalOptions(false);
     setMessageKey('default');
@@ -315,17 +287,10 @@ export default function HomeScreen() {
       }
       const formattedDate = drinkDate.toISOString().slice(0, 10);
 
-      await createDrinkHistory({
+      await createDrinkHistoryMutation.mutateAsync({
         drinkDate: formattedDate,
         isDrink: didDrink,
       });
-
-      await queryClient.invalidateQueries({
-        queryKey: PUPPY_QUERY_KEYS.puppyInfo,
-      });
-
-      const updatedIsRecorded = await fetchIsRecorded();
-      setIsRecorded(updatedIsRecorded);
     } catch (error) {
       console.error('음주 기록 처리 중 오류 발생:', error);
     }
@@ -530,17 +495,13 @@ export default function HomeScreen() {
                     label='작성 완료'
                     variant='primary'
                     onPress={async () => {
-                      await createGoal({
+                      await createGoalMutation.mutateAsync({
                         goal: goalCount,
                         isNew: true,
                       });
                       setShowGoalInput(false);
                       setShowGoalOptions(false);
                       setGoalCount(0);
-
-                      await queryClient.invalidateQueries({
-                        queryKey: PUPPY_QUERY_KEYS.puppyInfo,
-                      });
                     }}
                     style={{
                       opacity: 0.7,
@@ -570,13 +531,9 @@ export default function HomeScreen() {
                           setShowGoalInput(false);
                           setShowGoalOptions(false);
 
-                          await createGoal({
+                          await createGoalMutation.mutateAsync({
                             goal: 0,
                             isNew: false,
-                          });
-
-                          await queryClient.invalidateQueries({
-                            queryKey: PUPPY_QUERY_KEYS.puppyInfo,
                           });
                         }}
                         disabled={!recentGoal}

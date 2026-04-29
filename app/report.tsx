@@ -1,9 +1,8 @@
-import { ReportApi } from '@/services/reportData';
+import { useReportQuery } from '@/hooks/queries/useReportQuery';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Image,
   ScrollView,
   StyleSheet,
@@ -11,47 +10,24 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-type ReportResultDTO = {
-  goal: number;
-  drinkRecordCount: number;
-  drinkDays: number;
-  achievementRate: number;
-  scoldedCount: number;
-};
 
 const Report = () => {
   const router = useRouter();
-
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<ReportResultDTO | null>(null);
 
   const { year, month } = useLocalSearchParams<{
     year: string;
     month: string;
   }>();
-  const now = useMemo(() => new Date(), []);
+
+  const { data, isLoading: loading, isError } = useReportQuery(
+    Number(year),
+    Number(month),
+  );
 
   const daysInMonth = useMemo(
     () => new Date(Number(year), Number(month), 0).getDate(),
     [year, month],
   );
-
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const result = await ReportApi.lookupReport(
-          Number(year),
-          Number(month),
-        ); // Authorization 헤더는 axiosInstance 인터셉터로 주입되어야 함
-        setData(result);
-      } catch (e: any) {
-        Alert.alert('알림', e?.message || '리포트 조회에 실패했어요.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetch();
-  }, []);
 
   if (loading) {
     return (
@@ -61,7 +37,7 @@ const Report = () => {
     );
   }
 
-  if (!data) {
+  if (isError || !data) {
     return (
       <View style={[styles.container, { justifyContent: 'center' }]}>
         <Text>데이터가 없어요.</Text>
