@@ -1,4 +1,5 @@
 export const QUERY_KEYS = {
+  me: ['me'] as const,
   puppyInfo: ['puppyInfo'] as const,
   isRecorded: ['isRecorded'] as const,
   recentGoal: ['recentGoal'] as const,
