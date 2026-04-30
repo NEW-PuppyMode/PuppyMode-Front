@@ -104,7 +104,7 @@ const Setting = () => {
         setVisible={setSignOutModalVisible}
       >
         <View className='justify-between p-[15px] pt-[35px] w-[336px] h-[154px] bg-white rounded-[10px]'>
-          <Text className='text-[#555] text-center font-semibold text-[18px]'>
+          <Text className='text-center font-semibold text-[18px] text-grayscale-700'>
             정말 로그아웃을 하시겠습니까?
           </Text>
 
@@ -119,17 +119,18 @@ const Setting = () => {
                   queryKey: PUPPY_QUERY_KEYS.puppyInfo,
                 });
               }}
-              className='justify-center items-center w-[148px] h-[48px] border-[1px] border-[#0FD380] bg-white rounded-[5px]'
+              className='w-[148px] h-[48px] rounded-[5px] border border-green-500 items-center justify-center'
             >
-              <Text className='text-[#0FD380] font-medium text-[12px]'>
+              <Text className='font-medium text-[12px] text-green-500'>
                 확인
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className='justify-center items-center w-[148px] h-[48px] bg-[#0FD380] rounded-[5px]'
+              className='w-[148px] h-[48px] rounded-[5px] bg-green-500 items-center justify-center'
               onPress={() => setSignOutModalVisible(false)}
+              activeOpacity={0.75}
             >
-              <Text className='text-[#F2FFF4] font-medium text-[12px]'>
+              <Text className='font-medium text-[12px] text-green-050'>
                 취소
               </Text>
             </TouchableOpacity>

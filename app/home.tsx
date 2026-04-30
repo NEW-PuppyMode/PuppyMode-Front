@@ -14,6 +14,7 @@ import { ControlButton } from '@/components/page/home/ControlButton';
 import { IconButton } from '@/components/page/home/IconButton';
 import { SpeechBubble } from '@/components/page/home/SpeechBubble';
 import { TopBar } from '@/components/page/home/TopBar';
+import { UpdatePopupModal } from '@/components/page/home/UpdatePopupModal';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { PUPPY_MESSAGES } from '@/constants/messages';
@@ -90,6 +91,8 @@ export default function HomeScreen() {
   // 키보드용 상태 변수
   const [bottomPanelHeight, setBottomPanelHeight] = useState(0);
   const keyboardAnim = useRef(new Animated.Value(0)).current;
+
+  const [showUpdatePopup, setShowUpdatePopup] = useState(false);
 
   const handleNewGoalClick = () => {
     setShowMessage(true);
@@ -624,6 +627,13 @@ export default function HomeScreen() {
             </ThemedView>
           </ThemedView>
         </ThemedView>
+
+        {/* ===== 업데이트 팝업 모달 ===== */}
+        <UpdatePopupModal
+          visible={showUpdatePopup}
+          onLater={() => setShowUpdatePopup(false)}
+          onUpdate={() => setShowUpdatePopup(false)}
+        />
 
         {/* ===== 강아지 Gif 레이어 ===== */}
         {/* {isFetching && <LoadingOverlay />} */}
