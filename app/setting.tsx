@@ -37,10 +37,7 @@ const Setting = () => {
           height: 60,
         }}
       >
-        <TouchableOpacity
-          onPress={() => router.replace('/home')}
-          className='px-[8px]'
-        >
+        <TouchableOpacity onPress={() => router.back()} className='px-[8px]'>
           <Image
             className='w-[8px] h-[16px]'
             source={require('@/assets/images/chevron_left.png')}

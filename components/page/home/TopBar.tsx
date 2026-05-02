@@ -41,7 +41,7 @@ export function TopBar({ level, displayName, percent }: Props) {
       <ThemedView className='flex-row ml-4 gap-x-2.5 bg-transparent'>
         <TouchableOpacity
           className='w-10 h-10 justify-center items-center bg-white rounded-full shadow-sm'
-          onPress={() => router.replace('/calendar')}
+          onPress={() => router.push('/calendar')}
         >
           <CalendarIcon width={20} height={20} />
         </TouchableOpacity>
@@ -50,7 +50,7 @@ export function TopBar({ level, displayName, percent }: Props) {
           onPress={() => {
             // crashlytics().setAttribute('route_intent', '/setting');
             // crashlytics().log('navigate: settings (Home/TopBar)');
-            router.replace('/setting');
+            router.push('/setting');
           }}
         >
           <SettingIcon width={20} height={20} color='#10B981' />

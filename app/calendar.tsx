@@ -259,7 +259,10 @@ export default function CalendarPage() {
 
   const calendarYear = new Date(currentDate).getFullYear();
   const calendarMonth = new Date(currentDate).getMonth() + 1;
-  const { data: calendarData, isLoading } = useCalendarQuery(calendarYear, calendarMonth);
+  const { data: calendarData, isLoading } = useCalendarQuery(
+    calendarYear,
+    calendarMonth,
+  );
 
   // API 배열을 markedDates 형태로 매핑
   const mapApiToMarkedDates = (
@@ -350,7 +353,7 @@ export default function CalendarPage() {
         {/* 상단 헤더 */}
         <View className='px-[20px] mt-12 h-[60px] justify-center'>
           <TouchableOpacity
-            onPress={() => router.replace('/home')}
+            onPress={() => router.back()}
             className='px-[8px] py-[6px]'
           >
             <Image
