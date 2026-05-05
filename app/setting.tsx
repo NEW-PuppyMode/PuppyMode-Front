@@ -1,6 +1,7 @@
 import DefaultModal from '@/components/common/DefaultModal';
 import PolicyModal from '@/components/page/setting/PolicyModal';
 import SettingBtn from '@/components/page/setting/SettingBtn';
+import { APP_VERSION } from '@/constants/appVersion';
 import { POLICY_MESSAGES } from '@/constants/messages';
 import { useAuth } from '@/contexts/AuthContext';
 import { PUPPY_QUERY_KEYS } from '@/hooks/queries/usePuppyInfoQuery';
@@ -85,7 +86,7 @@ const Setting = () => {
       />
       <View style={styles.view}>
         <Text style={styles.text}>앱 버전</Text>
-        <Text style={styles.text}>1.0.5</Text>
+        <Text style={styles.text}>{APP_VERSION}</Text>
       </View>
 
       <PolicyModal
