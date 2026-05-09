@@ -14,8 +14,10 @@ import { ControlButton } from '@/components/page/home/ControlButton';
 import { IconButton } from '@/components/page/home/IconButton';
 import { SpeechBubble } from '@/components/page/home/SpeechBubble';
 import { TopBar } from '@/components/page/home/TopBar';
+import { UpdatePopupModal } from '@/components/page/home/UpdatePopupModal';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+// import { APP_VERSION } from '@/constants/appVersion';
 import { PUPPY_MESSAGES } from '@/constants/messages';
 import { useAdvicePuppyMutation } from '@/hooks/mutations/useAdvicePuppyMutation';
 import { useCreateDrinkHistoryMutation } from '@/hooks/mutations/useCreateDrinkHistoryMutation';
@@ -25,6 +27,7 @@ import { useRenameUserMutation } from '@/hooks/mutations/useRenameUserMutation';
 import { useIsRecordedQuery } from '@/hooks/queries/useIsRecordedQuery';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
+import { useVersionCheckQuery } from '@/hooks/queries/useVersionCheckQuery';
 import { maxDaysInMonth } from '@/utils/dateUtils';
 import { getPuppyGifSource } from '@/utils/dogMapper';
 import { throttle } from 'lodash';
@@ -33,6 +36,7 @@ import {
   Animated,
   ImageBackground,
   Keyboard,
+  Linking,
   Platform,
   StyleSheet,
   Text,
@@ -58,6 +62,7 @@ export default function HomeScreen() {
   } = usePuppyInfoQuery();
   const { data: isRecorded } = useIsRecordedQuery();
   const { data: recentGoal } = useRecentGoalQuery();
+  const { data: versionData } = useVersionCheckQuery();
 
   const [messageKey, setMessageKey] = useState<
     | 'default'
@@ -90,6 +95,17 @@ export default function HomeScreen() {
   // 키보드용 상태 변수
   const [bottomPanelHeight, setBottomPanelHeight] = useState(0);
   const keyboardAnim = useRef(new Animated.Value(0)).current;
+
+  const [showUpdatePopup, setShowUpdatePopup] = useState(false);
+
+  // useEffect(() => {
+  //   if (!versionData) return;
+  //   const currentVersion = APP_VERSION;
+  //   const latestVersion = versionData.latestVersion.replace(/^v/, '');
+  //   if (currentVersion !== latestVersion) {
+  //     setShowUpdatePopup(true);
+  //   }
+  // }, [versionData]);
 
   const handleNewGoalClick = () => {
     setShowMessage(true);
@@ -624,6 +640,18 @@ export default function HomeScreen() {
             </ThemedView>
           </ThemedView>
         </ThemedView>
+
+        {/* ===== 업데이트 팝업 모달 ===== */}
+        <UpdatePopupModal
+          visible={showUpdatePopup}
+          onLater={() => setShowUpdatePopup(false)}
+          onUpdate={() => {
+            if (versionData?.updateUrl) {
+              Linking.openURL(versionData.updateUrl);
+            }
+            setShowUpdatePopup(false);
+          }}
+        />
 
         {/* ===== 강아지 Gif 레이어 ===== */}
         {/* {isFetching && <LoadingOverlay />} */}
