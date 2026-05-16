@@ -29,7 +29,13 @@ export const useMeQuery = (enabled: boolean) => {
     queryKey: QUERY_KEYS.me,
     queryFn: fetchAuthState,
     enabled,
-    retry: false,
+    retry: (failureCount, error) => {
+      if (axios.isAxiosError(error) && !error.response) {
+        return failureCount < 2;
+      }
+      return false;
+    },
+    retryDelay: 1000,
     staleTime: Infinity,
   });
 };

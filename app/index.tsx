@@ -1,6 +1,7 @@
 import { KEYS } from '@/constants/storage';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
 
@@ -18,13 +19,19 @@ export default function Index() {
     );
   }, []);
 
-  const { data, isError, isPending } = useMeQuery(hasTokens === true);
+  const { data, isError, isPending, error } = useMeQuery(hasTokens === true);
 
   useEffect(() => {
-    if (isError) {
-      AsyncStorage.multiRemove([KEYS.ACCESS_TOKEN, KEYS.REFRESH_TOKEN, KEYS.PROVIDER]);
+    if (!isError || !error) return;
+    const isNetworkError = axios.isAxiosError(error) && !error.response;
+    if (!isNetworkError) {
+      AsyncStorage.multiRemove([
+        KEYS.ACCESS_TOKEN,
+        KEYS.REFRESH_TOKEN,
+        KEYS.PROVIDER,
+      ]);
     }
-  }, [isError]);
+  }, [isError, error]);
 
   if (hasTokens === null || (hasTokens && isPending)) return null;
 
