@@ -199,7 +199,8 @@ const DayComponent = ({
 }: DayComponentProps) => {
   if (!date) return null;
   const marked = markedDates[date.dateString];
-  const today = new Date().toISOString().split('T')[0];
+  const d = new Date();
+  const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const isToday = date.dateString === today;
   const isCurrentMonth = date.dateString.startsWith(currentMonth);
 
@@ -243,7 +244,8 @@ const DayComponent = ({
 };
 
 export default function CalendarPage() {
-  const today = new Date().toISOString().split('T')[0];
+  const d = new Date();
+  const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const [currentDate, setCurrentDate] = useState(today); // 'YYYY-MM-DD'
 
   // 월 선택 모달 상태
