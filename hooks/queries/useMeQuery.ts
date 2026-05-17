@@ -30,8 +30,11 @@ export const useMeQuery = (enabled: boolean) => {
     queryFn: fetchAuthState,
     enabled,
     retry: (failureCount, error) => {
-      if (axios.isAxiosError(error) && !error.response) {
-        return failureCount < 2;
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        if (!error.response || (status && status >= 500)) {
+          return failureCount < 2;
+        }
       }
       return false;
     },
