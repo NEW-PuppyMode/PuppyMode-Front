@@ -240,13 +240,17 @@ export default function HomeScreen() {
   }, [puppyInfo, isFetching]);
 
   const _handleAdviceClick = async () => {
-    setShowMessage(true);
-    const result = await advicePuppyMutation.mutateAsync();
-    setAdviceMessage(result.result.advice || '');
+    try {
+      const result = await advicePuppyMutation.mutateAsync();
+      setAdviceMessage(result.result.advice || '');
+    } catch {
+      setAdviceMessage('');
+      setMessageKey('default');
+    }
     setRenameMessage('');
     setShowGoalOptions(false);
-    setMessageKey('default');
     setRecordMode(false);
+    setShowMessage(true);
   };
 
   const handleAdviceClick = useMemo(
