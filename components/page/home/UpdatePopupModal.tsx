@@ -3,13 +3,14 @@ import { Text, TouchableOpacity, View } from 'react-native';
 
 interface Props {
   visible: boolean;
+  updateRequired: boolean;
   onLater: () => void;
   onUpdate: () => void;
 }
 
-export function UpdatePopupModal({ visible, onLater, onUpdate }: Props) {
+export function UpdatePopupModal({ visible, updateRequired, onLater, onUpdate }: Props) {
   return (
-    <DefaultModal visible={visible} setVisible={onLater}>
+    <DefaultModal visible={visible} setVisible={updateRequired ? () => {} : onLater}>
       <View className='justify-between p-[15px] pt-[35px] w-[336px]  bg-white rounded-[10px]'>
         {/* ===== 안내 텍스트 ===== */}
         <View className='items-center gap-[12px] px-[12px] py-[10px] w-full'>
@@ -18,23 +19,27 @@ export function UpdatePopupModal({ visible, onLater, onUpdate }: Props) {
             개선했어요!
           </Text>
           <Text className='text-center font-normal text-[14px] text-grayscale-600'>
-            앱 안정성을 높이고 일부 오류를 수정했어요
+            {updateRequired
+              ? '계속 이용하려면 업데이트가 필요해요'
+              : '앱 안정성을 높이고 일부 오류를 수정했어요'}
           </Text>
         </View>
 
         {/* ===== 버튼 ===== */}
         <View className='flex-row justify-between'>
-          <TouchableOpacity
-            className='w-[148px] h-[48px] rounded-[5px] border border-green-500 items-center justify-center'
-            onPress={onLater}
-          >
-            <Text className='font-medium text-[12px] text-green-500'>
-              나중에
-            </Text>
-          </TouchableOpacity>
+          {!updateRequired && (
+            <TouchableOpacity
+              className='w-[148px] h-[48px] rounded-[5px] border border-green-500 items-center justify-center'
+              onPress={onLater}
+            >
+              <Text className='font-medium text-[12px] text-green-500'>
+                나중에
+              </Text>
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
-            className='w-[148px] h-[48px] rounded-[5px] bg-green-500 items-center justify-center'
+            className={`h-[48px] rounded-[5px] bg-green-500 items-center justify-center ${updateRequired ? 'w-full' : 'w-[148px]'}`}
             onPress={onUpdate}
             activeOpacity={0.75}
           >
