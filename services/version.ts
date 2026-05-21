@@ -1,3 +1,4 @@
+import { APP_VERSION } from '@/constants/appVersion';
 import { Platform } from 'react-native';
 import { axiosInstance } from '.';
 
@@ -6,6 +7,8 @@ export type OsType = 'Android' | 'iOS';
 export interface VersionCheckResult {
   latestVersion: string;
   updateUrl: string;
+  updateRequired: boolean;
+  updateAvailable: boolean;
 }
 
 export interface VersionCheckResponse {
@@ -21,7 +24,7 @@ export const versionAPI = {
   check: async (): Promise<VersionCheckResult> => {
     const response = await axiosInstance.get<VersionCheckResponse>(
       '/version/check',
-      { params: { osType } },
+      { params: { osType, currentVersion: APP_VERSION } },
     );
 
     if (!response.data.isSuccess) {

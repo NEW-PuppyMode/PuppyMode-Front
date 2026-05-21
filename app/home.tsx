@@ -98,14 +98,12 @@ export default function HomeScreen() {
 
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
 
-  // useEffect(() => {
-  //   if (!versionData) return;
-  //   const currentVersion = APP_VERSION;
-  //   const latestVersion = versionData.latestVersion.replace(/^v/, '');
-  //   if (currentVersion !== latestVersion) {
-  //     setShowUpdatePopup(true);
-  //   }
-  // }, [versionData]);
+  useEffect(() => {
+    if (!versionData) return;
+    if (versionData.updateRequired || versionData.updateAvailable) {
+      setShowUpdatePopup(true);
+    }
+  }, [versionData]);
 
   const handleNewGoalClick = () => {
     setShowMessage(true);
@@ -242,13 +240,17 @@ export default function HomeScreen() {
   }, [puppyInfo, isFetching]);
 
   const _handleAdviceClick = async () => {
-    setShowMessage(true);
-    const result = await advicePuppyMutation.mutateAsync();
-    setAdviceMessage(result.result.advice || '');
+    try {
+      const result = await advicePuppyMutation.mutateAsync();
+      setAdviceMessage(result.result.advice || '');
+    } catch {
+      setAdviceMessage('');
+      setMessageKey('default');
+    }
     setRenameMessage('');
     setShowGoalOptions(false);
-    setMessageKey('default');
     setRecordMode(false);
+    setShowMessage(true);
   };
 
   const handleAdviceClick = useMemo(
@@ -644,6 +646,7 @@ export default function HomeScreen() {
         {/* ===== 업데이트 팝업 모달 ===== */}
         <UpdatePopupModal
           visible={showUpdatePopup}
+          updateRequired={versionData?.updateRequired ?? false}
           onLater={() => setShowUpdatePopup(false)}
           onUpdate={() => {
             if (versionData?.updateUrl) {
