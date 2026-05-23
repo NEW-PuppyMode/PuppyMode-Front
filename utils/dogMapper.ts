@@ -71,10 +71,10 @@ export const getPuppyGifSource = (
   else if (name.includes('시바')) breedKey = 'siba';
   else if (name.includes('푸들')) breedKey = 'poodle';
 
-  const safeLevel = (level === 1 || level === 2 || level === 3 ? level : 1) as
-    | 1
-    | 2
-    | 3;
+  let safeLevel: 1 | 2 | 3;
+  if (level >= 20) safeLevel = 3;
+  else if (level >= 10) safeLevel = 2;
+  else safeLevel = 1;
 
   return puppyGifs[breedKey][safeLevel] ?? puppyGifs[breedKey][1];
 };
