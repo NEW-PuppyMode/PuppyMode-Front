@@ -1,4 +1,6 @@
 import { useCalendarQuery } from '@/hooks/queries/useCalendarQuery';
+import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
+import { getCalendarDogImage } from '@/utils/dogMapper';
 import { Stack, useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import {
@@ -190,12 +192,14 @@ interface DayComponentProps {
   date?: DateData;
   currentMonth: string; // 'YYYY-MM'
   markedDates: MarkedDatesMap; // API에서 매핑된 데이터
+  puppyLevelName: string;
 }
 
 const DayComponent = ({
   date,
   currentMonth,
   markedDates,
+  puppyLevelName,
 }: DayComponentProps) => {
   if (!date) return null;
   const marked = markedDates[date.dateString];
@@ -209,12 +213,7 @@ const DayComponent = ({
   }
   // const containerStyles = [styles.dayContainer];
   const textStyles = [styles.dayText];
-  let statusImage = require('@/assets/images/unmarked_drink.png'); // 디폴트 (회색)
-  if (marked?.isDrink === true) {
-    statusImage = require('@/assets/images/drink.png'); // 주황
-  } else if (marked?.isDrink === false) {
-    statusImage = require('@/assets/images/not_drink.png'); // 초록
-  }
+  const statusImage = getCalendarDogImage(puppyLevelName, marked?.isDrink);
 
   if (isToday) {
     textStyles.push({ ...styles.todayText, fontSize: 16 });
@@ -258,6 +257,9 @@ export default function CalendarPage() {
   );
 
   const router = useRouter();
+
+  const { data: puppyInfo } = usePuppyInfoQuery();
+  const puppyLevelName = puppyInfo?.puppyLevelName ?? '';
 
   const calendarYear = new Date(currentDate).getFullYear();
   const calendarMonth = new Date(currentDate).getMonth() + 1;
@@ -393,6 +395,7 @@ export default function CalendarPage() {
                 {...dayProps}
                 currentMonth={currentDate.substring(0, 7)}
                 markedDates={mergedMarkedDates}
+                puppyLevelName={puppyLevelName}
               />
             )}
             hideArrows={true}
