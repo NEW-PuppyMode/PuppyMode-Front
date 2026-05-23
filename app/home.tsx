@@ -98,6 +98,11 @@ export default function HomeScreen() {
 
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
 
+  const [reaction, setReaction] = useState<'normal' | 'angry' | 'heart'>(
+    'normal',
+  );
+  const reactionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     if (!versionData) return;
     if (versionData.updateRequired || versionData.updateAvailable) {
@@ -268,6 +273,12 @@ export default function HomeScreen() {
     };
   }, [handleAdviceClick]);
 
+  useEffect(() => {
+    return () => {
+      if (reactionTimerRef.current) clearTimeout(reactionTimerRef.current);
+    };
+  }, []);
+
   const level = puppyInfo?.puppyLevel ?? 0;
   const percent = puppyInfo?.puppyLevelPercent ?? 0;
   const displayName = puppyInfo?.puppyLevelName; // 강아지 종 ex)눈송이 비숑
@@ -298,6 +309,10 @@ export default function HomeScreen() {
       setMessageKey('archiveSuccess');
       setRecordMode(false);
       setRecordType(null);
+
+      if (reactionTimerRef.current) clearTimeout(reactionTimerRef.current);
+      setReaction(didDrink ? 'angry' : 'heart');
+      reactionTimerRef.current = setTimeout(() => setReaction('normal'), 2000);
 
       const drinkDate = new Date();
       if (recordType === 'yesterday') {
@@ -661,7 +676,7 @@ export default function HomeScreen() {
         {/* 이런식으로 추후에 데이터 패칭 중 -> 로딩 UI 추가하기 */}
         <View pointerEvents='none' style={styles.gifLayer}>
           <Gif
-            source={getPuppyGifSource(displayName ?? '', level)}
+            source={getPuppyGifSource(displayName ?? '', level, reaction)}
             style={{
               width: 240,
               height: 240,
