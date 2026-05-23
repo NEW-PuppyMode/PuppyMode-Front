@@ -24,6 +24,42 @@ const puppyGifs = {
 
 import { ImageSourcePropType } from 'react-native';
 
+const calendarDogImages = {
+  bichon: {
+    drunk: require('@/assets/images/calendar/calendar_dog_bichon_drunk.png'),
+    sober: require('@/assets/images/calendar/calendar_dog_bichon_sober.png'),
+  },
+  poodle: {
+    drunk: require('@/assets/images/calendar/calendar_dog_poodle_drunk.png'),
+    sober: require('@/assets/images/calendar/calendar_dog_poodle_sober.png'),
+  },
+  siba: {
+    drunk: require('@/assets/images/calendar/calendar_dog_siba_drunk.png'),
+    sober: require('@/assets/images/calendar/calendar_dog_siba_sober.png'),
+  },
+  welshcorgi: {
+    drunk: require('@/assets/images/calendar/calendar_dog_welshcorgi_drunk.png'),
+    sober: require('@/assets/images/calendar/calendar_dog_welshcorgi_sober.png'),
+  },
+};
+
+const unmarkedDrinkImage = require('@/assets/images/calendar/calendar_dog_empty.png');
+
+export const getCalendarDogImage = (
+  levelName: string,
+  isDrink: boolean | null | undefined,
+): ImageSourcePropType => {
+  if (isDrink === null || isDrink === undefined) return unmarkedDrinkImage;
+
+  const name = (levelName ?? '').trim();
+  let breedKey: keyof typeof calendarDogImages = 'bichon';
+  if (name.includes('코기')) breedKey = 'welshcorgi';
+  else if (name.includes('시바')) breedKey = 'siba';
+  else if (name.includes('푸들')) breedKey = 'poodle';
+
+  return isDrink ? calendarDogImages[breedKey].drunk : calendarDogImages[breedKey].sober;
+};
+
 export const getPuppyGifSource = (
   levelName: string,
   level: number,
@@ -35,10 +71,10 @@ export const getPuppyGifSource = (
   else if (name.includes('시바')) breedKey = 'siba';
   else if (name.includes('푸들')) breedKey = 'poodle';
 
-  const safeLevel = (level === 1 || level === 2 || level === 3 ? level : 1) as
-    | 1
-    | 2
-    | 3;
+  let safeLevel: 1 | 2 | 3;
+  if (level >= 20) safeLevel = 3;
+  else if (level >= 10) safeLevel = 2;
+  else safeLevel = 1;
 
   return puppyGifs[breedKey][safeLevel] ?? puppyGifs[breedKey][1];
 };
