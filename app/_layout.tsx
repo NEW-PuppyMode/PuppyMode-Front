@@ -1,3 +1,4 @@
+import { AnalyticsRouteTracker } from '@/components/common/AnalyticsRouteTracker';
 import { CrashlyticsRouteTracker } from '@/components/common/CrashlyticsRouteTracker';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -126,6 +127,7 @@ export default function RootLayout() {
         >
           <EmotionThemeProvider theme={theme}>
             {/* <ErrorBoundary> */}
+            <AnalyticsRouteTracker />
             <CrashlyticsRouteTracker />
             <Stack>
               <Stack.Screen name='index' options={{ headerShown: false }} />

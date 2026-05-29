@@ -17,6 +17,7 @@ import {
 } from 'react-native-safe-area-context';
 
 import { PUPPY_QUERY_KEYS } from '@/hooks/queries/usePuppyInfoQuery';
+import { logButtonTap } from '@/utils/analytics';
 import { useQueryClient } from '@tanstack/react-query';
 import Apple from '../assets/icons/signin/ic_apple.svg';
 import Kakao from '../assets/icons/signin/ic_kakao.svg';
@@ -87,7 +88,10 @@ const SignIn = () => {
           <TouchableOpacity
             style={[btnStyles.btn, { backgroundColor: '#FEE500' }]}
             activeOpacity={0.8}
-            onPress={loginWithKakao}
+            onPress={() => {
+              logButtonTap('login_kakao');
+              loginWithKakao();
+            }}
             disabled={isLoading}
           >
             <Kakao width={17} height={16} />
@@ -110,7 +114,10 @@ const SignIn = () => {
               },
             ]}
             activeOpacity={0.8}
-            onPress={handleSignInApple}
+            onPress={() => {
+              logButtonTap('login_apple');
+              handleSignInApple();
+            }}
             disabled={isLoading}
           >
             <Apple width={18} height={18} />

@@ -28,6 +28,7 @@ import { useIsRecordedQuery } from '@/hooks/queries/useIsRecordedQuery';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
 import { useVersionCheckQuery } from '@/hooks/queries/useVersionCheckQuery';
+import { logButtonTap } from '@/utils/analytics';
 import { maxDaysInMonth } from '@/utils/dateUtils';
 import { getPuppyGifSource } from '@/utils/dogMapper';
 import { throttle } from 'lodash';
@@ -132,6 +133,7 @@ export default function HomeScreen() {
   };
 
   const handleDrinkRecordPress = () => {
+    logButtonTap('drink_record');
     setShowMessage(true);
     setRecordMode(!recordMode);
     setShowNameInput(false);
@@ -245,6 +247,7 @@ export default function HomeScreen() {
   }, [puppyInfo, isFetching]);
 
   const _handleAdviceClick = async () => {
+    logButtonTap('advice');
     try {
       const result = await advicePuppyMutation.mutateAsync();
       setAdviceMessage(result.result.advice || '');
