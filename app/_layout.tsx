@@ -3,6 +3,7 @@ import { CrashlyticsRouteTracker } from '@/components/common/CrashlyticsRouteTra
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import theme from '@/styles/theme';
+import { setupTokenRefreshListener } from '@/utils/fcm';
 import { ThemeProvider as EmotionThemeProvider } from '@emotion/react';
 import crashlytics from '@react-native-firebase/crashlytics';
 import {
@@ -96,6 +97,11 @@ export default function RootLayout() {
   }, [loaded]);
 
   const ready = loaded && mockReady;
+
+  useEffect(() => {
+    const unsubscribe = setupTokenRefreshListener();
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     crashlytics().setAttribute('ready', ready ? '1' : '0');
