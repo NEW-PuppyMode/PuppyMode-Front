@@ -34,10 +34,7 @@ export const useLogin = (): UseLoginReturn => {
 
       await AsyncStorage.setItem(KEYS.ACCESS_TOKEN, result.accessToken);
 
-      // FCM 토큰 등록 (실패해도 로그인 흐름 유지)
-      requestPermissionAndRegisterFcmToken().catch((e) =>
-        console.error('FCM 토큰 등록 실패:', e),
-      );
+      requestPermissionAndRegisterFcmToken();
 
       setUserInfo(result.userInfo);
     } catch (err: any) {

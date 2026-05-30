@@ -63,10 +63,7 @@ async function handleSignInApple() {
       } else {
         await AsyncStorage.removeItem(KEYS.REFRESH_TOKEN);
       }
-      // FCM 토큰 등록 (실패해도 로그인 흐름 유지)
-      requestPermissionAndRegisterFcmToken().catch((e) =>
-        console.error('FCM 토큰 등록 실패:', e),
-      );
+      requestPermissionAndRegisterFcmToken();
       if (result.userInfo?.isNewUser) {
         router.replace('/test/start'); // 강아지 등록/온보딩 화면
       } else {

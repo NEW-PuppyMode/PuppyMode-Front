@@ -4,15 +4,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 
 export async function requestPermissionAndRegisterFcmToken(): Promise<void> {
-  const authStatus = await messaging().requestPermission();
-  const enabled =
-    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  try {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-  if (!enabled) return;
+    if (!enabled) return;
 
-  const token = await messaging().getToken();
-  await fcmAPI.registerToken(token);
+    const token = await messaging().getToken();
+    await fcmAPI.registerToken(token);
+  } catch (e) {
+    console.error('FCM 권한 요청 및 토큰 등록 실패:', e);
+  }
 }
 
 export async function deleteFcmToken(): Promise<void> {
