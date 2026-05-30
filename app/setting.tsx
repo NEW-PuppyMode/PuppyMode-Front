@@ -4,11 +4,22 @@ import SettingBtn from '@/components/page/setting/SettingBtn';
 import { APP_VERSION } from '@/constants/appVersion';
 import { POLICY_MESSAGES } from '@/constants/messages';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  useNotificationSettingQuery,
+  useUpdateNotificationSettingMutation,
+} from '@/hooks/queries/useNotificationSettingQuery';
 import { PUPPY_QUERY_KEYS } from '@/hooks/queries/usePuppyInfoQuery';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 const Setting = () => {
   const queryClient = useQueryClient();
@@ -20,6 +31,9 @@ const Setting = () => {
   const [signOutModalVisible, setSignOutModalVisible] = useState(false);
 
   const { logout } = useAuth();
+  const { data: notificationSetting } = useNotificationSettingQuery();
+  const { mutate: updateNotificationSetting } =
+    useUpdateNotificationSettingMutation();
 
   // useEffect(() => {
   //   crashlytics().log('screen: /setting mounted');
@@ -56,6 +70,16 @@ const Setting = () => {
           설정
         </Text>
         <View style={{ width: 40 }} />
+      </View>
+
+      <View style={styles.view}>
+        <Text style={styles.text}>알림 수신</Text>
+        <Switch
+          value={notificationSetting?.receiveNotifications ?? false}
+          onValueChange={(value) => updateNotificationSetting(value)}
+          trackColor={{ false: '#E0E0E0', true: '#00A775' }}
+          thumbColor='#ffffff'
+        />
       </View>
 
       <SettingBtn

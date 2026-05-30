@@ -1,5 +1,6 @@
 import { KEYS } from '@/constants/storage';
 import { KakaoLoginResult, loginAPI } from '@/services/auth';
+import { requestPermissionAndRegisterFcmToken } from '@/utils/fcm';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { login as loginWithKakaoAccount } from '@react-native-seoul/kakao-login';
 import { useCallback, useState } from 'react';
@@ -32,6 +33,8 @@ export const useLogin = (): UseLoginReturn => {
       );
 
       await AsyncStorage.setItem(KEYS.ACCESS_TOKEN, result.accessToken);
+
+      requestPermissionAndRegisterFcmToken();
 
       setUserInfo(result.userInfo);
     } catch (err: any) {

@@ -1,5 +1,6 @@
 import { KEYS } from '@/constants/storage';
 import { axiosInstance } from '@/services/index';
+import { requestPermissionAndRegisterFcmToken } from '@/utils/fcm';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { router } from 'expo-router';
@@ -62,6 +63,7 @@ async function handleSignInApple() {
       } else {
         await AsyncStorage.removeItem(KEYS.REFRESH_TOKEN);
       }
+      requestPermissionAndRegisterFcmToken();
       if (result.userInfo?.isNewUser) {
         router.replace('/test/start'); // 강아지 등록/온보딩 화면
       } else {

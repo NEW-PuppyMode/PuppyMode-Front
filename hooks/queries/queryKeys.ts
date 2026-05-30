@@ -7,4 +7,5 @@ export const QUERY_KEYS = {
   calendar: (year: number, month: number) => ['calendar', year, month] as const,
   report: (year: number, month: number) => ['report', year, month] as const,
   versionCheck: ['versionCheck'] as const,
+  notificationSetting: ['notificationSetting'] as const,
 };
