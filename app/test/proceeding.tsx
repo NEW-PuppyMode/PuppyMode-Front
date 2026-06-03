@@ -1,4 +1,6 @@
+import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { TestApi } from '@/services/testData';
+import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -108,6 +110,7 @@ const questions: Question[] = [
 ];
 
 export default function TestProceeding() {
+  const queryClient = useQueryClient();
   const [step, setStep] = useState(1);
   const [selected, setSelected] = useState<number[]>([0, 0, 0, 0, 0, 0, 0]); // 0: default, 1: 첫번째, 2: 두번째. 0번째 index dummy
 
@@ -133,6 +136,16 @@ export default function TestProceeding() {
 
         console.log('제출 성공:', res.message);
         console.log('제출 성공:', res.result);
+
+        // 문제: 탈퇴 -> 로그인 -> 저장공간 삭제 -> 앱 재실행 후 로그인 -> 강아지 테스트 시에 테스트를 2번 하는 오류
+        // 원인: 로그인 화면에서 isNewUser: true을 받고 home으로 간 후 다시 온보딩 화면으로 돌아옴으로써 isOnboarded: false이 됨.
+        // 임시 해결(로직이 비효율적): 온보딩 완료 후 서버 상태(isOnboarded)를 다시 받아 캐시를 갱신한다
+        // 근본 해결: 소셜 로그인 api(카카오 및 애플)에 isOnboarded 값 필요 (서버에 요청 예정)
+        await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.me });
+        await queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.puppyInfo,
+        });
+
         router.replace({
           pathname: '/test/result',
           params: { result: JSON.stringify(res.result) },
