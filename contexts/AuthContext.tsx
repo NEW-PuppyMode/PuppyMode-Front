@@ -1,5 +1,6 @@
 import { loginAPI } from '@/services/auth';
 import { deleteFcmToken } from '@/utils/fcm';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   createContext,
   PropsWithChildren,
@@ -18,6 +19,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const queryClient = useQueryClient();
 
   const logout = useCallback(async () => {
     await deleteFcmToken();
@@ -29,8 +31,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
       }
     } finally {
       setIsLoggedIn(false);
+      // 이전 계정의 데이터(음주 기록 여부, 캘린더 등)가 남지 않도록 캐시를 모두 비운다
+      queryClient.clear();
     }
-  }, []);
+  }, [queryClient]);
 
   const value = useMemo(
     () => ({ isLoggedIn, logout }),
