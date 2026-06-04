@@ -123,6 +123,8 @@ export default function HomeScreen() {
     setInputType('dog');
     setShowNameInput(true);
     setMessageKey('namingPuppy');
+    setRenameMessage('');
+    setAdviceMessage('');
   };
 
   const handleUserNameButtonPress = () => {
@@ -130,6 +132,8 @@ export default function HomeScreen() {
     setInputType('user');
     setShowNameInput(true);
     setMessageKey('namingUser');
+    setRenameMessage('');
+    setAdviceMessage('');
   };
 
   const handleDrinkRecordPress = () => {
@@ -141,6 +145,7 @@ export default function HomeScreen() {
     setRecordType(null);
     setMessageKey('default');
     setAdviceMessage('');
+    setRenameMessage('');
   };
 
   const handleCancel = () => {
@@ -302,6 +307,7 @@ export default function HomeScreen() {
         setShowMessage(false);
         setMessageKey('default');
         setAdviceMessage('');
+        setRenameMessage('');
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -310,6 +316,7 @@ export default function HomeScreen() {
   const handleRecordDrinkHistory = async (didDrink: boolean) => {
     try {
       setMessageKey('archiveSuccess');
+      setShowMessage(true);
       setRecordMode(false);
       setRecordType(null);
 
@@ -610,6 +617,7 @@ export default function HomeScreen() {
                         onPress={() => {
                           setRecordType('yesterday');
                           setMessageKey('archiveYesterday');
+                          setShowMessage(true);
                         }}
                         disabled={
                           isRecorded && isRecorded.yesterdayRecorded === true
@@ -624,6 +632,7 @@ export default function HomeScreen() {
                         onPress={() => {
                           setRecordType('today');
                           setMessageKey('archiveToday');
+                          setShowMessage(true);
                         }}
                         disabled={
                           isRecorded && isRecorded.todayRecorded === true
