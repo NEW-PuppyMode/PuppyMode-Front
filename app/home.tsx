@@ -48,6 +48,9 @@ import { Image as Gif } from 'expo-image';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+// 3초 후 자동으로 사라지는 메시지 키 (그 외는 관련 UI가 닫힐 때까지 유지)
+const TRANSIENT_MESSAGE_KEYS = ['default', 'archiveSuccess'] as const;
+
 export default function HomeScreen() {
   const renamePuppyMutation = useRenamePuppyMutation();
   const renameUserMutation = useRenameUserMutation();
@@ -138,14 +141,21 @@ export default function HomeScreen() {
 
   const handleDrinkRecordPress = () => {
     logButtonTap('drink_record');
-    setShowMessage(true);
-    setRecordMode(!recordMode);
+    const willOpen = !recordMode;
+    setRecordMode(willOpen);
     setShowNameInput(false);
     setInputType(null);
     setRecordType(null);
-    setMessageKey('default');
     setAdviceMessage('');
     setRenameMessage('');
+    if (willOpen) {
+      // 기록 모드 진입: '음주 기록할래' 안내(default, 3초)
+      setMessageKey('default');
+      setShowMessage(true);
+    } else {
+      // 기록 모드 해제(버튼 비활성화): 말풍선 숨김
+      setShowMessage(false);
+    }
   };
 
   const handleCancel = () => {
@@ -153,17 +163,24 @@ export default function HomeScreen() {
     setShowNameInput(false);
     setInputType(null);
     setRecordType(null);
-    setMessageKey('default');
+    // 취소(버튼 비활성화): 안내 말풍선 숨김
+    setShowMessage(false);
   };
 
   const handleShowGoalOptions = () => {
     setShowNameInput(false);
-    setShowMessage(true);
     setAdviceMessage('');
     setRenameMessage('');
     setShowGoalOptions((prev) => {
       const newState = !prev;
-      setMessageKey(newState ? 'makeGoal' : 'default');
+      if (newState) {
+        // 목표 설정 진입: '목표를 선택해주세요' 안내(makeGoal, 유지)
+        setMessageKey('makeGoal');
+        setShowMessage(true);
+      } else {
+        // 목표 설정 닫기(버튼 비활성화): 말풍선 숨김
+        setShowMessage(false);
+      }
       setGoalType(null);
       setShowGoalInput(false);
       return newState;
@@ -302,16 +319,24 @@ export default function HomeScreen() {
     inputType === 'dog' ? '이름을 입력해주세요.' : '이름을 입력해주세요.';
 
   useEffect(() => {
-    if (showMessage) {
-      const timer = setTimeout(() => {
-        setShowMessage(false);
-        setMessageKey('default');
-        setAdviceMessage('');
-        setRenameMessage('');
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [showMessage]);
+    if (!showMessage) return;
+
+    // A그룹(조언/음주 기록/기록 완료/이름 등록 완료)만 3초 후 자동으로 사라짐.
+    // B그룹(이름 짓기/목표 설정&새로운 목표 설정/음주 기록 선택-어제&오늘)은 관련 UI가 닫힐 때까지 유지.
+    const isTransient =
+      !!renameMessage ||
+      !!adviceMessage ||
+      (TRANSIENT_MESSAGE_KEYS as readonly string[]).includes(messageKey);
+    if (!isTransient) return;
+
+    const timer = setTimeout(() => {
+      setShowMessage(false);
+      setMessageKey('default');
+      setAdviceMessage('');
+      setRenameMessage('');
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [showMessage, messageKey, renameMessage, adviceMessage]);
 
   const handleRecordDrinkHistory = async (didDrink: boolean) => {
     try {
@@ -495,6 +520,8 @@ export default function HomeScreen() {
                       setShowGoalInput(false);
                       setShowGoalOptions(false);
                       setGoalCount(10);
+                      // 목표 설정 취소(버튼 비활성화): 안내 말풍선 숨김
+                      setShowMessage(false);
                     }}
                     style={{
                       opacity: 0.9,
@@ -545,6 +572,8 @@ export default function HomeScreen() {
                       setShowGoalInput(false);
                       setShowGoalOptions(false);
                       setGoalCount(0);
+                      // 목표 설정 완료(다음 단계): 안내 말풍선 숨김
+                      setShowMessage(false);
                     }}
                     style={{
                       opacity: 0.7,
@@ -573,6 +602,8 @@ export default function HomeScreen() {
                           setGoalType('same');
                           setShowGoalInput(false);
                           setShowGoalOptions(false);
+                          // 목표 설정 완료(다음 단계): 안내 말풍선 숨김
+                          setShowMessage(false);
 
                           await createGoalMutation.mutateAsync({
                             goal: 0,
