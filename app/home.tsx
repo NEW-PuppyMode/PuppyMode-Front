@@ -272,8 +272,16 @@ export default function HomeScreen() {
     logButtonTap('advice');
     try {
       const result = await advicePuppyMutation.mutateAsync();
-      setAdviceMessage(result.result.advice || '');
+      const advice = result.result.advice?.trim();
+      if (advice) {
+        setAdviceMessage(advice);
+      } else {
+        // 성공했지만 빈 응답: 범용 멘트(default)로 fallback
+        setAdviceMessage('');
+        setMessageKey('default');
+      }
     } catch {
+      // 실패: 범용 멘트(default)로 fallback
       setAdviceMessage('');
       setMessageKey('default');
     }
