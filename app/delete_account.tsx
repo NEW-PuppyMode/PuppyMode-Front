@@ -65,9 +65,6 @@ const DeleteAccount = () => {
       }
 
       await logout();
-      queryClient.removeQueries({
-        queryKey: PUPPY_QUERY_KEYS.puppyInfo,
-      });
       goHomeAndClearStack();
     } catch (err: unknown) {
       await logout();
