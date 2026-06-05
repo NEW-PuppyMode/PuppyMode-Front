@@ -17,7 +17,6 @@ import { TopBar } from '@/components/page/home/TopBar';
 import { UpdatePopupModal } from '@/components/page/home/UpdatePopupModal';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-// import { APP_VERSION } from '@/constants/appVersion';
 import { PUPPY_MESSAGES } from '@/constants/messages';
 import { useAdvicePuppyMutation } from '@/hooks/mutations/useAdvicePuppyMutation';
 import { useCreateDrinkHistoryMutation } from '@/hooks/mutations/useCreateDrinkHistoryMutation';
