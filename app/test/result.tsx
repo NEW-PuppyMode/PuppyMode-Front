@@ -1,4 +1,5 @@
 import ResultBG from '@/assets/images/test/result-bg.svg';
+import { getPuppyGifSource } from '@/utils/dogMapper';
 import { Image as ExpoImage } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
@@ -22,7 +23,9 @@ const TestResult = () => {
     result: string;
   }>();
 
-  const { type, puppyBreedKo, puppyBreedEn, imageUrl } = JSON.parse(result);
+  const { type, puppyBreedKo, puppyBreedEn } = JSON.parse(result);
+
+  const puppyGifSource = getPuppyGifSource(puppyBreedKo, 1, 'normal');
 
   const cardSlideAnim = useRef(
     new Animated.Value(-SCREEN_HEIGHT * 0.6),
@@ -56,14 +59,9 @@ const TestResult = () => {
       >
         <View style={styles.innerBox}>
           <ExpoImage
-            source={{ uri: imageUrl }}
-            style={{ width: 148, height: 160 }}
+            source={puppyGifSource}
+            style={{ width: 220, height: 238 }}
             contentFit='cover'
-            cachePolicy='disk'
-            onError={(e) => {
-              console.log('Image load error:', e);
-              console.log('imageUrl:', imageUrl);
-            }}
           />
         </View>
       </Animated.View>
