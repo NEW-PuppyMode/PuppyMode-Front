@@ -14,7 +14,6 @@ export async function requestPermissionAndRegisterFcmToken(): Promise<void> {
     if (!enabled) return;
 
     const token = await messaging().getToken();
-    console.log('[FCM Token]', token); // TODO: 임시 확인용 로그, 추후 제거
     await fcmAPI.registerToken(token);
   } catch (e) {
     console.error('FCM 권한 요청 및 토큰 등록 실패:', e);
@@ -30,7 +29,10 @@ export async function deleteFcmToken(): Promise<void> {
   }
 }
 
-export async function displayLocalNotification(title: string, body: string): Promise<void> {
+export async function displayLocalNotification(
+  title: string,
+  body: string,
+): Promise<void> {
   try {
     const channelId = await notifee.createChannel({
       id: 'default',
