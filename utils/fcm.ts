@@ -1,20 +1,57 @@
 import { KEYS } from '@/constants/storage';
 import { fcmAPI } from '@/services/fcm';
-import notifee, { AndroidImportance } from '@notifee/react-native';
+import { notificationAPI } from '@/services/notification';
+import notifee, { AndroidImportance, AuthorizationStatus } from '@notifee/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
+import { Alert, AppState, Linking } from 'react-native';
+
+async function registerFcmTokenAndEnableNotification(): Promise<void> {
+  const token = await messaging().getToken();
+  await fcmAPI.registerToken(token);
+  await notificationAPI.updateSettings(true);
+}
 
 export async function requestPermissionAndRegisterFcmToken(): Promise<void> {
   try {
-    const authStatus = await messaging().requestPermission();
+    const settings = await notifee.requestPermission();
     const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      settings.authorizationStatus === AuthorizationStatus.AUTHORIZED ||
+      settings.authorizationStatus === AuthorizationStatus.PROVISIONAL;
 
-    if (!enabled) return;
+    if (!enabled) {
+      Alert.alert(
+        '알림 권한 필요',
+        '푸시 알림을 받으려면 기기 설정에서 알림을 허용해주세요.',
+        [
+          { text: '취소', style: 'cancel' },
+          {
+            text: '설정 열기',
+            onPress: () => {
+              Linking.openSettings();
+              const subscription = AppState.addEventListener(
+                'change',
+                async (nextState) => {
+                  if (nextState === 'active') {
+                    subscription.remove();
+                    const newSettings = await notifee.getNotificationSettings();
+                    const nowGranted =
+                      newSettings.authorizationStatus ===
+                      AuthorizationStatus.AUTHORIZED;
+                    if (nowGranted) {
+                      await registerFcmTokenAndEnableNotification();
+                    }
+                  }
+                },
+              );
+            },
+          },
+        ],
+      );
+      return;
+    }
 
-    const token = await messaging().getToken();
-    await fcmAPI.registerToken(token);
+    await registerFcmTokenAndEnableNotification();
   } catch (e) {
     console.error('FCM 권한 요청 및 토큰 등록 실패:', e);
   }
