@@ -66,16 +66,22 @@ export async function deleteFcmToken(): Promise<void> {
   }
 }
 
+export const DEFAULT_CHANNEL_ID = 'default';
+
+export async function createDefaultChannel(): Promise<string> {
+  return notifee.createChannel({
+    id: DEFAULT_CHANNEL_ID,
+    name: '기본 알림',
+    importance: AndroidImportance.HIGH,
+  });
+}
+
 export async function displayLocalNotification(
   title: string,
   body: string,
 ): Promise<void> {
   try {
-    const channelId = await notifee.createChannel({
-      id: 'default',
-      name: '기본 알림',
-      importance: AndroidImportance.HIGH,
-    });
+    const channelId = await createDefaultChannel();
     await notifee.displayNotification({ title, body, android: { channelId } });
   } catch (e) {
     console.error('로컬 알림 표시 실패:', e);

@@ -3,7 +3,7 @@ import { CrashlyticsRouteTracker } from '@/components/common/CrashlyticsRouteTra
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import theme from '@/styles/theme';
-import { setupForegroundNotificationHandler, setupTokenRefreshListener } from '@/utils/fcm';
+import { createDefaultChannel, setupForegroundNotificationHandler, setupTokenRefreshListener } from '@/utils/fcm';
 import { ThemeProvider as EmotionThemeProvider } from '@emotion/react';
 import crashlytics from '@react-native-firebase/crashlytics';
 import {
@@ -101,6 +101,12 @@ export default function RootLayout() {
   useEffect(() => {
     const unsubscribe = setupTokenRefreshListener();
     return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    createDefaultChannel().catch((e) =>
+      console.error('기본 알림 채널 생성 실패:', e),
+    );
   }, []);
 
   useEffect(() => {
