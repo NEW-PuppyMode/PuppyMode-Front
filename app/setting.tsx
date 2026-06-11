@@ -4,6 +4,7 @@ import SettingBtn from '@/components/page/setting/SettingBtn';
 import { APP_VERSION } from '@/constants/appVersion';
 import { POLICY_MESSAGES } from '@/constants/messages';
 import { useAuth } from '@/contexts/AuthContext';
+import { useEnableNotifications } from '@/hooks/notifications/useEnableNotifications';
 import {
   useNotificationSettingQuery,
   useUpdateNotificationSettingMutation,
@@ -14,10 +15,7 @@ import messaging from '@react-native-firebase/messaging';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  Alert,
-  AppState,
   Image,
-  Linking,
   StyleSheet,
   Switch,
   Text,
@@ -38,6 +36,7 @@ const Setting = () => {
   const { data: notificationSetting } = useNotificationSettingQuery();
   const { mutate: updateNotificationSetting } =
     useUpdateNotificationSettingMutation();
+  const { requestAndEnable } = useEnableNotifications();
 
   const [hasNotifPermission, setHasNotifPermission] = useState(false);
 
@@ -52,35 +51,7 @@ const Setting = () => {
 
   const handleNotificationToggle = (value: boolean) => {
     if (value && !hasNotifPermission) {
-      Alert.alert(
-        '알림 권한 필요',
-        '푸시 알림을 받으려면 기기 설정에서 알림을 허용해주세요.',
-        [
-          { text: '취소', style: 'cancel' },
-          {
-            text: '설정 열기',
-            onPress: () => {
-              Linking.openSettings();
-              const subscription = AppState.addEventListener(
-                'change',
-                async (nextState) => {
-                  if (nextState === 'active') {
-                    subscription.remove();
-                    const newStatus = await messaging().hasPermission();
-                    const nowGranted =
-                      newStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-                      newStatus === messaging.AuthorizationStatus.PROVISIONAL;
-                    if (nowGranted) {
-                      setHasNotifPermission(true);
-                      updateNotificationSetting(true);
-                    }
-                  }
-                },
-              );
-            },
-          },
-        ],
-      );
+      requestAndEnable();
       return;
     }
     updateNotificationSetting(value);

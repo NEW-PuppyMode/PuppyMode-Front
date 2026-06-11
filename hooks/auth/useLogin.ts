@@ -1,6 +1,6 @@
+import { useEnableNotifications } from '@/hooks/notifications/useEnableNotifications';
 import { KEYS } from '@/constants/storage';
 import { KakaoLoginResult, loginAPI } from '@/services/auth';
-import { requestPermissionAndRegisterFcmToken } from '@/utils/fcm';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { login as loginWithKakaoAccount } from '@react-native-seoul/kakao-login';
 import { useCallback, useState } from 'react';
@@ -18,6 +18,7 @@ export const useLogin = (): UseLoginReturn => {
   const [userInfo, setUserInfo] = useState<KakaoLoginResult['userInfo'] | null>(
     null,
   );
+  const { requestAndEnable } = useEnableNotifications();
 
   const loginWithKakao = useCallback(async () => {
     setIsLoading(true);
@@ -34,7 +35,7 @@ export const useLogin = (): UseLoginReturn => {
 
       await AsyncStorage.setItem(KEYS.ACCESS_TOKEN, result.accessToken);
 
-      requestPermissionAndRegisterFcmToken();
+      requestAndEnable();
 
       setUserInfo(result.userInfo);
     } catch (err: any) {
@@ -43,7 +44,7 @@ export const useLogin = (): UseLoginReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [requestAndEnable]);
 
   return {
     isLoading,
