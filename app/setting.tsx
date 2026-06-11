@@ -10,12 +10,14 @@ import {
   useUpdateNotificationSettingMutation,
 } from '@/hooks/queries/useNotificationSettingQuery';
 import { PUPPY_QUERY_KEYS } from '@/hooks/queries/usePuppyInfoQuery';
-import { useQueryClient } from '@tanstack/react-query';
 import messaging from '@react-native-firebase/messaging';
-import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
+  AppState,
   Image,
+  Linking,
   StyleSheet,
   Switch,
   Text,
@@ -40,14 +42,31 @@ const Setting = () => {
 
   const [hasNotifPermission, setHasNotifPermission] = useState(false);
 
-  useEffect(() => {
-    messaging().hasPermission().then((status) => {
-      setHasNotifPermission(
-        status === messaging.AuthorizationStatus.AUTHORIZED ||
-          status === messaging.AuthorizationStatus.PROVISIONAL,
-      );
-    });
+  const checkPermission = useCallback(async () => {
+    const status = await messaging().hasPermission();
+    setHasNotifPermission(
+      status === messaging.AuthorizationStatus.AUTHORIZED ||
+        status === messaging.AuthorizationStatus.PROVISIONAL,
+    );
   }, []);
+
+  // 화면 진입 시, 그리고 OS 설정에서 권한을 바꾸고 앱으로 복귀했을 때
+  // OS 권한 상태를 다시 읽어 안내 배너를 최신으로 유지한다.
+  useFocusEffect(
+    useCallback(() => {
+      checkPermission();
+      const subscription = AppState.addEventListener('change', (nextState) => {
+        if (nextState === 'active') {
+          checkPermission();
+        }
+      });
+      return () => subscription.remove();
+    }, [checkPermission]),
+  );
+
+  // OS 권한은 거부됐는데 서버 설정은 켜져 있는 상태(조용한 실패, 토글은 ON).
+  const showPermissionNotice =
+    !hasNotifPermission && !!notificationSetting?.receiveNotifications;
 
   const handleNotificationToggle = (value: boolean) => {
     if (value && !hasNotifPermission) {
@@ -103,6 +122,19 @@ const Setting = () => {
           thumbColor='#ffffff'
         />
       </View>
+
+      {showPermissionNotice && (
+        <TouchableOpacity
+          style={styles.permissionNotice}
+          activeOpacity={0.7}
+          onPress={() => Linking.openSettings()}
+        >
+          <Text style={styles.permissionNoticeText}>
+            기기 알림이 꺼져 있어 알림을 받을 수 없어요.
+          </Text>
+          <Text style={styles.permissionNoticeAction}>설정 열기</Text>
+        </TouchableOpacity>
+      )}
 
       <SettingBtn
         title='이용약관'
@@ -205,5 +237,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '400',
     lineHeight: 22,
+  },
+  permissionNotice: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: '#FFF4F4',
+  },
+  permissionNoticeText: {
+    flex: 1,
+    color: '#D14343',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  permissionNoticeAction: {
+    marginLeft: 12,
+    color: '#D14343',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });
