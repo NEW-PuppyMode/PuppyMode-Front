@@ -11,13 +11,16 @@ import PersonIcon from '@/assets/icons/home/ic_person.svg';
 import { TextInput } from '@/components/common/Inputs/TextInput';
 import { ChoiceButton } from '@/components/page/home/ChoiceButton';
 import { ControlButton } from '@/components/page/home/ControlButton';
+import { EvolvingPuppy } from '@/components/page/home/EvolvingPuppy';
 import { IconButton } from '@/components/page/home/IconButton';
+import { LevelUpBadge } from '@/components/page/home/LevelUpBadge';
 import { SpeechBubble } from '@/components/page/home/SpeechBubble';
 import { TopBar } from '@/components/page/home/TopBar';
 import { UpdatePopupModal } from '@/components/page/home/UpdatePopupModal';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { PUPPY_MESSAGES } from '@/constants/messages';
+import { useLevelUpDetector } from '@/hooks/home/useLevelUpDetector';
 import { useAdvicePuppyMutation } from '@/hooks/mutations/useAdvicePuppyMutation';
 import { useCreateDrinkHistoryMutation } from '@/hooks/mutations/useCreateDrinkHistoryMutation';
 import { useCreateGoalMutation } from '@/hooks/mutations/useCreateGoalMutation';
@@ -29,7 +32,6 @@ import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
 import { useVersionCheckQuery } from '@/hooks/queries/useVersionCheckQuery';
 import { logButtonTap } from '@/utils/analytics';
 import { maxDaysInMonth } from '@/utils/dateUtils';
-import { getPuppyGifSource } from '@/utils/dogMapper';
 import { throttle } from 'lodash';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -42,8 +44,6 @@ import {
   Text,
   View,
 } from 'react-native';
-// import Gif from 'react-native-gif';
-import { Image as Gif } from 'expo-image';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -66,6 +66,9 @@ export default function HomeScreen() {
   const { data: isRecorded } = useIsRecordedQuery();
   const { data: recentGoal } = useRecentGoalQuery();
   const { data: versionData } = useVersionCheckQuery();
+
+  // 레벨업 감지 (puppyLevel 변화를 추적)
+  const levelUpEvent = useLevelUpDetector(puppyInfo?.puppyLevel);
 
   const [messageKey, setMessageKey] = useState<
     | 'default'
@@ -360,7 +363,7 @@ export default function HomeScreen() {
       if (recordType === 'yesterday') {
         drinkDate.setDate(drinkDate.getDate() - 1);
       }
-      const formattedDate = drinkDate.toISOString().slice(0, 10);
+      const formattedDate = `${drinkDate.getFullYear()}-${String(drinkDate.getMonth() + 1).padStart(2, '0')}-${String(drinkDate.getDate()).padStart(2, '0')}`;
 
       await createDrinkHistoryMutation.mutateAsync({
         drinkDate: formattedDate,
@@ -425,6 +428,7 @@ export default function HomeScreen() {
           level={level}
           displayName={displayName ?? ''}
           percent={percent}
+          levelUpEvent={levelUpEvent}
         />
 
         <ThemedView className='flex-1 w-full h-full px-4 bg-transparent'>
@@ -721,20 +725,19 @@ export default function HomeScreen() {
           }}
         />
 
-        {/* ===== 강아지 Gif 레이어 ===== */}
-        {/* {isFetching && <LoadingOverlay />} */}
-        {/* 이런식으로 추후에 데이터 패칭 중 -> 로딩 UI 추가하기 */}
+        {/* ===== 강아지 Gif 레이어 (외형 변화 + 반짝이 연출 포함) ===== */}
         <View pointerEvents='none' style={styles.gifLayer}>
-          <Gif
-            source={getPuppyGifSource(displayName ?? '', level, reaction)}
-            style={{
-              width: 240,
-              height: 240,
-            }}
-            contentFit='contain'
-            autoplay
+          <EvolvingPuppy
+            breedName={displayName ?? ''}
+            level={level}
+            reaction={reaction}
+            evolveEvent={levelUpEvent}
+            size={288}
           />
         </View>
+
+        {/* ===== 레벨업 배지(LEVEL UP!) 오버레이 ===== */}
+        <LevelUpBadge trigger={levelUpEvent?.id ?? 0} />
       </SafeAreaView>
     </ImageBackground>
   );
