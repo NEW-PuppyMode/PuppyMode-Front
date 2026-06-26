@@ -12,7 +12,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 // SVG 원본 비율(viewBox 87 x 35)을 유지하며 렌더 (벡터라 확대해도 깨지지 않음)
-const BADGE_WIDTH = 112;
+const BADGE_WIDTH = 98;
 const BADGE_HEIGHT = Math.round((BADGE_WIDTH * 35) / 87);
 
 const POP_IN_MS = 350; // 등장(팝인)
@@ -88,6 +88,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     // 강아지 위쪽(상단에서 약 -% 지점)에 배지가 뜨도록
-    paddingTop: '60%',
+    paddingTop: '76%',
   },
 });

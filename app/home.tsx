@@ -11,6 +11,7 @@ import PersonIcon from '@/assets/icons/home/ic_person.svg';
 import { TextInput } from '@/components/common/Inputs/TextInput';
 import { ChoiceButton } from '@/components/page/home/ChoiceButton';
 import { ControlButton } from '@/components/page/home/ControlButton';
+import { EvolvingPuppy } from '@/components/page/home/EvolvingPuppy';
 import { IconButton } from '@/components/page/home/IconButton';
 import { LevelUpBadge } from '@/components/page/home/LevelUpBadge';
 import { SpeechBubble } from '@/components/page/home/SpeechBubble';
@@ -25,16 +26,12 @@ import { useCreateDrinkHistoryMutation } from '@/hooks/mutations/useCreateDrinkH
 import { useCreateGoalMutation } from '@/hooks/mutations/useCreateGoalMutation';
 import { useRenamePuppyMutation } from '@/hooks/mutations/useRenamePuppyMutation';
 import { useRenameUserMutation } from '@/hooks/mutations/useRenameUserMutation';
-import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { useIsRecordedQuery } from '@/hooks/queries/useIsRecordedQuery';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
 import { useVersionCheckQuery } from '@/hooks/queries/useVersionCheckQuery';
-import { IPuppyInfo } from '@/types/models/puppy';
 import { logButtonTap } from '@/utils/analytics';
 import { maxDaysInMonth } from '@/utils/dateUtils';
-import { getPuppyGifSource } from '@/utils/dogMapper';
-import { useQueryClient } from '@tanstack/react-query';
 import { throttle } from 'lodash';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -47,8 +44,6 @@ import {
   Text,
   View,
 } from 'react-native';
-// import Gif from 'react-native-gif';
-import { Image as Gif } from 'expo-image';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -72,23 +67,8 @@ export default function HomeScreen() {
   const { data: recentGoal } = useRecentGoalQuery();
   const { data: versionData } = useVersionCheckQuery();
 
-  const queryClient = useQueryClient();
-
   // 레벨업 감지 (puppyLevel 변화를 추적)
   const levelUpEvent = useLevelUpDetector(puppyInfo?.puppyLevel);
-  useEffect(() => {
-    if (!levelUpEvent) return;
-    // TODO(애니메이션): 2~4번 연출 트리거 지점. 현재는 감지 확인용 로그.
-    console.log('[LEVEL UP]', levelUpEvent);
-  }, [levelUpEvent]);
-
-  // [DEV 전용] 서버 없이 레벨업 감지/연출을 테스트하기 위한 임시 트리거. 머지 전 제거.
-  const __devBumpLevel = (delta: number) => {
-    queryClient.setQueryData<IPuppyInfo>(QUERY_KEYS.puppyInfo, (prev) => {
-      if (!prev) return prev;
-      return { ...prev, puppyLevel: (prev.puppyLevel ?? 0) + delta };
-    });
-  };
 
   const [messageKey, setMessageKey] = useState<
     | 'default'
@@ -451,23 +431,6 @@ export default function HomeScreen() {
           levelUpEvent={levelUpEvent}
         />
 
-        {/* [DEV 전용] 레벨업 테스트 버튼. 머지 전 제거. */}
-        {__DEV__ && (
-          <View
-            style={{
-              position: 'absolute',
-              top: 110,
-              right: 12,
-              zIndex: 999,
-              flexDirection: 'row',
-              gap: 6,
-            }}
-          >
-            <ChoiceButton label='+1 Lv' onPress={() => __devBumpLevel(1)} />
-            <ChoiceButton label='+10 Lv' onPress={() => __devBumpLevel(10)} />
-          </View>
-        )}
-
         <ThemedView className='flex-1 w-full h-full px-4 bg-transparent'>
           {/* ===== 동기부여 메시지 ===== */}
           <View className='justify-center pt-4 h-20 bg-transparent'>
@@ -762,18 +725,14 @@ export default function HomeScreen() {
           }}
         />
 
-        {/* ===== 강아지 Gif 레이어 ===== */}
-        {/* {isFetching && <LoadingOverlay />} */}
-        {/* 이런식으로 추후에 데이터 패칭 중 -> 로딩 UI 추가하기 */}
+        {/* ===== 강아지 Gif 레이어 (외형 변화 + 반짝이 연출 포함) ===== */}
         <View pointerEvents='none' style={styles.gifLayer}>
-          <Gif
-            source={getPuppyGifSource(displayName ?? '', level, reaction)}
-            style={{
-              width: 240,
-              height: 240,
-            }}
-            contentFit='contain'
-            autoplay
+          <EvolvingPuppy
+            breedName={displayName ?? ''}
+            level={level}
+            reaction={reaction}
+            evolveEvent={levelUpEvent}
+            size={288}
           />
         </View>
 
