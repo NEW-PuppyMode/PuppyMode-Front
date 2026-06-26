@@ -12,6 +12,7 @@ import { TextInput } from '@/components/common/Inputs/TextInput';
 import { ChoiceButton } from '@/components/page/home/ChoiceButton';
 import { ControlButton } from '@/components/page/home/ControlButton';
 import { IconButton } from '@/components/page/home/IconButton';
+import { LevelUpBadge } from '@/components/page/home/LevelUpBadge';
 import { SpeechBubble } from '@/components/page/home/SpeechBubble';
 import { TopBar } from '@/components/page/home/TopBar';
 import { UpdatePopupModal } from '@/components/page/home/UpdatePopupModal';
@@ -775,6 +776,9 @@ export default function HomeScreen() {
             autoplay
           />
         </View>
+
+        {/* ===== 레벨업 배지(LEVEL UP!) 오버레이 ===== */}
+        <LevelUpBadge trigger={levelUpEvent?.id ?? 0} />
       </SafeAreaView>
     </ImageBackground>
   );
