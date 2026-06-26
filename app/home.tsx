@@ -360,7 +360,7 @@ export default function HomeScreen() {
       if (recordType === 'yesterday') {
         drinkDate.setDate(drinkDate.getDate() - 1);
       }
-      const formattedDate = drinkDate.toISOString().slice(0, 10);
+      const formattedDate = `${drinkDate.getFullYear()}-${String(drinkDate.getMonth() + 1).padStart(2, '0')}-${String(drinkDate.getDate()).padStart(2, '0')}`;
 
       await createDrinkHistoryMutation.mutateAsync({
         drinkDate: formattedDate,
