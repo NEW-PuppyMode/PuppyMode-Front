@@ -1,12 +1,21 @@
 import ResultBG from '@/assets/images/test/result-bg.svg';
 import { getPuppyGifSource } from '@/utils/dogMapper';
+import {
+  getIosNotificationPermissionStatus,
+  hasGrantedIosNotificationPermission,
+  requestIosNotificationPermission,
+} from '@/utils/notificationPermission';
 import { Image as ExpoImage } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import {
+  Alert,
   Animated,
+  AppState,
   Dimensions,
   Easing,
+  Linking,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -18,6 +27,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const TestResult = () => {
   const router = useRouter();
+  const shouldRecheckPermissionOnActive = useRef(false);
 
   const { result } = useLocalSearchParams<{
     result: string;
@@ -38,7 +48,64 @@ const TestResult = () => {
       easing: Easing.out(Easing.quad),
       useNativeDriver: true,
     }).start();
-  }, []);
+  }, [cardSlideAnim]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState !== 'active' || !shouldRecheckPermissionOnActive.current) {
+        return;
+      }
+
+      shouldRecheckPermissionOnActive.current = false;
+
+      void (async () => {
+        const permission = await getIosNotificationPermissionStatus();
+        if (
+          permission &&
+          hasGrantedIosNotificationPermission(permission)
+        ) {
+          router.replace('/home');
+        }
+      })();
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [router]);
+
+  const handleStart = async () => {
+    if (Platform.OS !== 'ios') {
+      router.replace('/home');
+      return;
+    }
+
+    const hasPermission = await requestIosNotificationPermission();
+
+    if (!hasPermission) {
+      Alert.alert(
+        '알림 권한이 꺼져 있어요',
+        'iOS에서는 한 번 거절하면 앱 설정에서 다시 켜야 해요.',
+        [
+          {
+            text: '나중에',
+            style: 'cancel',
+            onPress: () => router.replace('/home'),
+          },
+          {
+            text: '설정 열기',
+            onPress: () => {
+              shouldRecheckPermissionOnActive.current = true;
+              void Linking.openSettings();
+            },
+          },
+        ],
+      );
+      return;
+    }
+
+    router.replace('/home');
+  };
 
   return (
     <View style={styles.container}>
@@ -79,10 +146,7 @@ const TestResult = () => {
         }}
         edges={['bottom']}
       >
-        <TouchableOpacity
-          style={styles.bottomBtn}
-          onPress={() => router.replace('/home')}
-        >
+        <TouchableOpacity style={styles.bottomBtn} onPress={handleStart}>
           <Text className='font-medium text-white'>시작하기</Text>
         </TouchableOpacity>
       </SafeAreaView>
