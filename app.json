@@ -11,6 +11,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.anonymous.puppymode",
+      "buildNumber": "5",
       "googleServicesFile": "./GoogleService-Info.plist",
       "appleTeamId": "AGQJU3FNWG"
     },
