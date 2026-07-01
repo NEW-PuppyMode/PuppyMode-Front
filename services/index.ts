@@ -6,10 +6,17 @@ import axios, {
   InternalAxiosRequestConfig,
 } from 'axios';
 
+const mockActivate = process.env.EXPO_PUBLIC_MOCK_ACTIVATE?.trim();
 const baseURL =
-  process.env.MOCK_ACTIVATE === 'enable'
-    ? process.env.EXPO_PUBLIC_MOCK_API_URL
-    : process.env.EXPO_PUBLIC_API_URL;
+  (
+    mockActivate === 'enable'
+      ? process.env.EXPO_PUBLIC_MOCK_API_URL
+      : process.env.EXPO_PUBLIC_API_URL
+  )?.trim();
+
+if (!baseURL) {
+  console.warn('[API] baseURL is empty. Check EXPO_PUBLIC_API_URL.');
+}
 
 export const axiosInstance = axios.create({
   baseURL,
