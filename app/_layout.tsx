@@ -1,5 +1,8 @@
+import 'react-native-gesture-handler';
+import 'react-native-reanimated';
 import { AnalyticsRouteTracker } from '@/components/common/AnalyticsRouteTracker';
 import { CrashlyticsRouteTracker } from '@/components/common/CrashlyticsRouteTracker';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import theme from '@/styles/theme';
@@ -22,8 +25,6 @@ import {
   type StyleProp,
   type TextStyle,
 } from 'react-native';
-import 'react-native-gesture-handler';
-import 'react-native-reanimated';
 
 function setGlobalFontFamily(fontFamily: string) {
   const TextComp = RNText as unknown as {
@@ -143,39 +144,42 @@ export default function RootLayout() {
           value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
         >
           <EmotionThemeProvider theme={theme}>
-            {/* <ErrorBoundary> */}
-            <AnalyticsRouteTracker />
-            <CrashlyticsRouteTracker />
-            <Stack>
-              <Stack.Screen name='index' options={{ headerShown: false }} />
-              <Stack.Screen name='signin' options={{ headerShown: false }} />
-              <Stack.Screen
-                name='home'
-                options={{ title: '홈', headerShown: false }}
-              />
-              <Stack.Screen
-                name='test/start'
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name='test/proceeding'
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name='test/result'
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen name='report' options={{ headerShown: false }} />
-              <Stack.Screen name='calendar' options={{ headerShown: false }} />
-              <Stack.Screen name='setting' options={{ headerShown: false }} />
-              <Stack.Screen
-                name='delete_account'
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen name='+not-found' />
-            </Stack>
-            <StatusBar style='auto' />
-            {/* </ErrorBoundary> */}
+            <ErrorBoundary>
+              <AnalyticsRouteTracker />
+              <CrashlyticsRouteTracker />
+              <Stack>
+                <Stack.Screen name='index' options={{ headerShown: false }} />
+                <Stack.Screen name='signin' options={{ headerShown: false }} />
+                <Stack.Screen
+                  name='home'
+                  options={{ title: '홈', headerShown: false }}
+                />
+                <Stack.Screen
+                  name='test/start'
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name='test/proceeding'
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name='test/result'
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen name='report' options={{ headerShown: false }} />
+                <Stack.Screen
+                  name='calendar'
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen name='setting' options={{ headerShown: false }} />
+                <Stack.Screen
+                  name='delete_account'
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen name='+not-found' />
+              </Stack>
+              <StatusBar style='auto' />
+            </ErrorBoundary>
           </EmotionThemeProvider>
         </ThemeProvider>
       </AuthProvider>

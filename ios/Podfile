@@ -55,6 +55,30 @@ target 'puppymode' do
       :ccache_enabled => podfile_properties['apple.ccacheEnabled'] == 'true',
     )
 
+    installer.pods_project.targets.each do |target|
+      if target.name == 'fmt'
+        target.build_configurations.each do |config|
+          config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '$(inherited) -DFMT_USE_NONTYPE_TEMPLATE_ARGS=0'
+        end
+      end
+    end
+
+    # Xcode 16+'s stricter consteval checking breaks fmt's compile-time
+    # format string validation (FMT_USE_CONSTEVAL). Force it off at the
+    # source level since it isn't gated behind an overridable macro.
+    fmt_base_header = File.join(installer.sandbox.pod_dir('fmt'), 'include', 'fmt', 'base.h')
+    if File.exist?(fmt_base_header)
+      content = File.read(fmt_base_header)
+      patched = content.sub(
+        '#if !defined(__cpp_lib_is_constant_evaluated)',
+        "#if 1 // patched by Podfile post_install to disable FMT_USE_CONSTEVAL\n#elif !defined(__cpp_lib_is_constant_evaluated)"
+      )
+      if patched != content
+        File.chmod(0644, fmt_base_header)
+        File.write(fmt_base_header, patched)
+      end
+    end
+
     # This is necessary for Xcode 14, because it signs resource bundles by default
     # when building for devices.
     installer.target_installation_results.pod_target_installation_results

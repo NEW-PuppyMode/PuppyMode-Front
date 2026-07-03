@@ -1,4 +1,5 @@
-import { Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import RightArrowIcon from '@/assets/icons/setting/ic_right_arrow.svg';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 interface SettingBtnProps {
   title: string;
@@ -9,7 +10,7 @@ const SettingBtn = ({ title, onPress }: SettingBtnProps) => {
   return (
     <TouchableOpacity onPress={onPress} style={styles.button}>
       <Text style={styles.text}>{title}</Text>
-      <Image source={require('@/assets/icons/setting/ic_right_arrow.svg')} />
+      <RightArrowIcon width={6} height={12} />
     </TouchableOpacity>
   );
 };
