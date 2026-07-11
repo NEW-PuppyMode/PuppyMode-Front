@@ -1,4 +1,5 @@
 import DefaultModal from '@/components/common/DefaultModal';
+import ChevronLeftImage from '@/assets/images/chevron_left.png';
 import PolicyModal from '@/components/page/setting/PolicyModal';
 import SettingBtn from '@/components/page/setting/SettingBtn';
 import { APP_VERSION } from '@/constants/appVersion';
@@ -10,14 +11,21 @@ import {
   useUpdateNotificationSettingMutation,
 } from '@/hooks/queries/useNotificationSettingQuery';
 import { PUPPY_QUERY_KEYS } from '@/hooks/queries/usePuppyInfoQuery';
+import {
+  getIosNotificationPermissionStatus,
+  hasGrantedIosNotificationPermission,
+  requestIosNotificationPermission,
+} from '@/utils/notificationPermission';
 import messaging from '@react-native-firebase/messaging';
 import { useQueryClient } from '@tanstack/react-query';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
+  Alert,
   AppState,
   Image,
   Linking,
+  Platform,
   StyleSheet,
   Switch,
   Text,
@@ -80,6 +88,42 @@ const Setting = () => {
   //   crashlytics().log('screen: /setting mounted');
   // }, []);
 
+  const handleNotificationSettingPress = async () => {
+    if (Platform.OS !== 'ios') {
+      void Linking.openSettings();
+      return;
+    }
+
+    const currentPermission = await getIosNotificationPermissionStatus();
+    const hasPermission = await requestIosNotificationPermission();
+
+    if (hasPermission) {
+      if (
+        currentPermission &&
+        !hasGrantedIosNotificationPermission(currentPermission)
+      ) {
+        return;
+      }
+
+      void Linking.openSettings();
+      return;
+    }
+
+    Alert.alert(
+      '알림 권한이 꺼져 있어요',
+      'iOS에서는 앱 설정에서 알림 권한을 다시 변경할 수 있어요.',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '설정 열기',
+          onPress: () => {
+            void Linking.openSettings();
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View
@@ -96,7 +140,7 @@ const Setting = () => {
         <TouchableOpacity onPress={() => router.back()} className='px-[8px]'>
           <Image
             className='w-[8px] h-[16px]'
-            source={require('@/assets/images/chevron_left.png')}
+            source={ChevronLeftImage}
             style={{ margin: 10 }}
           />
         </TouchableOpacity>
@@ -149,6 +193,10 @@ const Setting = () => {
           setPolicyModalVisible(true);
           setPolicyModalType('privacy_policies');
         }}
+      />
+      <SettingBtn
+        title='알림 설정'
+        onPress={handleNotificationSettingPress}
       />
       <SettingBtn
         title='탈퇴하기'

@@ -1,10 +1,16 @@
 import { AnalyticsRouteTracker } from '@/components/common/AnalyticsRouteTracker';
 import { CrashlyticsRouteTracker } from '@/components/common/CrashlyticsRouteTracker';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import theme from '@/styles/theme';
-import { createDefaultChannel, setupForegroundNotificationHandler, setupTokenRefreshListener } from '@/utils/fcm';
+import {
+  createDefaultChannel,
+  setupForegroundNotificationHandler,
+  setupTokenRefreshListener,
+} from '@/utils/fcm';
 import { ThemeProvider as EmotionThemeProvider } from '@emotion/react';
+import analytics from '@react-native-firebase/analytics';
 import crashlytics from '@react-native-firebase/crashlytics';
 import {
   DarkTheme,
@@ -99,6 +105,13 @@ export default function RootLayout() {
   const ready = loaded && mockReady;
 
   useEffect(() => {
+    // 개발 빌드에서는 Analytics 이벤트 수집을 비활성화해 노이즈 데이터 차단
+    analytics()
+      .setAnalyticsCollectionEnabled(!__DEV__)
+      .catch((e) => console.log('[Analytics] setCollectionEnabled failed', e));
+  }, []);
+
+  useEffect(() => {
     const unsubscribe = setupTokenRefreshListener();
     return unsubscribe;
   }, []);
@@ -143,39 +156,42 @@ export default function RootLayout() {
           value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
         >
           <EmotionThemeProvider theme={theme}>
-            {/* <ErrorBoundary> */}
-            <AnalyticsRouteTracker />
-            <CrashlyticsRouteTracker />
-            <Stack>
-              <Stack.Screen name='index' options={{ headerShown: false }} />
-              <Stack.Screen name='signin' options={{ headerShown: false }} />
-              <Stack.Screen
-                name='home'
-                options={{ title: '홈', headerShown: false }}
-              />
-              <Stack.Screen
-                name='test/start'
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name='test/proceeding'
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name='test/result'
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen name='report' options={{ headerShown: false }} />
-              <Stack.Screen name='calendar' options={{ headerShown: false }} />
-              <Stack.Screen name='setting' options={{ headerShown: false }} />
-              <Stack.Screen
-                name='delete_account'
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen name='+not-found' />
-            </Stack>
-            <StatusBar style='auto' />
-            {/* </ErrorBoundary> */}
+            <ErrorBoundary>
+              <AnalyticsRouteTracker />
+              <CrashlyticsRouteTracker />
+              <Stack>
+                <Stack.Screen name='index' options={{ headerShown: false }} />
+                <Stack.Screen name='signin' options={{ headerShown: false }} />
+                <Stack.Screen
+                  name='home'
+                  options={{ title: '홈', headerShown: false }}
+                />
+                <Stack.Screen
+                  name='test/start'
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name='test/proceeding'
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name='test/result'
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen name='report' options={{ headerShown: false }} />
+                <Stack.Screen
+                  name='calendar'
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen name='setting' options={{ headerShown: false }} />
+                <Stack.Screen
+                  name='delete_account'
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen name='+not-found' />
+              </Stack>
+              <StatusBar style='auto' />
+            </ErrorBoundary>
           </EmotionThemeProvider>
         </ThemeProvider>
       </AuthProvider>
