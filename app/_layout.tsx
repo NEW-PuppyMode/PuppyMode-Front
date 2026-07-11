@@ -1,13 +1,16 @@
-import 'react-native-gesture-handler';
-import 'react-native-reanimated';
 import { AnalyticsRouteTracker } from '@/components/common/AnalyticsRouteTracker';
 import { CrashlyticsRouteTracker } from '@/components/common/CrashlyticsRouteTracker';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import theme from '@/styles/theme';
-import { createDefaultChannel, setupForegroundNotificationHandler, setupTokenRefreshListener } from '@/utils/fcm';
+import {
+  createDefaultChannel,
+  setupForegroundNotificationHandler,
+  setupTokenRefreshListener,
+} from '@/utils/fcm';
 import { ThemeProvider as EmotionThemeProvider } from '@emotion/react';
+import analytics from '@react-native-firebase/analytics';
 import crashlytics from '@react-native-firebase/crashlytics';
 import {
   DarkTheme,
@@ -25,6 +28,8 @@ import {
   type StyleProp,
   type TextStyle,
 } from 'react-native';
+import 'react-native-gesture-handler';
+import 'react-native-reanimated';
 
 function setGlobalFontFamily(fontFamily: string) {
   const TextComp = RNText as unknown as {
@@ -98,6 +103,13 @@ export default function RootLayout() {
   }, [loaded]);
 
   const ready = loaded && mockReady;
+
+  useEffect(() => {
+    // 개발 빌드에서는 Analytics 이벤트 수집을 비활성화해 노이즈 데이터 차단
+    analytics()
+      .setAnalyticsCollectionEnabled(!__DEV__)
+      .catch((e) => console.log('[Analytics] setCollectionEnabled failed', e));
+  }, []);
 
   useEffect(() => {
     const unsubscribe = setupTokenRefreshListener();
