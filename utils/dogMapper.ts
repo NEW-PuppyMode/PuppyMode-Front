@@ -113,6 +113,14 @@ export const getCalendarDogImage = (
 
 type ReactionState = 'normal' | 'angry' | 'heart';
 
+type GrowthKey = 'growth1' | 'growth2' | 'growth3';
+
+export const getGrowthStage = (level: number): GrowthKey => {
+  if (level >= 20) return 'growth3';
+  if (level >= 10) return 'growth2';
+  return 'growth1';
+};
+
 export const getPuppyGifSource = (
   levelName: string,
   level: number,
@@ -125,10 +133,5 @@ export const getPuppyGifSource = (
   else if (name.includes('시바')) breedKey = 'shiba';
   else if (name.includes('푸들')) breedKey = 'poodle';
 
-  let growthKey: 'growth1' | 'growth2' | 'growth3';
-  if (level >= 20) growthKey = 'growth3';
-  else if (level >= 10) growthKey = 'growth2';
-  else growthKey = 'growth1';
-
-  return puppyGifs[breedKey][growthKey][reaction];
+  return puppyGifs[breedKey][getGrowthStage(level)][reaction];
 };
