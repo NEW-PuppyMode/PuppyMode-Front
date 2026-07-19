@@ -1,24 +1,15 @@
 import ResultBG from '@/assets/images/test/result-bg.svg';
+import { PrimaryButton } from '@/components/common/buttons/PrimaryButton';
 import { getPuppyGifSource } from '@/utils/dogMapper';
-import {
-  getIosNotificationPermissionStatus,
-  hasGrantedIosNotificationPermission,
-  requestIosNotificationPermission,
-} from '@/utils/notificationPermission';
 import { Image as ExpoImage } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import {
-  Alert,
   Animated,
-  AppState,
   Dimensions,
   Easing,
-  Linking,
-  Platform,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,7 +18,6 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const TestResult = () => {
   const router = useRouter();
-  const shouldRecheckPermissionOnActive = useRef(false);
 
   const { result } = useLocalSearchParams<{
     result: string;
@@ -50,61 +40,12 @@ const TestResult = () => {
     }).start();
   }, [cardSlideAnim]);
 
-  useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextState) => {
-      if (nextState !== 'active' || !shouldRecheckPermissionOnActive.current) {
-        return;
-      }
-
-      shouldRecheckPermissionOnActive.current = false;
-
-      void (async () => {
-        const permission = await getIosNotificationPermissionStatus();
-        if (
-          permission &&
-          hasGrantedIosNotificationPermission(permission)
-        ) {
-          router.replace('/home');
-        }
-      })();
+  const handleStart = () => {
+    // 온보딩(목표 → 이름)으로 진입. 알림 권한 요청은 온보딩 마지막 단계에서 실행된다.
+    router.replace({
+      pathname: '/onboarding',
+      params: { breed: puppyBreedKo },
     });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [router]);
-
-  const handleStart = async () => {
-    if (Platform.OS !== 'ios') {
-      router.replace('/home');
-      return;
-    }
-
-    const hasPermission = await requestIosNotificationPermission();
-
-    if (!hasPermission) {
-      Alert.alert(
-        '알림 권한이 꺼져 있어요',
-        'iOS에서는 한 번 거절하면 앱 설정에서 다시 켜야 해요.',
-        [
-          {
-            text: '나중에',
-            style: 'cancel',
-            onPress: () => router.replace('/home'),
-          },
-          {
-            text: '설정 열기',
-            onPress: () => {
-              shouldRecheckPermissionOnActive.current = true;
-              void Linking.openSettings();
-            },
-          },
-        ],
-      );
-      return;
-    }
-
-    router.replace('/home');
   };
 
   return (
@@ -146,9 +87,11 @@ const TestResult = () => {
         }}
         edges={['bottom']}
       >
-        <TouchableOpacity style={styles.bottomBtn} onPress={handleStart}>
-          <Text className='font-medium text-white'>시작하기</Text>
-        </TouchableOpacity>
+        <PrimaryButton
+          title='시작하기'
+          onPress={handleStart}
+          style={{ marginTop: (SCREEN_HEIGHT * 40) / 852 }}
+        />
       </SafeAreaView>
     </View>
   );
@@ -211,14 +154,5 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: '#868686',
     textAlign: 'center',
-  },
-  bottomBtn: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: (SCREEN_HEIGHT * 40) / 852,
-    width: '100%',
-    height: 60,
-    borderRadius: 10,
-    backgroundColor: '#0FD380',
   },
 });

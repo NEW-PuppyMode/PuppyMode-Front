@@ -264,9 +264,24 @@ export default function HomeScreen() {
   useEffect(() => {
     if (!puppyInfo || isFetching || hasRedirectedRef.current) return;
 
+    // 강아지 입양 테스트 미완료 → 테스트부터
     if (puppyInfo.isOnboarded === false) {
       hasRedirectedRef.current = true;
       router.replace('/test/start');
+      return;
+    }
+
+    // 테스트는 했지만 목표·이름 설정이 안 되어 있으면 온보딩으로
+    if (
+      !puppyInfo.isGoal ||
+      !puppyInfo.isPuppyName ||
+      !puppyInfo.isMyName
+    ) {
+      hasRedirectedRef.current = true;
+      router.replace({
+        pathname: '/onboarding',
+        params: { breed: puppyInfo.puppyLevelName ?? '' },
+      });
     }
   }, [puppyInfo, isFetching]);
 
@@ -409,6 +424,17 @@ export default function HomeScreen() {
   if (isError) {
     return null;
     // 추후 에러 UI 추가 (문제가 생겼습니다, 로그인 화면으로 이동? 상의 필요)
+  }
+
+  // 온보딩(테스트/목표/이름) 미완료 시 홈 UI를 그리지 않고 리다이렉트를 기다린다.
+  if (
+    puppyInfo &&
+    (puppyInfo.isOnboarded === false ||
+      !puppyInfo.isGoal ||
+      !puppyInfo.isPuppyName ||
+      !puppyInfo.isMyName)
+  ) {
+    return null;
   }
 
   // F3 검색용(임시, 차후 삭제)

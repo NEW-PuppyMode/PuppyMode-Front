@@ -178,6 +178,10 @@ export default function RootLayout() {
                   name='test/result'
                   options={{ headerShown: false }}
                 />
+                <Stack.Screen
+                  name='onboarding/index'
+                  options={{ headerShown: false }}
+                />
                 <Stack.Screen name='report' options={{ headerShown: false }} />
                 <Stack.Screen
                   name='calendar'

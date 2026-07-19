@@ -7,12 +7,15 @@ type SpeechBubbleProps = {
   children: React.ReactNode;
   variant?: 'puppy' | 'user';
   onPress?: () => void;
+  /** 지정 시 말풍선 최소 높이를 고정해, 줄 수가 달라도 높이를 일정하게 유지한다. */
+  minHeight?: number;
 };
 
 export function SpeechBubble({
   children,
   variant = 'puppy',
   onPress,
+  minHeight,
 }: SpeechBubbleProps) {
   const bgColor =
     variant === 'puppy'
@@ -27,6 +30,7 @@ export function SpeechBubble({
   const Content = (
     <Animated.View
       className={`${bgColor}`}
+      style={minHeight ? { minHeight, justifyContent: 'center' } : undefined}
       entering={ZoomIn.duration(300).springify()}
     >
       <ThemedText className={textStyle}>{children}</ThemedText>
