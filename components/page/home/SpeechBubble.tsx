@@ -9,6 +9,8 @@ type SpeechBubbleProps = {
   onPress?: () => void;
   /** 지정 시 말풍선 최소 높이를 고정해, 줄 수가 달라도 높이를 일정하게 유지한다. */
   minHeight?: number;
+  /** 아래쪽 꼬리(화살표) 크기 배율. 기본 1. */
+  tailScale?: number;
 };
 
 export function SpeechBubble({
@@ -16,6 +18,7 @@ export function SpeechBubble({
   variant = 'puppy',
   onPress,
   minHeight,
+  tailScale = 1,
 }: SpeechBubbleProps) {
   const bgColor =
     variant === 'puppy'
@@ -52,9 +55,9 @@ export function SpeechBubble({
         style={{
           width: 0,
           height: 0,
-          borderLeftWidth: 6,
-          borderRightWidth: 6,
-          borderTopWidth: 8,
+          borderLeftWidth: 6 * tailScale,
+          borderRightWidth: 6 * tailScale,
+          borderTopWidth: 8 * tailScale,
           borderLeftColor: 'transparent',
           borderRightColor: 'transparent',
           borderTopColor: tailColor,

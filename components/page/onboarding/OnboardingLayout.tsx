@@ -25,6 +25,8 @@ const BUBBLE_MIN_HEIGHT = 120;
 type OnboardingLayoutProps = {
   /** 진행 단계 (1부터 시작) */
   step: number;
+  /** 전체 단계 수 (진행 점 개수) */
+  totalSteps?: number;
   /** 상단 강조 타이틀 (초록 강조는 <Text style={{ color: '#0FD380' }}> 로 감싼다) */
   title: React.ReactNode;
   /** 타이틀 하단 보조 설명 */
@@ -45,6 +47,7 @@ type OnboardingLayoutProps = {
  */
 export function OnboardingLayout({
   step,
+  totalSteps = 3,
   title,
   subtitle,
   bubbleText,
@@ -89,7 +92,7 @@ export function OnboardingLayout({
     >
       <SafeAreaView style={styles.container}>
         <View style={styles.progressWrapper}>
-          <OnboardingProgress step={step} total={3} />
+          <OnboardingProgress step={step} total={totalSteps} />
         </View>
 
         <View style={styles.titleBlock}>
@@ -100,7 +103,11 @@ export function OnboardingLayout({
         <View style={styles.middle}>
           <View style={styles.bubbleWrapper}>
             {/* step이 바뀌면 remount 되어 등장 애니메이션이 다시 재생된다. */}
-            <SpeechBubble key={step} minHeight={BUBBLE_MIN_HEIGHT}>
+            <SpeechBubble
+              key={step}
+              minHeight={BUBBLE_MIN_HEIGHT}
+              tailScale={2.4}
+            >
               {bubbleText}
             </SpeechBubble>
           </View>
@@ -116,7 +123,9 @@ export function OnboardingLayout({
         <Animated.View
           style={[
             styles.bottom,
-            { transform: [{ translateY: Animated.multiply(keyboardAnim, -1) }] },
+            {
+              transform: [{ translateY: Animated.multiply(keyboardAnim, -1) }],
+            },
           ]}
         >
           {children}
@@ -138,7 +147,7 @@ const styles = StyleSheet.create({
   },
   progressWrapper: {
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 26,
   },
   titleBlock: {
     alignItems: 'center',
@@ -166,6 +175,7 @@ const styles = StyleSheet.create({
   },
   bubbleWrapper: {
     width: '100%',
+    marginBottom: 0,
   },
   bottom: {
     paddingVertical: 14,

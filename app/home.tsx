@@ -278,10 +278,7 @@ export default function HomeScreen() {
       !puppyInfo.isMyName
     ) {
       hasRedirectedRef.current = true;
-      router.replace({
-        pathname: '/onboarding',
-        params: { breed: puppyInfo.puppyLevelName ?? '' },
-      });
+      router.replace('/onboarding');
     }
   }, [puppyInfo, isFetching]);
 

@@ -41,11 +41,8 @@ const TestResult = () => {
   }, [cardSlideAnim]);
 
   const handleStart = () => {
-    // 온보딩(목표 → 이름)으로 진입. 알림 권한 요청은 온보딩 마지막 단계에서 실행된다.
-    router.replace({
-      pathname: '/onboarding',
-      params: { breed: puppyBreedKo },
-    });
+    // 온보딩으로 진입. 필요한 단계와 알림 권한 요청은 온보딩 화면에서 처리한다.
+    router.replace('/onboarding');
   };
 
   return (
