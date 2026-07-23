@@ -1,3 +1,4 @@
+import { PrimaryButton } from '@/components/common/buttons/PrimaryButton';
 import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { TestApi } from '@/services/testData';
 import { useQueryClient } from '@tanstack/react-query';
@@ -235,18 +236,11 @@ export default function TestProceeding() {
         </View>
       </View>
 
-      <TouchableOpacity
-        onPress={() => {
-          onPressNext();
-        }}
-        style={[
-          styles.bottomBtn,
-          selected[step] !== 0 && styles.bottomBtnActive,
-        ]}
+      <PrimaryButton
+        title='다음'
+        onPress={onPressNext}
         disabled={selected[step] === 0}
-      >
-        <Text className='font-medium text-white'>다음</Text>
-      </TouchableOpacity>
+      />
     </SafeAreaView>
   );
 }
@@ -307,23 +301,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     lineHeight: 22,
-  },
-  bottomBtn: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    height: 60,
-    borderRadius: 10,
-    backgroundColor: '#C1C1C1',
-    color: '#F1F1F1',
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: '500',
-    lineHeight: 24,
-    fontStyle: 'normal',
-  },
-  bottomBtnActive: {
-    backgroundColor: '#0FD380',
-    color: '#F2FFF4',
   },
 });
