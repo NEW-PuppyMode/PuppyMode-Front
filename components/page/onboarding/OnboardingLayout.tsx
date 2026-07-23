@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   },
   bubbleWrapper: {
     width: '100%',
-    marginBottom: 0,
+    marginBottom: -40,
   },
   bottom: {
     paddingVertical: 14,
