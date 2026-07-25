@@ -22,7 +22,6 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.anonymous.puppymode",
-      "versionCode": 22,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
@@ -38,7 +37,8 @@
       [
         "@react-native-seoul/kakao-login",
         {
-          "kakaoAppKey": "c3e8f77f2c2654beb51541c4161ff1aa"
+          "kakaoAppKey": "c3e8f77f2c2654beb51541c4161ff1aa",
+          "kotlinVersion": "2.1.20"
         }
       ],
       "expo-router",
