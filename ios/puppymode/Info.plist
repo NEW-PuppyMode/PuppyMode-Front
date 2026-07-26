@@ -40,6 +40,10 @@
     </array>
     <key>CFBundleVersion</key>
     <string>4</string>
+    <key>UIBackgroundModes</key>
+    <array>
+      <string>remote-notification</string>
+    </array>
     <key>KAKAO_APP_KEY</key>
     <string>c3e8f77f2c2654beb51541c4161ff1aa</string>
     <key>LSApplicationQueriesSchemes</key>
