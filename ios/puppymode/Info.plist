@@ -19,7 +19,7 @@
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.1.0</string>
+    <string>1.2.1</string>
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleURLTypes</key>
@@ -39,7 +39,13 @@
       </dict>
     </array>
     <key>CFBundleVersion</key>
-    <string>4</string>
+    <string>15</string>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
+    <key>UIBackgroundModes</key>
+    <array>
+      <string>remote-notification</string>
+    </array>
     <key>KAKAO_APP_KEY</key>
     <string>c3e8f77f2c2654beb51541c4161ff1aa</string>
     <key>LSApplicationQueriesSchemes</key>
