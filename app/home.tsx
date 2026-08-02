@@ -32,6 +32,7 @@ import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
 import { useVersionCheckQuery } from '@/hooks/queries/useVersionCheckQuery';
 import { logButtonTap } from '@/utils/analytics';
 import { maxDaysInMonth } from '@/utils/dateUtils';
+import { router } from 'expo-router';
 import { throttle } from 'lodash';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -44,7 +45,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // 3초 후 자동으로 사라지는 메시지 키 (그 외는 관련 UI가 닫힐 때까지 유지)
@@ -444,7 +444,7 @@ export default function HomeScreen() {
     >
       <SafeAreaView
         style={styles.background}
-        className='flex flex-column justify-between items-center'
+        className='flex flex-col justify-between items-center'
       >
         {/* ===== 실제 UI 레이어 ===== */}
         <TopBar
@@ -468,7 +468,7 @@ export default function HomeScreen() {
 
           {/* ===== 하단 컴포넌트 묶음 ===== */}
           {/* shadow-lg */}
-          <ThemedView className='flex-1 w-full h-full flex-column justify-between justify-end bg-transparent'>
+          <ThemedView className='flex-1 w-full h-full flex-col justify-end bg-transparent'>
             {/* ===== 키보드 - 이름 설정 입력창 ===== */}
             {showNameInput && (
               <Animated.View
