@@ -263,8 +263,14 @@ export default function TutorialScreen() {
       : 'left';
   const tooltipPlacement: 'above' | 'below' = step === 5 ? 'below' : 'above';
 
+  // 2번(어제 거 기록할래! 안내)부터 3번(음주 여부 선택)까지 같은 말풍선을 유지한다.
+  // 스텝이 넘어갈 때 말풍선이 새로 튀어나오지 않아 화면이 덜 튄다.
   const messageKey =
-    step === 3 ? 'archiveYesterday' : step === 4 ? 'archiveSuccess' : null;
+    step === 2 || step === 3
+      ? 'archiveYesterday'
+      : step === 4
+        ? 'archiveSuccess'
+        : null;
 
   const renderSpotlightClone = () => {
     if (step === 1) {

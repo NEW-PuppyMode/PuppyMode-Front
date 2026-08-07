@@ -368,8 +368,11 @@ export default function CalendarPage() {
         </View>
 
         <View className='flex-row items-center justify-center mt-5'>
+          {/* NativeWind v2의 gap-*은 "부모에 음수 마진 + 자식에 양수 마진"으로 흉내 내는
+              방식이라 부모 박스가 위/왼쪽으로 밀린다. RN 0.79의 네이티브 gap을 쓴다. */}
           <TouchableOpacity
-            className='flex-row items-center justify-center gap-2 '
+            className='flex-row items-center justify-center'
+            style={{ gap: 8 }}
             onPress={handleMonthPress}
             disabled={isLoading}
           >
