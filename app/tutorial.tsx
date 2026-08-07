@@ -369,7 +369,10 @@ export default function TutorialScreen() {
               >
                 <ThemedView className='flex-row justify-between bg-transparent'>
                   {recordMode && (
-                    <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
+                    <View
+                      className='flex-row justify-between flex-1 mb-4 bg-transparent'
+                      style={{ columnGap: 8 }}
+                    >
                       <View
                         ref={yesterdayButtonRef}
                         collapsable={false}
@@ -390,7 +393,10 @@ export default function TutorialScreen() {
                   )}
                 </ThemedView>
 
-                <ThemedView className='flex-row justify-between space-x-2 bg-transparent'>
+                <ThemedView
+                  className='flex-row justify-between bg-transparent'
+                  style={{ columnGap: 8 }}
+                >
                   <IconButton
                     icon={<MessageIcon width={24} height={24} />}
                     text='나한테 한마디만 해줘'

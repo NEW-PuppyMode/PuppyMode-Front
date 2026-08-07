@@ -627,7 +627,10 @@ export default function HomeScreen() {
               >
                 <ThemedView className='flex-row justify-between bg-transparent'>
                   {showGoalOptions ? (
-                    <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
+                    <View
+                      className='flex-row justify-between flex-1 mb-4 bg-transparent'
+                      style={{ columnGap: 8 }}
+                    >
                       <IconButton
                         icon={<PastGoalIcon width={24} height={24} />}
                         text='지난 달이랑 똑같아!'
@@ -655,7 +658,10 @@ export default function HomeScreen() {
                     </View>
                   ) : !recordMode &&
                     !(puppyInfo?.isPuppyName && puppyInfo?.isMyName) ? (
-                    <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
+                    <View
+                      className='flex-row justify-between flex-1 mb-4 bg-transparent'
+                      style={{ columnGap: 8 }}
+                    >
                       <IconButton
                         icon={<PawIcon width={24} height={24} />}
                         text='강아지 이름 지어주기'
@@ -672,7 +678,10 @@ export default function HomeScreen() {
                       />
                     </View>
                   ) : recordMode ? (
-                    <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
+                    <View
+                      className='flex-row justify-between flex-1 mb-4 bg-transparent'
+                      style={{ columnGap: 8 }}
+                    >
                       <IconButton
                         icon={<CalendarYesterdayIcon width={24} height={24} />}
                         text='어제 거 기록할래!'
@@ -707,7 +716,10 @@ export default function HomeScreen() {
                   ) : null}
                 </ThemedView>
 
-                <ThemedView className='flex-row justify-between space-x-2 bg-transparent'>
+                <ThemedView
+                  className='flex-row justify-between bg-transparent'
+                  style={{ columnGap: 8 }}
+                >
                   <IconButton
                     icon={<MessageIcon width={24} height={24} />}
                     text='나한테 한마디만 해줘'
