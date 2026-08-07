@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dimensions, Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -7,7 +7,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-/** 화면 좌표계(measureInWindow) 기준 사각형 */
+/** 오버레이가 놓인 컨테이너(rootRef) 기준 사각형 */
 export type SpotlightRect = {
   x: number;
   y: number;
@@ -29,6 +29,13 @@ type Props = {
    */
   rect?: SpotlightRect | null;
   /**
+   * 오버레이가 놓인 컨테이너의 실측 크기.
+   * Dimensions.get('window')는 Android edge-to-edge에서 실제 루트 뷰 크기와 다를 수 있어
+   * 말풍선 위치가 어긋난다. rect와 같은 기준(rootRef)에서 잰 값을 받아 쓴다.
+   */
+  containerWidth: number;
+  containerHeight: number;
+  /**
    * 딤 위에 다시 그릴 UI. 실제 punch-hole 마스크 대신 대상을 복제해 올리는 방식이라
    * 여기에 대상과 같은 컴포넌트를 넘겨주면 된다. 탭도 이쪽이 받는다.
    */
@@ -46,6 +53,8 @@ type Props = {
 export function TutorialOverlay({
   visible,
   rect,
+  containerWidth,
+  containerHeight,
   children,
   tooltip,
   tooltipPlacement = 'above',
@@ -54,8 +63,6 @@ export function TutorialOverlay({
   centerContent,
   onPressBackdrop,
 }: Props) {
-  const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-
   const opacity = useDerivedValue(
     () =>
       withTiming(visible ? 1 : 0, {
@@ -69,12 +76,12 @@ export function TutorialOverlay({
 
   const horizontal =
     rect && tooltipAlign === 'right'
-      ? { right: Math.max(EDGE_INSET, screenWidth - (rect.x + rect.width)) }
+      ? { right: Math.max(EDGE_INSET, containerWidth - (rect.x + rect.width)) }
       : { left: Math.max(EDGE_INSET, rect?.x ?? 0) };
 
   const vertical =
     rect && tooltipPlacement === 'above'
-      ? { bottom: screenHeight - rect.y + tooltipGap }
+      ? { bottom: containerHeight - rect.y + tooltipGap }
       : { top: (rect?.y ?? 0) + (rect?.height ?? 0) + tooltipGap };
 
   return (

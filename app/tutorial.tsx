@@ -22,7 +22,7 @@ import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { logButtonTap } from '@/utils/analytics';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Dimensions, ImageBackground, StyleSheet, View } from 'react-native';
+import { ImageBackground, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 /**
@@ -37,8 +37,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
  */
 
 type Step = 1 | 2 | 3 | 4 | 5 | 6;
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // 4번(기록 완료 연출)을 최소한 이만큼은 보여준 뒤 5번으로 넘어간다.
 // 강아지 리액션(2s)이 잦아드는 시점과 맞춘다.
@@ -78,6 +76,17 @@ export default function TutorialScreen() {
   const recordButtonRef = useRef<View>(null);
   const yesterdayButtonRef = useRef<View>(null);
 
+  /**
+   * 측정 기준이자 오버레이의 위치 기준이 되는 공통 조상.
+   *
+   * measureInWindow는 Android edge-to-edge에서 상태바 높이만큼 어긋난 값을 준다.
+   * (실측: SafeAreaView 최상단이 y=-27) 그래서 절대 좌표를 쓰지 않고, 이 노드를 기준으로
+   * 한 상대 좌표(measureLayout)를 쓴다. 트리 전체에 균일하게 걸린 오프셋은 상대 측정에서
+   * 상쇄되므로, 플랫폼별 보정 상수가 필요 없다.
+   */
+  const rootRef = useRef<View>(null);
+  const [rootSize, setRootSize] = useState({ width: 0, height: 0 });
+
   // 레벨업 연출도 공개 시점(5번)에 맞춰 터지도록 표시용 레벨을 추적한다.
   const levelUpEvent = useLevelUpDetector(displayedLevel ?? undefined);
 
@@ -103,6 +112,7 @@ export default function TutorialScreen() {
   // ===== 스포트라이트 대상 측정 =====
   // Figma의 393x852 절대좌표를 옮기지 않고 실제 렌더된 위치를 재서, 기기 폭과
   // 노치가 달라져도 스포트라이트와 말풍선이 따라가게 한다.
+  // 좌표는 rootRef 기준 상대값이라, 오버레이(rootRef 안의 absoluteFill)와 같은 기준을 쓴다.
   useEffect(() => {
     const target =
       step === 1
@@ -121,10 +131,20 @@ export default function TutorialScreen() {
     // 스텝 전환으로 버튼 행이 늘어난 직후라, 레이아웃이 확정될 때까지 두 프레임 기다린다.
     frame = requestAnimationFrame(() => {
       frame = requestAnimationFrame(() => {
-        target.current?.measureInWindow((x, y, width, height) => {
-          if (cancelled || (!width && !height)) return;
-          setRect({ x, y, width, height });
-        });
+        const node = target.current;
+        const root = rootRef.current;
+        if (cancelled || !node || !root) return;
+
+        node.measureLayout(
+          root,
+          (x, y, width, height) => {
+            if (cancelled || (!width && !height)) return;
+            setRect({ x, y, width, height });
+          },
+          () => {
+            // 기준 노드가 아직 붙지 않은 경우 등. 다음 layoutTick에서 다시 시도된다.
+          },
+        );
       });
     });
 
@@ -213,9 +233,12 @@ export default function TutorialScreen() {
   const dimmed = step === 1 || step === 2 || step === 5 || step === 6;
   const recordMode = step >= 2;
 
-  // 대상이 화면 오른쪽 절반에 있으면 말풍선도 오른쪽으로 붙인다.
+  // 대상이 오른쪽 절반에 있으면 말풍선도 오른쪽으로 붙인다.
+  // 화면 크기 API 대신 rootRef의 실측 크기를 쓴다. (window/screen 불일치 회피)
   const tooltipAlign: 'left' | 'right' =
-    rect && rect.x + rect.width / 2 > SCREEN_WIDTH / 2 ? 'right' : 'left';
+    rect && rootSize.width > 0 && rect.x + rect.width / 2 > rootSize.width / 2
+      ? 'right'
+      : 'left';
   const tooltipPlacement: 'above' | 'below' = step === 5 ? 'below' : 'above';
 
   const messageKey =
@@ -299,10 +322,24 @@ export default function TutorialScreen() {
       style={styles.background}
       resizeMode='cover'
     >
-      <SafeAreaView
+      {/*
+        측정 기준 겸 오버레이의 위치 기준. 스포트라이트 좌표를 이 노드 기준 상대값으로
+        재고, 오버레이도 이 안의 absoluteFill로 그려서 두 좌표계를 일치시킨다.
+        NativeWind를 거치지 않도록 className 없이 순수 style만 준다.
+      */}
+      <View
+        ref={rootRef}
+        collapsable={false}
         style={styles.background}
-        className='flex flex-column justify-between items-center'
+        onLayout={(e) => {
+          const { width, height } = e.nativeEvent.layout;
+          setRootSize({ width, height });
+        }}
       >
+        <SafeAreaView
+          style={styles.background}
+          className='flex flex-col justify-between items-center'
+        >
         {/* ===== 상단 진행 바 =====
             SafeAreaView가 items-center라 래퍼에 w-full이 없으면 TopBar가 콘텐츠 폭으로
             줄어들어 레벨 카드가 찌그러진다. w-full을 반드시 유지할 것.
@@ -328,7 +365,7 @@ export default function TutorialScreen() {
             )}
           </View>
 
-          <ThemedView className='flex-1 w-full h-full flex-column justify-between justify-end bg-transparent'>
+          <ThemedView className='flex-1 w-full h-full flex-col justify-end bg-transparent'>
             {/* ===== 음주 여부 선택 ===== */}
             {step === 3 && (
               <ThemedView
@@ -429,12 +466,18 @@ export default function TutorialScreen() {
           />
         </View>
 
-        <LevelUpBadge trigger={levelUpEvent?.id ?? 0} />
+          <LevelUpBadge trigger={levelUpEvent?.id ?? 0} />
+        </SafeAreaView>
 
-        {/* ===== 코치마크 오버레이 ===== */}
+        {/* ===== 코치마크 오버레이 =====
+            SafeAreaView 밖, rootRef 바로 아래에 둔다. 안에 두면 absoluteFill의 기준이
+            안전영역 padding 박스가 되어 측정 좌표와 상단 인셋만큼 어긋나고,
+            상태바 영역에는 딤도 걸리지 않는다. */}
         <TutorialOverlay
           visible={dimmed}
           rect={step === 6 ? null : rect}
+          containerWidth={rootSize.width}
+          containerHeight={rootSize.height}
           tooltip={renderTooltip()}
           tooltipPlacement={tooltipPlacement}
           tooltipAlign={tooltipAlign}
@@ -445,7 +488,7 @@ export default function TutorialScreen() {
         >
           {renderSpotlightClone()}
         </TutorialOverlay>
-      </SafeAreaView>
+      </View>
     </ImageBackground>
   );
 }
