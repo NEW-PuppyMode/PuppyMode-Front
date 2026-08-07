@@ -6,6 +6,7 @@ import MessageIcon from '@/assets/icons/home/ic_message.svg';
 import { EvolvingPuppy } from '@/components/page/home/EvolvingPuppy';
 import { IconButton } from '@/components/page/home/IconButton';
 import { LevelUpBadge } from '@/components/page/home/LevelUpBadge';
+import { ProgressCard } from '@/components/page/home/ProgressCard';
 import { SpeechBubble } from '@/components/page/home/SpeechBubble';
 import { TopBar } from '@/components/page/home/TopBar';
 import { CoachTooltip } from '@/components/page/tutorial/CoachTooltip';
@@ -87,6 +88,14 @@ export default function TutorialScreen() {
   const rootRef = useRef<View>(null);
   const [rootSize, setRootSize] = useState({ width: 0, height: 0 });
 
+  /**
+   * 경험치 카드가 TopBar 안에서 차지한 위치. 5번 스텝에서 카드만 스포트라이트로 띄우려면
+   * 카드의 좌표가 필요한데, TopBar 안쪽 노드라 직접 잴 수 없다.
+   * TopBar의 좌표(rootRef 기준)에 이 오프셋을 더해 카드의 좌표를 만든다.
+   * onLayout의 x/y는 부모의 padding까지 반영된 값이라 그대로 더하면 된다.
+   */
+  const [cardLayout, setCardLayout] = useState<SpotlightRect | null>(null);
+
   // 레벨업 연출도 공개 시점(5번)에 맞춰 터지도록 표시용 레벨을 추적한다.
   const levelUpEvent = useLevelUpDetector(displayedLevel ?? undefined);
 
@@ -139,6 +148,19 @@ export default function TutorialScreen() {
           root,
           (x, y, width, height) => {
             if (cancelled || (!width && !height)) return;
+
+            // 5번은 상단 바 전체가 아니라 경험치 카드만 비춘다.
+            // (캘린더·설정 아이콘까지 밝으면 시선이 분산된다)
+            if (step === 5 && cardLayout) {
+              setRect({
+                x: x + cardLayout.x,
+                y: y + cardLayout.y,
+                width: cardLayout.width,
+                height: cardLayout.height,
+              });
+              return;
+            }
+
             setRect({ x, y, width, height });
           },
           () => {
@@ -152,7 +174,7 @@ export default function TutorialScreen() {
       cancelled = true;
       cancelAnimationFrame(frame);
     };
-  }, [step, layoutTick]);
+  }, [step, layoutTick, cardLayout]);
 
   // ===== 4번 → 5번 자동 진행 =====
   // 기록 응답과 puppyInfo 리페치가 모두 끝난 뒤에 넘어가야, 5번에서 게이지가 멈춰 있는
@@ -266,9 +288,10 @@ export default function TutorialScreen() {
       );
     }
     if (step === 5) {
+      // 카드만 복제한다. 캘린더·설정 아이콘은 딤 아래에 남는다.
       return (
-        <View pointerEvents='none'>
-          <TopBar
+        <View pointerEvents='none' style={{ flex: 1 }}>
+          <ProgressCard
             level={displayedLevel}
             displayName={displayName}
             percent={displayedPercent}
@@ -351,6 +374,18 @@ export default function TutorialScreen() {
               displayName={displayName}
               percent={displayedPercent}
               levelUpEvent={levelUpEvent}
+              onCardLayout={(e) => {
+                const { x, y, width, height } = e.nativeEvent.layout;
+                setCardLayout((prev) =>
+                  prev &&
+                  prev.x === x &&
+                  prev.y === y &&
+                  prev.width === width &&
+                  prev.height === height
+                    ? prev
+                    : { x, y, width, height },
+                );
+              }}
             />
           </View>
         </View>

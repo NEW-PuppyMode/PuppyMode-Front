@@ -2,7 +2,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { LevelUpEvent } from '@/hooks/home/useLevelUpDetector';
 import { useEffect, useRef, useState } from 'react';
-import { TextInput } from 'react-native';
+import { TextInput, type ViewProps } from 'react-native';
 import Animated, {
   Easing,
   runOnJS,
@@ -25,6 +25,11 @@ interface Props {
   displayName: string;
   percent: number;
   levelUpEvent?: LevelUpEvent | null;
+  /**
+   * 카드가 부모(TopBar) 안에서 차지한 위치. 튜토리얼이 이 카드만 스포트라이트로
+   * 띄우는 데 쓴다. 콜백이라 레이아웃에는 영향이 없다.
+   */
+  onLayout?: ViewProps['onLayout'];
 }
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
@@ -40,6 +45,7 @@ export function ProgressCard({
   displayName,
   percent,
   levelUpEvent,
+  onLayout,
 }: Props) {
   // 바 채움 정도(0~100). 퍼센트 숫자 텍스트도 이 값을 따라간다.
   const progress = useSharedValue(percent);
@@ -102,7 +108,10 @@ export function ProgressCard({
   });
 
   return (
-    <ThemedView className='flex-1 px-4 py-3 rounded-2xl bg-cream-200'>
+    <ThemedView
+      className='flex-1 px-4 py-3 rounded-2xl bg-cream-200'
+      onLayout={onLayout}
+    >
       <ThemedView className='flex-row items-center mb-2 bg-transparent'>
         <ThemedView className='bg-green-500 px-2 py-1 rounded-full'>
           <ThemedText className='text-white text-xs font-semibold'>
