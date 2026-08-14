@@ -2,6 +2,9 @@
 
 PuppyMode Front
 
+> ⚠️ **네이티브 작업 전 필독**: `expo prebuild` 실행 전 [NATIVE_UPGRADE.md](./NATIVE_UPGRADE.md) 필독.
+> Windows 개발자는 watchman 설치 필수: `choco install watchman`
+
 ### 📦 주요 기술 요약
 
 | 분류                | 기술                                           |
