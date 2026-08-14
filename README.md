@@ -9,8 +9,8 @@ PuppyMode Front
 
 | 분류                | 기술                                           |
 | ------------------- | ---------------------------------------------- |
-| **프레임워크**      | React Native 0.79, Expo SDK 53 (Bare Workflow) |
-| **언어**            | TypeScript 5.8                                 |
+| **프레임워크**      | React Native 0.81, Expo SDK 54 (Prebuild 기반, 네이티브 폴더 커밋) |
+| **언어**            | TypeScript 5.9                                 |
 | **라우팅**          | Expo Router 5 (파일 기반)                      |
 | **서버 상태**       | TanStack Query v5                              |
 | **클라이언트 상태** | Zustand v5                                     |
