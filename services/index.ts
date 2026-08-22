@@ -1,4 +1,5 @@
 import { KEYS } from '@/constants/storage';
+import { describeToken, logAuthEvent } from '@/utils/tokenDebug';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, {
   AxiosError,
@@ -86,7 +87,25 @@ async function saveTokens(accessToken: string, refreshToken?: string) {
   await AsyncStorage.multiSet(items);
 }
 
-async function clearTokens() {
+/**
+ * 토큰 삭제 = 강제 로그아웃. 모든 로그아웃에 원인을 남기기 위해 reason을 받는다.
+ */
+async function clearTokens(
+  reason: string,
+  extra?: Record<string, unknown>,
+) {
+  const [access, refresh] = await Promise.all([
+    getAccessToken(),
+    getRefreshToken(),
+  ]);
+
+  logAuthEvent('tokens:cleared', {
+    reason,
+    access: describeToken(access),
+    refresh: describeToken(refresh),
+    ...extra,
+  });
+
   await AsyncStorage.multiRemove([
     KEYS.ACCESS_TOKEN,
     KEYS.REFRESH_TOKEN,
@@ -104,10 +123,18 @@ export async function reissueAccessToken(): Promise<string> {
     const refreshToken = await getRefreshToken();
 
     if (!refreshToken) {
+      logAuthEvent('reissue:no-refresh-token');
       throw new Error('리프레시 토큰이 없습니다.');
     }
 
     const accessToken = await getAccessToken();
+
+    // 보내는 refresh가 이미 만료됐는지 / 살아있는데 서버가 거부하는지 구분하기 위함
+    logAuthEvent('reissue:request', {
+      refresh: describeToken(refreshToken),
+      access: describeToken(accessToken),
+    });
+
     const response = await reissueInstance.post(
       '/auth/reissue',
       { refreshToken },
@@ -119,6 +146,10 @@ export async function reissueAccessToken(): Promise<string> {
     const data = response.data;
 
     if (!data?.isSuccess) {
+      logAuthEvent('reissue:not-success', {
+        code: data?.code,
+        message: data?.message,
+      });
       throw new Error(data?.message || '토큰 재발급 실패');
     }
 
@@ -126,8 +157,21 @@ export async function reissueAccessToken(): Promise<string> {
     const newRefreshToken = data.result.refreshToken;
 
     if (!newAccessToken) {
+      logAuthEvent('reissue:missing-access-token', {
+        resultKeys: Object.keys(data.result ?? {}),
+      });
       throw new Error('새 access token이 없습니다.');
     }
+
+    // rotation 증명: refresh fp가 바뀌고 exp가 다시 +14일로 리셋되는지
+    logAuthEvent('reissue:success', {
+      rotated: !!newRefreshToken && newRefreshToken !== refreshToken,
+      newRefreshReceived: !!newRefreshToken,
+      oldRefresh: describeToken(refreshToken),
+      newRefresh: describeToken(newRefreshToken),
+      newAccess: describeToken(newAccessToken),
+      expiresIn: data.result.expiresIn,
+    });
 
     await saveTokens(newAccessToken, newRefreshToken);
 
@@ -203,8 +247,19 @@ axiosInstance.interceptors.response.use(
         const reissueStatus = axios.isAxiosError(reissueError)
           ? reissueError.response?.status
           : null;
+
+        // 서버 code가 AUTH_REFRESH_TOKEN_INVALID면 Redis 소실/TTL 만료가 확정된다
+        logAuthEvent('reissue:failed', {
+          triggeredBy: requestUrl,
+          status: reissueStatus,
+          body: axios.isAxiosError(reissueError)
+            ? reissueError.response?.data
+            : String(reissueError),
+          willClearTokens: reissueStatus === 401 || reissueStatus === 403,
+        });
+
         if (reissueStatus === 401 || reissueStatus === 403) {
-          await clearTokens();
+          await clearTokens('reissue-rejected', { status: reissueStatus });
         }
         return Promise.reject(reissueError);
       }
