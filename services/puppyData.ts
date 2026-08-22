@@ -11,8 +11,8 @@ import { axiosInstance } from '.';
 export const PuppyDataAPI = {
   renamePuppy: async (
     puppyName: string,
-  ): Promise<ApiResponse<{ puppyName: string }>> => {
-    const response = await axiosInstance.post('/puppy-name', {
+  ): Promise<ApiResponse<Record<string, never>>> => {
+    const response = await axiosInstance.patch('/puppy-name', {
       puppyName: puppyName,
     });
     return response.data;
@@ -20,8 +20,8 @@ export const PuppyDataAPI = {
 
   renameUser: async (
     userName: string,
-  ): Promise<ApiResponse<{ myName: string }>> => {
-    const response = await axiosInstance.post('/my-name', {
+  ): Promise<ApiResponse<Record<string, never>>> => {
+    const response = await axiosInstance.patch('/user-name', {
       myName: userName,
     });
     return response.data;

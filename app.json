@@ -2,10 +2,10 @@
   "expo": {
     "name": "멍멍멍멍멍",
     "slug": "puppymode",
-    "version": "1.2.0",
+    "version": "1.3.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "puppymode",
+    "scheme": ["puppymode", "puppymod"],
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -21,7 +21,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.puppymode"
+      "package": "com.anonymous.puppymode",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -36,7 +37,8 @@
       [
         "@react-native-seoul/kakao-login",
         {
-          "kakaoAppKey": "c3e8f77f2c2654beb51541c4161ff1aa"
+          "kakaoAppKey": "c3e8f77f2c2654beb51541c4161ff1aa",
+          "kotlinVersion": "2.1.20"
         }
       ],
       "expo-router",
@@ -46,7 +48,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#0FD380"
         }
       ],
       "expo-video",

@@ -8,10 +8,10 @@ import {
   Image,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { PrimaryButton } from '@/components/common/buttons/PrimaryButton';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -120,12 +120,10 @@ const TestStart = () => {
       </Animated.View>
 
       <SafeAreaView style={styles.buttonWrapper} edges={['bottom']}>
-        <TouchableOpacity
-          style={styles.button}
+        <PrimaryButton
+          title='시작하기'
           onPress={() => router.replace('/test/proceeding')}
-        >
-          <Text style={styles.buttonText}>시작하기</Text>
-        </TouchableOpacity>
+        />
       </SafeAreaView>
     </View>
   );
@@ -198,19 +196,5 @@ const styles = StyleSheet.create({
     right: 0,
     paddingHorizontal: 15,
     paddingVertical: 14,
-  },
-  button: {
-    width: '100%',
-    height: 60,
-    borderRadius: 10,
-    backgroundColor: '#0FD380',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '500',
-    lineHeight: 24,
-    color: '#F2FFF4',
   },
 });
