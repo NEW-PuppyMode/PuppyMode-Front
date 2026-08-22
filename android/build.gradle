@@ -6,47 +6,26 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-          // classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.6'
+          classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.20'
+        classpath 'com.google.gms:google-services:4.4.1'
     classpath('com.android.tools.build:gradle')
     classpath('com.facebook.react:react-native-gradle-plugin')
     classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
-    classpath('com.google.gms:google-services:4.4.0')
-    classpath('com.google.firebase:firebase-crashlytics-gradle:2.9.9')
   }
 }
 
-def reactNativeAndroidDir = new File(
-  providers.exec {
-    workingDir(rootDir)
-    commandLine("node", "--print", "require.resolve('react-native/package.json')")
-  }.standardOutput.asText.get().trim(),
-  "../android"
-)
-
 allprojects {
   repositories {
-    maven {
-      // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-      url(reactNativeAndroidDir)
-    }
-
     google()
     mavenCentral()
     maven { url 'https://www.jitpack.io' }
-    maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }
+    // notifee AAR (node_modules 내 로컬 maven) — prebuild --clean 후 재추가 필요
     maven { url "$rootDir/../node_modules/@notifee/react-native/android/libs" }
+    // Kakao SDK 전용 저장소 — prebuild --clean 후 재추가 필요
+    maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }
   }
 }
 
 apply plugin: "expo-root-project"
 apply plugin: "com.facebook.react.rootproject"
-
-project.ext {
-    set('react-native', [
-        versions: [
-            kakao: [
-                sdk: "2.20.1",
-            ],
-        ],
-    ])
-}
