@@ -13,7 +13,13 @@ export function UpdatePopupModal({ visible, updateRequired, onLater, onUpdate }:
     <DefaultModal visible={visible} setVisible={updateRequired ? () => {} : onLater}>
       <View className='justify-between p-[15px] pt-[35px] w-[336px]  bg-white rounded-[10px]'>
         {/* ===== 안내 텍스트 ===== */}
-        <View className='items-center gap-[12px] px-[12px] py-[10px] w-full'>
+        {/* NativeWind v2의 gap-*은 "부모에 음수 마진 + 자식에 양수 마진"으로 흉내 내는
+            방식이라, 부모 박스가 밀리고 자식 마진 때문에 items-center 정렬도 틀어진다.
+            RN 0.79의 네이티브 gap을 쓴다. */}
+        <View
+          className='items-center px-[12px] py-[10px] w-full'
+          style={{ gap: 12 }}
+        >
           <Text className='text-center font-semibold text-[18px] text-grayscale-700'>
             <Text className='text-green-500'>멍멍멍멍멍</Text>의 환경을
             개선했어요!

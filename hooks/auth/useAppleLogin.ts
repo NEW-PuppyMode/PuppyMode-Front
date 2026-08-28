@@ -1,6 +1,7 @@
 import { useEnableNotifications } from '@/hooks/notifications/useEnableNotifications';
 import { KEYS } from '@/constants/storage';
 import { axiosInstance } from '@/services/index';
+import { describeToken, logAuthEvent } from '@/utils/tokenDebug';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { router } from 'expo-router';
@@ -59,6 +60,13 @@ export const useAppleLogin = () => {
         const { result } = backendResponse.data;
         console.log('[APPLE] isNewUser =', result.userInfo?.isNewUser);
         console.log('[APPLE] userInfo =', result.userInfo);
+
+        // refreshToken이 없으면 아래에서 삭제되어 해당 세션은 재발급이 영영 불가능해진다
+        logAuthEvent('login:apple', {
+          refreshTokenReceived: !!result.refreshToken,
+          access: describeToken(result.accessToken),
+          refresh: describeToken(result.refreshToken),
+        });
 
         await AsyncStorage.setItem(KEYS.ACCESS_TOKEN, result.accessToken);
         await AsyncStorage.setItem(KEYS.PROVIDER, 'apple');

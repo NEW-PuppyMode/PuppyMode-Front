@@ -32,6 +32,7 @@ import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
 import { useVersionCheckQuery } from '@/hooks/queries/useVersionCheckQuery';
 import { logButtonTap } from '@/utils/analytics';
 import { maxDaysInMonth } from '@/utils/dateUtils';
+import { router } from 'expo-router';
 import { throttle } from 'lodash';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -45,7 +46,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // 3초 후 자동으로 사라지는 메시지 키 (그 외는 관련 UI가 닫힐 때까지 유지)
@@ -445,7 +445,7 @@ export default function HomeScreen() {
     >
       <SafeAreaView
         style={styles.background}
-        className='flex flex-column justify-between items-center'
+        className='flex flex-col justify-between items-center'
       >
         {/* ===== 실제 UI 레이어 ===== */}
         <TopBar
@@ -469,7 +469,7 @@ export default function HomeScreen() {
 
           {/* ===== 하단 컴포넌트 묶음 ===== */}
           {/* shadow-lg */}
-          <ThemedView className='flex-1 w-full h-full flex-column justify-between justify-end bg-transparent'>
+          <ThemedView className='flex-1 w-full h-full flex-col justify-end bg-transparent'>
             {/* ===== 키보드 - 이름 설정 입력창 ===== */}
             {showNameInput && (
               <Animated.View
@@ -628,7 +628,10 @@ export default function HomeScreen() {
               >
                 <ThemedView className='flex-row justify-between bg-transparent'>
                   {showGoalOptions ? (
-                    <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
+                    <View
+                      className='flex-row justify-between flex-1 mb-4 bg-transparent'
+                      style={{ columnGap: 8 }}
+                    >
                       <IconButton
                         icon={<PastGoalIcon width={24} height={24} />}
                         text='지난 달이랑 똑같아!'
@@ -656,7 +659,10 @@ export default function HomeScreen() {
                     </View>
                   ) : !recordMode &&
                     !(puppyInfo?.isPuppyName && puppyInfo?.isMyName) ? (
-                    <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
+                    <View
+                      className='flex-row justify-between flex-1 mb-4 bg-transparent'
+                      style={{ columnGap: 8 }}
+                    >
                       <IconButton
                         icon={<PawIcon width={24} height={24} />}
                         text='강아지 이름 지어주기'
@@ -673,7 +679,10 @@ export default function HomeScreen() {
                       />
                     </View>
                   ) : recordMode ? (
-                    <View className='flex-row justify-between flex-1 mb-4 space-x-2 bg-transparent'>
+                    <View
+                      className='flex-row justify-between flex-1 mb-4 bg-transparent'
+                      style={{ columnGap: 8 }}
+                    >
                       <IconButton
                         icon={<CalendarYesterdayIcon width={24} height={24} />}
                         text='어제 거 기록할래!'
@@ -708,7 +717,10 @@ export default function HomeScreen() {
                   ) : null}
                 </ThemedView>
 
-                <ThemedView className='flex-row justify-between space-x-2 bg-transparent'>
+                <ThemedView
+                  className='flex-row justify-between bg-transparent'
+                  style={{ columnGap: 8 }}
+                >
                   <IconButton
                     icon={<MessageIcon width={24} height={24} />}
                     text='나한테 한마디만 해줘'

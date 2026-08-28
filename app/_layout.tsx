@@ -182,6 +182,10 @@ export default function RootLayout() {
                   name='onboarding/index'
                   options={{ headerShown: false }}
                 />
+                <Stack.Screen
+                  name='tutorial'
+                  options={{ headerShown: false }}
+                />
                 <Stack.Screen name='report' options={{ headerShown: false }} />
                 <Stack.Screen
                   name='calendar'
