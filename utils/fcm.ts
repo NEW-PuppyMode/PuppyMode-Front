@@ -29,7 +29,22 @@ export async function displayLocalNotification(
 ): Promise<void> {
   try {
     const channelId = await createDefaultChannel();
-    await notifee.displayNotification({ title, body, android: { channelId } });
+    await notifee.displayNotification({
+      title,
+      body,
+      android: { channelId },
+      ios: {
+        sound: 'default',
+        // iOS는 기본적으로 포그라운드 알림을 표시하지 않으므로,
+        // Android(IMPORTANCE_HIGH 채널)와 동일하게 배너가 뜨도록 명시한다.
+        foregroundPresentationOptions: {
+          banner: true,
+          list: true,
+          sound: true,
+          badge: true,
+        },
+      },
+    });
   } catch (e) {
     console.error('로컬 알림 표시 실패:', e);
   }
