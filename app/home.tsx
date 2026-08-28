@@ -41,6 +41,7 @@ import {
   Keyboard,
   Linking,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   View,
@@ -761,14 +762,17 @@ export default function HomeScreen() {
         />
 
         {/* ===== 강아지 Gif 레이어 (외형 변화 + 반짝이 연출 포함) ===== */}
-        <View pointerEvents='none' style={styles.gifLayer}>
-          <EvolvingPuppy
-            breedName={displayName ?? ''}
-            level={level}
-            reaction={reaction}
-            evolveEvent={levelUpEvent}
-            size={288}
-          />
+        {/* box-none: 강아지 영역만 터치를 받고, 나머지 빈 영역은 하단 버튼으로 터치를 통과시킨다. */}
+        <View pointerEvents='box-none' style={styles.gifLayer}>
+          <Pressable onPress={handleAdviceClick} accessibilityRole='button'>
+            <EvolvingPuppy
+              breedName={displayName ?? ''}
+              level={level}
+              reaction={reaction}
+              evolveEvent={levelUpEvent}
+              size={288}
+            />
+          </Pressable>
         </View>
 
         {/* ===== 레벨업 배지(LEVEL UP!) 오버레이 ===== */}
