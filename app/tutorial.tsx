@@ -19,8 +19,11 @@ import { ThemedView } from '@/components/ThemedView';
 import { PUPPY_MESSAGES } from '@/constants/messages';
 import { useLevelUpDetector } from '@/hooks/home/useLevelUpDetector';
 import { useCreateDrinkHistoryMutation } from '@/hooks/mutations/useCreateDrinkHistoryMutation';
+import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
+import { onboardingAPI } from '@/services/onboarding';
 import { logButtonTap } from '@/utils/analytics';
+import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ImageBackground, StyleSheet, View } from 'react-native';
@@ -33,8 +36,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
  * SpeechBubble / EvolvingPuppy)만 조립해 스텝을 스크립트한다. 레이아웃은 홈과
  * 동일한 flex 구조를 써야 스포트라이트가 어긋나지 않는다.
  *
- * "튜토리얼을 봤는지"는 저장하지 않는다. 온보딩 완료 시점에만 진입하고, 중도 이탈 후
- * 재진입하면 app/index.tsx가 isOnboarded를 보고 홈으로 보내므로 재노출되지 않는다.
+ * 진입 시 POST /onboarding/tutorial/start로 "봤음"을 서버에 등록한다. 서버가 완료가
+ * 아니라 진입 시점으로 정의한 API라, 중도에 앱을 종료해도 다시 노출되지 않는다.
+ * 재노출 여부 판정은 app/index.tsx가 /auth/me의 tutorialShown으로 한다.
  */
 
 type Step = 1 | 2 | 3 | 4 | 5 | 6;
@@ -48,6 +52,10 @@ const XP_REVEAL_DELAY_MS = 400;
 export default function TutorialScreen() {
   const { data: puppyInfo, isFetching } = usePuppyInfoQuery();
   const createDrinkHistoryMutation = useCreateDrinkHistoryMutation();
+  const queryClient = useQueryClient();
+
+  // 진입 마킹을 한 번만 보내기 위한 가드. 실패하면 false로 되돌려 종료 시 재시도한다.
+  const tutorialMarkedRef = useRef(false);
 
   const [step, setStep] = useState<Step>(1);
   const [rect, setRect] = useState<SpotlightRect | null>(null);
@@ -110,6 +118,19 @@ export default function TutorialScreen() {
     return () => {
       if (reactionTimerRef.current) clearTimeout(reactionTimerRef.current);
     };
+  }, []);
+
+  // ===== 진입 마킹 =====
+  // 실패해도 튜토리얼은 그대로 진행시킨다. 안내를 못 보게 막을 이유가 없고,
+  // 멱등한 API라 handleFinish에서 한 번 더 시도하면 된다.
+  useEffect(() => {
+    if (tutorialMarkedRef.current) return;
+    tutorialMarkedRef.current = true;
+
+    void onboardingAPI.startTutorial().catch((error) => {
+      console.error('튜토리얼 진행 상태 등록 실패:', error);
+      tutorialMarkedRef.current = false;
+    });
   }, []);
 
   // 스텝이 바뀌면 이전 대상의 좌표에 복제본이 잠깐 그려지지 않도록 먼저 비운다.
@@ -243,10 +264,25 @@ export default function TutorialScreen() {
     [createDrinkHistoryMutation],
   );
 
-  const handleFinish = useCallback(() => {
+  const handleFinish = useCallback(async () => {
     logButtonTap('tutorial_finish');
+
+    // 진입 시 마킹이 실패했다면 마지막으로 한 번 더 시도한다. 여기서도 실패하면
+    // 다음 실행에 튜토리얼이 다시 뜨지만, 종료를 막지는 않는다.
+    if (!tutorialMarkedRef.current) {
+      try {
+        await onboardingAPI.startTutorial();
+        tutorialMarkedRef.current = true;
+      } catch (error) {
+        console.error('튜토리얼 진행 상태 등록 재시도 실패:', error);
+      }
+    }
+
+    // 진입 판정의 근거가 되는 서버 상태를 새로 받게 한다. (app/index.tsx)
+    await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.me });
+
     router.replace('/home');
-  }, []);
+  }, [queryClient]);
 
   // 진입 값이 확정되기 전에는 그리지 않는다. (홈과 동일한 처리)
   if (displayedLevel === null || displayedPercent === null) return null;
