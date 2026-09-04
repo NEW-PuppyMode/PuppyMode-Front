@@ -15,6 +15,19 @@ export const useEnableNotifications = () => {
     await updateNotificationSetting(true);
   }, [updateNotificationSetting]);
 
+  /**
+   * 기기 알림 권한을 거부했을 때 서버 수신 설정도 내려준다.
+   * 서버 기본값이 ON이라, 이걸 하지 않으면 권한을 거부했는데도 설정 화면
+   * 토글이 켜져 있는 것처럼 보인다.
+   */
+  const disableOnServer = useCallback(async () => {
+    try {
+      await updateNotificationSetting(false);
+    } catch (e) {
+      console.error('알림 수신 설정 OFF 동기화 실패:', e);
+    }
+  }, [updateNotificationSetting]);
+
   const requestAndEnable = useCallback(async () => {
     try {
       const settings = await notifee.requestPermission();
@@ -26,6 +39,8 @@ export const useEnableNotifications = () => {
         await registerTokenAndEnable();
         return;
       }
+
+      await disableOnServer();
 
       Alert.alert(
         '알림 권한 필요',
@@ -58,7 +73,7 @@ export const useEnableNotifications = () => {
     } catch (e) {
       console.error('FCM 권한 요청 및 토큰 등록 실패:', e);
     }
-  }, [registerTokenAndEnable]);
+  }, [registerTokenAndEnable, disableOnServer]);
 
   return { requestAndEnable, registerTokenAndEnable };
 };
