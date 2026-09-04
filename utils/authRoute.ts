@@ -14,7 +14,9 @@ import type { Href } from 'expo-router';
  */
 export function resolveNextRoute(me: MeResult): Href {
   // 구버전 호환 필드가 강아지 유형 검사 완료 여부와 같은 값이다.
-  const puppyTestCompleted = me.isPuppyTestCompleted ?? me.isOnboarded;
+  // 둘 다 없으면 "완료"로 본다. 미완료로 잘못 판정하면 이미 검사를 마친 사용자를
+  // 다시 검사로 보내 강아지 종이 바뀌는데, 이건 되돌릴 수 없다.
+  const puppyTestCompleted = me.isPuppyTestCompleted ?? me.isOnboarded ?? true;
 
   // 필드가 없으면 "이미 마친 것"으로 본다. 서버 배포가 늦어 값이 빠졌을 때
   // 기존 사용자에게 온보딩·튜토리얼을 다시 보여주는 쪽이 더 나쁜 실패다.

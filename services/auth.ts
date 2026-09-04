@@ -33,8 +33,11 @@ export interface MeResult {
   onboardingCompleted?: boolean;
   /** 강아지 유형 검사 완료 여부 */
   isPuppyTestCompleted?: boolean;
-  /** isPuppyTestCompleted와 같은 값. 구버전 호환용이라 신규 코드에서는 쓰지 않는다. */
-  isOnboarded: boolean;
+  /**
+   * isPuppyTestCompleted와 같은 값. 구버전 호환용이라 신규 코드에서는 쓰지 않는다.
+   * 언젠가 사라질 필드이기에 선택 필드로 둔다.
+   */
+  isOnboarded?: boolean;
 }
 
 export interface MeResponse {

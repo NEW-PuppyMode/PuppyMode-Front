@@ -1,8 +1,10 @@
 import { useEnableNotifications } from '@/hooks/notifications/useEnableNotifications';
 import { KEYS } from '@/constants/storage';
+import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { axiosInstance } from '@/services/index';
 import { describeToken, logAuthEvent } from '@/utils/tokenDebug';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useQueryClient } from '@tanstack/react-query';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { router } from 'expo-router';
 import { useCallback } from 'react';
@@ -10,6 +12,7 @@ import { Alert } from 'react-native';
 
 export const useAppleLogin = () => {
   const { requestAndEnable } = useEnableNotifications();
+  const queryClient = useQueryClient();
 
   const handleSignInApple = useCallback(async () => {
     try {
@@ -76,11 +79,12 @@ export const useAppleLogin = () => {
           await AsyncStorage.removeItem(KEYS.REFRESH_TOKEN);
         }
         requestAndEnable();
-        if (result.userInfo?.isNewUser) {
-          router.replace('/test/start'); // 강아지 등록/온보딩 화면
-        } else {
-          router.replace('/home');
-        }
+
+        // 카카오 로그인과 같은 이유로 isNewUser 분기를 두지 않는다.
+        // 캐시를 비우고 진입 지점으로 보내면 app/index.tsx가 판정한다.
+        queryClient.removeQueries({ queryKey: QUERY_KEYS.me });
+        queryClient.removeQueries({ queryKey: QUERY_KEYS.puppyInfo });
+        router.replace('/');
 
         return backendResponse.data;
       } catch (backendError: any) {
@@ -104,7 +108,7 @@ export const useAppleLogin = () => {
       Alert.alert('로그인 오류', 'Apple 로그인 중 문제가 발생했습니다.');
       return null;
     }
-  }, [requestAndEnable]);
+  }, [requestAndEnable, queryClient]);
 
   return { handleSignInApple };
 };

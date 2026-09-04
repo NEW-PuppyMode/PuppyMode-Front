@@ -260,24 +260,17 @@ export default function HomeScreen() {
     }
   };
 
-  // onboarded 라우팅 (한 번만 실행, 서버 응답 확정 후에만)
+  // 목표 갱신 라우팅 (한 번만 실행, 서버 응답 확정 후에만)
+  //
+  // 강아지 유형 검사·이름·최초 목표 설정의 미완료 판정은 app/index.tsx가 /auth/me로
+  // 처리한다. 여기 남은 건 매월 돌아오는 목표 갱신뿐이다. /auth/me의
+  // onboardingCompleted는 "최초" 목표 설정만 가리켜서 갱신을 잡아내지 못하는데,
+  // isGoal은 홈이 어차피 받는 /main 데이터라 여기서 판정하면 요청이 늘지 않는다.
   const hasRedirectedRef = useRef(false);
   useEffect(() => {
     if (!puppyInfo || isFetching || hasRedirectedRef.current) return;
 
-    // 강아지 입양 테스트 미완료 → 테스트부터
-    if (puppyInfo.isOnboarded === false) {
-      hasRedirectedRef.current = true;
-      router.replace('/test/start');
-      return;
-    }
-
-    // 테스트는 했지만 목표·이름 설정이 안 되어 있으면 온보딩으로
-    if (
-      !puppyInfo.isGoal ||
-      !puppyInfo.isPuppyName ||
-      !puppyInfo.isMyName
-    ) {
+    if (!puppyInfo.isGoal) {
       hasRedirectedRef.current = true;
       router.replace('/onboarding');
     }
@@ -424,14 +417,8 @@ export default function HomeScreen() {
     // 추후 에러 UI 추가 (문제가 생겼습니다, 로그인 화면으로 이동? 상의 필요)
   }
 
-  // 온보딩(테스트/목표/이름) 미완료 시 홈 UI를 그리지 않고 리다이렉트를 기다린다.
-  if (
-    puppyInfo &&
-    (puppyInfo.isOnboarded === false ||
-      !puppyInfo.isGoal ||
-      !puppyInfo.isPuppyName ||
-      !puppyInfo.isMyName)
-  ) {
+  // 목표 갱신이 필요하면 홈 UI를 그리지 않고 리다이렉트를 기다린다.
+  if (puppyInfo && !puppyInfo.isGoal) {
     return null;
   }
 
