@@ -183,6 +183,10 @@ export default function RootLayout() {
                   options={{ headerShown: false }}
                 />
                 <Stack.Screen
+                  name='goal/index'
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
                   name='tutorial'
                   options={{ headerShown: false }}
                 />

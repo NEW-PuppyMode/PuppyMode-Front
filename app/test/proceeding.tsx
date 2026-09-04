@@ -138,10 +138,9 @@ export default function TestProceeding() {
         console.log('제출 성공:', res.message);
         console.log('제출 성공:', res.result);
 
-        // 문제: 탈퇴 -> 로그인 -> 저장공간 삭제 -> 앱 재실행 후 로그인 -> 강아지 테스트 시에 테스트를 2번 하는 오류
-        // 원인: 로그인 화면에서 isNewUser: true을 받고 home으로 간 후 다시 온보딩 화면으로 돌아옴으로써 isOnboarded: false이 됨.
-        // 임시 해결(로직이 비효율적): 온보딩 완료 후 서버 상태(isOnboarded)를 다시 받아 캐시를 갱신한다
-        // 근본 해결: 소셜 로그인 api(카카오 및 애플)에 isOnboarded 값 필요 (서버에 요청 예정)
+        // 검사를 마쳤으니 진입 판정의 근거가 되는 서버 상태를 새로 받는다.
+        // useMeQuery는 staleTime: Infinity라 무효화하지 않으면 "검사 미완료"가
+        // 캐시에 남아, 다음 진입에서 app/index.tsx가 검사로 다시 보낸다.
         await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.me });
         await queryClient.invalidateQueries({
           queryKey: QUERY_KEYS.puppyInfo,

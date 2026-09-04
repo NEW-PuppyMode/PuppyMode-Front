@@ -19,13 +19,32 @@ export interface KakaoLoginResponse {
   result: KakaoLoginResult;
 }
 
+/**
+ * GET /auth/me 의 사용자 상태.
+ *
+ * isOnboarded를 뺀 나머지는 선택 필드로 둔다. 서버 배포가 늦거나 롤백되어 필드가
+ * 빠져도 타입이 값을 있다고 단정하지 않게 하려는 것이다. 값이 없을 때의 판정은
+ * utils/authRoute.ts 의 resolveNextRoute가 정한다.
+ */
+export interface MeResult {
+  /** 튜토리얼 진행 여부 */
+  tutorialShown?: boolean;
+  /** 강아지이름·내이름·최초 목표설정을 모두 마쳤는지 */
+  onboardingCompleted?: boolean;
+  /** 강아지 유형 검사 완료 여부 */
+  isPuppyTestCompleted?: boolean;
+  /**
+   * isPuppyTestCompleted와 같은 값. 구버전 호환용이라 신규 코드에서는 쓰지 않는다.
+   * 언젠가 사라질 필드이기에 선택 필드로 둔다.
+   */
+  isOnboarded?: boolean;
+}
+
 export interface MeResponse {
   isSuccess: boolean;
   code: string;
   message: string;
-  result: {
-    isOnboarded: boolean;
-  };
+  result: MeResult;
 }
 
 export interface WithdrawResponse {

@@ -1,5 +1,6 @@
 import { KEYS } from '@/constants/storage';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
+import { resolveNextRoute } from '@/utils/authRoute';
 import { describeToken, logAuthEvent } from '@/utils/tokenDebug';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -52,6 +53,9 @@ export default function Index() {
 
   if (isError || hasTokens === false) return <Redirect href='/signin' />;
 
-  if (data?.isOnboarded) return <Redirect href='/home' />;
-  return <Redirect href='/test/start' />;
+  // enabled 상태에서 pending도 error도 아니면 data는 항상 있다.
+  if (!data) return null;
+
+  // 어디로 갈지는 resolveNextRoute 한 곳에서만 정한다. (utils/authRoute.ts)
+  return <Redirect href={resolveNextRoute(data)} />;
 }

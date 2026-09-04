@@ -16,7 +16,7 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
-import { PUPPY_QUERY_KEYS } from '@/hooks/queries/usePuppyInfoQuery';
+import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { logButtonTap } from '@/utils/analytics';
 import { useQueryClient } from '@tanstack/react-query';
 import Apple from '../assets/icons/signin/ic_apple.svg';
@@ -36,14 +36,15 @@ const SignIn = () => {
   const { handleSignInApple } = useAppleLogin();
 
   useEffect(() => {
-    if (userInfo?.isNewUser) router.replace('/test/start');
-    else if (userInfo?.isNewUser === false && userInfo?.username) {
-      queryClient.removeQueries({
-        queryKey: PUPPY_QUERY_KEYS.puppyInfo,
-      });
-      router.replace('/home');
-    }
-  }, [userInfo]);
+    if (!userInfo) return;
+
+    // 로그인 응답의 isNewUser로 분기하지 않는다. 탈퇴 후 재가입처럼 로그인 응답과
+    // 실제 서버 상태가 어긋나는 경우가 있어서, 캐시를 비우고 진입 지점으로 되돌려
+    // /auth/me를 새로 받은 뒤 app/index.tsx가 한 곳에서 판정하게 한다.
+    queryClient.removeQueries({ queryKey: QUERY_KEYS.me });
+    queryClient.removeQueries({ queryKey: QUERY_KEYS.puppyInfo });
+    router.replace('/');
+  }, [userInfo, queryClient]);
 
   useEffect(() => {
     if (error) Alert.alert('로그인 오류', error);
