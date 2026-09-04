@@ -1,18 +1,15 @@
 import { PrimaryButton } from '@/components/common/buttons/PrimaryButton';
 import { TextInput } from '@/components/common/Inputs/TextInput';
-import { ControlButton } from '@/components/page/home/ControlButton';
+import { GoalCounter } from '@/components/page/onboarding/GoalCounter';
 import { OnboardingLayout } from '@/components/page/onboarding/OnboardingLayout';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { useCreateGoalMutation } from '@/hooks/mutations/useCreateGoalMutation';
 import { useRenamePuppyMutation } from '@/hooks/mutations/useRenamePuppyMutation';
 import { useRenameUserMutation } from '@/hooks/mutations/useRenameUserMutation';
 import { useCompleteOnboarding } from '@/hooks/onboarding/useCompleteOnboarding';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { logButtonTap } from '@/utils/analytics';
-import { maxDaysInMonth } from '@/utils/dateUtils';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text } from 'react-native';
 
 type StepKey = 'puppyName' | 'userName' | 'goal';
 
@@ -186,24 +183,7 @@ export default function Onboarding() {
         </>
       ) : (
         <>
-          <View style={styles.counterRow}>
-            <ControlButton
-              label='-'
-              onPress={() => setCount((n) => Math.max(1, n - 1))}
-            />
-            <ThemedView className='px-5 py-3 mx-1 bg-green-100 shadow-sm rounded-2xl'>
-              <ThemedText
-                style={{ color: '#21D08A', fontWeight: '600', fontSize: 16 }}
-                className='text-green-500'
-              >
-                {count}번
-              </ThemedText>
-            </ThemedView>
-            <ControlButton
-              label='+'
-              onPress={() => setCount((n) => Math.min(maxDaysInMonth, n + 1))}
-            />
-          </View>
+          <GoalCounter value={count} onChange={setCount} />
           <PrimaryButton
             title={nextTitle}
             onPress={handleGoal}
@@ -218,10 +198,5 @@ export default function Onboarding() {
 const styles = StyleSheet.create({
   highlight: {
     color: '#0FD380',
-  },
-  counterRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
