@@ -272,7 +272,7 @@ export default function HomeScreen() {
 
     if (!puppyInfo.isGoal) {
       hasRedirectedRef.current = true;
-      router.replace('/onboarding');
+      router.replace('/goal');
     }
   }, [puppyInfo, isFetching]);
 
