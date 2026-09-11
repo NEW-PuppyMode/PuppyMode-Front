@@ -1,5 +1,10 @@
 // import { calendarHandlers } from './api/calendar';
 // import { onboardHandlers } from './api/onboard';
+import {
+  calendarMonthsEmptyHandlers,
+  calendarMonthsErrorHandlers,
+  calendarMonthsHandlers,
+} from './api/calendarMonths';
 import { goalRenewalHandlers } from './api/goalRenewal';
 import { puppyHandlers } from './api/puppy';
 
@@ -9,9 +14,14 @@ import { puppyHandlers } from './api/puppy';
  * 다른 사람도 .env만 바꾸면 같은 상황을 볼 수 있다.
  *
  * - goalRenewal: 온보딩을 마친 사용자의 월간 목표 갱신 (mocks/api/goalRenewal.ts)
+ * - calendarMonths / calendarMonthsEmpty / calendarMonthsError:
+ *   캘린더 월 선택 모달의 월·연도 비활성화 (mocks/api/calendarMonths.ts)
  */
 const scenarios = {
   goalRenewal: goalRenewalHandlers,
+  calendarMonths: calendarMonthsHandlers,
+  calendarMonthsEmpty: calendarMonthsEmptyHandlers,
+  calendarMonthsError: calendarMonthsErrorHandlers,
 };
 
 const scenario = process.env.EXPO_PUBLIC_MOCK_SCENARIO as

@@ -1,4 +1,5 @@
 import { useCalendarQuery } from '@/hooks/queries/useCalendarQuery';
+import { useGoalMonthsQuery } from '@/hooks/queries/useGoalMonthsQuery';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { getCalendarDogImage } from '@/utils/dogMapper';
 import { Stack, useRouter } from 'expo-router';
@@ -146,6 +147,9 @@ const styles = StyleSheet.create({
   modalActiveMonthText: {
     color: '#fff',
   },
+  modalDisabledMonthText: {
+    color: '#EBEBEB', // Grayscale/200
+  },
   modalButtonContainer: {
     marginTop: 20,
   },
@@ -288,6 +292,28 @@ export default function CalendarPage() {
     [calendarData],
   );
 
+  // 목표를 설정한 적 있는 월만 모달에서 고를 수 있다.
+  // 조회에 실패해 목록이 없으면 제한 없이 모든 월·연도를 열어 둔다.
+  const { data: goalMonths, isLoading: isGoalMonthsLoading } =
+    useGoalMonthsQuery();
+  const enabledMonths = useMemo(
+    () => (goalMonths ? new Set(goalMonths) : null),
+    [goalMonths],
+  );
+  const isMonthEnabled = (year: number, month: number) =>
+    !enabledMonths ||
+    enabledMonths.has(`${year}-${String(month).padStart(2, '0')}`);
+
+  // 서버가 오름차순으로 주므로 처음과 끝이 연도 범위다. 빈 배열이면 양쪽 다 막힌다.
+  const minYear = goalMonths?.length ? Number(goalMonths[0].slice(0, 4)) : null;
+  const maxYear = goalMonths?.length
+    ? Number(goalMonths[goalMonths.length - 1].slice(0, 4))
+    : null;
+  const canGoPrevYear =
+    !goalMonths || (minYear !== null && selectedYear > minYear);
+  const canGoNextYear =
+    !goalMonths || (maxYear !== null && selectedYear < maxYear);
+
   const currentMonthName =
     LocaleConfig.locales['ko'].monthNames[new Date(currentDate).getMonth()];
 
@@ -316,25 +342,32 @@ export default function CalendarPage() {
 
   const renderMonths = () => {
     const months = LocaleConfig.locales['ko'].monthNamesShort;
-    return months.map((month: string, index: number) => (
-      <TouchableOpacity
-        key={index}
-        style={[
-          styles.modalMonthButton,
-          selectedMonth === index + 1 && styles.modalActiveMonth,
-        ]}
-        onPress={() => handleMonthChange(index + 1)}
-      >
-        <Text
+    return months.map((month: string, index: number) => {
+      const isEnabled = isMonthEnabled(selectedYear, index + 1);
+      // 연도를 넘기면 이전에 고른 월이 비활성일 수 있다. 그때는 선택 표시를 하지 않는다.
+      const isSelected = isEnabled && selectedMonth === index + 1;
+      return (
+        <TouchableOpacity
+          key={index}
           style={[
-            styles.modalMonthText,
-            selectedMonth === index + 1 && styles.modalActiveMonthText,
+            styles.modalMonthButton,
+            isSelected && styles.modalActiveMonth,
           ]}
+          onPress={() => handleMonthChange(index + 1)}
+          disabled={!isEnabled}
         >
-          {month}
-        </Text>
-      </TouchableOpacity>
-    ));
+          <Text
+            style={[
+              styles.modalMonthText,
+              isSelected && styles.modalActiveMonthText,
+              !isEnabled && styles.modalDisabledMonthText,
+            ]}
+          >
+            {month}
+          </Text>
+        </TouchableOpacity>
+      );
+    });
   };
 
   const mergedMarkedDates = useMemo<MarkedDatesMap>(() => {
@@ -374,7 +407,7 @@ export default function CalendarPage() {
             className='flex-row items-center justify-center'
             style={{ gap: 8 }}
             onPress={handleMonthPress}
-            disabled={isLoading}
+            disabled={isLoading || isGoalMonthsLoading}
           >
             <Text className='text-[#0FD380] text-center text-[30px] font-extrabold'>
               {currentMonthName}
@@ -447,18 +480,21 @@ export default function CalendarPage() {
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
                 <View style={styles.modalYearSelector}>
-                  <TouchableOpacity onPress={() => handleYearChange('prev')}>
+                  <TouchableOpacity
+                    onPress={() => handleYearChange('prev')}
+                    disabled={!canGoPrevYear}
+                  >
                     <Svg width={24} height={24} viewBox='0 0 24 24' fill='none'>
                       <Circle
                         cx={12}
                         cy={12}
                         r={11.5}
                         transform='matrix(-1 0 0 1 24 0)'
-                        stroke='#868686'
+                        stroke={canGoPrevYear ? '#868686' : '#EBEBEB'}
                       />
                       <Path
                         d='M14.6084 7.30078L9.91275 11.9964L14.6084 16.6921'
-                        stroke='#868686'
+                        stroke={canGoPrevYear ? '#868686' : '#EBEBEB'}
                       />
                     </Svg>
                   </TouchableOpacity>
@@ -468,12 +504,20 @@ export default function CalendarPage() {
                   >
                     {selectedYear}
                   </Text>
-                  <TouchableOpacity onPress={() => handleYearChange('next')}>
+                  <TouchableOpacity
+                    onPress={() => handleYearChange('next')}
+                    disabled={!canGoNextYear}
+                  >
                     <Svg width={24} height={24} viewBox='0 0 24 24' fill='none'>
-                      <Circle cx={12} cy={12} r={11.5} stroke='#868686' />
+                      <Circle
+                        cx={12}
+                        cy={12}
+                        r={11.5}
+                        stroke={canGoNextYear ? '#868686' : '#EBEBEB'}
+                      />
                       <Path
                         d='M9.3916 7.30078L14.0873 11.9964L9.3916 16.6921'
-                        stroke='#868686'
+                        stroke={canGoNextYear ? '#868686' : '#EBEBEB'}
                       />
                     </Svg>
                   </TouchableOpacity>
@@ -499,7 +543,9 @@ export default function CalendarPage() {
               <TouchableOpacity
                 style={styles.modalConfirmButton}
                 onPress={handleModalConfirm}
-                disabled={isLoading}
+                disabled={
+                  isLoading || !isMonthEnabled(selectedYear, selectedMonth)
+                }
               >
                 <Text
                   style={styles.modalConfirmText}
