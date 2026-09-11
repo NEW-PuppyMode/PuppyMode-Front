@@ -52,6 +52,12 @@ export const PuppyDataAPI = {
     return response.data;
   },
 
+  // 목표를 설정한 적 있는 월 목록. 'yyyy-MM' 오름차순, 이력이 없으면 빈 배열
+  fetchGoalMonths: async (): Promise<ApiResponse<string[]>> => {
+    const response = await axiosInstance.get('/goals/months');
+    return response.data;
+  },
+
   createDrinkHistory: async (drinkHistory: DrinkHistoryDTO) => {
     const response = await axiosInstance.post('/drink-history', drinkHistory);
     return response.data;
