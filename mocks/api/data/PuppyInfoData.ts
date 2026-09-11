@@ -4,7 +4,7 @@ export const PuppyInfoData = {
   message: 'success',
   result: {
     puppyLevel: 2,
-    puppyLevelName: '서준',
+    puppyLevelName: '멍멍이',
     puppyLevelPercent: 99,
     puppyImageUrl: 'string',
     didRecordYesterday: true,
