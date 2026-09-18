@@ -102,11 +102,16 @@ export const setAnalyticsUserId = (userId: string): void => {
 
 /**
  * 로그아웃·탈퇴 시 사용자 식별을 끊는다.
- * 이걸 하지 않으면 한 기기에서 계정을 바꿨을 때 다음 사용자의 이벤트가
- * 이전 사용자에게 붙고, 사용자 속성도 남아서 섞인다.
+ *
+ * userId만 비우고 deviceId는 유지한다. SDK의 reset()은 deviceId까지 새로 발급하는데,
+ * 그러면 같은 실기기에서 로그아웃할 때마다 다른 기기로 잡혀 운영 환경 테스트가
+ * 여러 사용자로 쪼개진다.
+ *
+ * 대신 "한 기기에서 계정을 바꾼 경우"의 분리는 포기했다. 서버가 사용자 식별자를
+ * 내려주기 시작하면 setAnalyticsUserId가 계정을 구분해주므로, 이 함수는 그대로
+ * 두어도 그때부터 제 역할을 한다.
  */
 export const resetAnalyticsUser = (): void => {
-  // deviceId까지 새로 발급해 이전 사용자와 완전히 분리한다.
-  amplitude.reset();
+  amplitude.setUserId(undefined);
   analytics().setUserId(null).catch(swallow('resetUserId'));
 };

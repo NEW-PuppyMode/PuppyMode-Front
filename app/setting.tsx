@@ -11,6 +11,7 @@ import {
   useUpdateNotificationSettingMutation,
 } from '@/hooks/queries/useNotificationSettingQuery';
 import { PUPPY_QUERY_KEYS } from '@/hooks/queries/usePuppyInfoQuery';
+import { logEvent } from '@/utils/analytics';
 import {
   getIosNotificationPermissionStatus,
   hasGrantedIosNotificationPermission,
@@ -236,6 +237,9 @@ const Setting = () => {
             <TouchableOpacity
               onPress={async () => {
                 setSignOutModalVisible(false);
+                // AuthContext.logout은 탈퇴에서도 쓰이므로, 사용자가 직접 로그아웃한
+                // 이 지점에서만 이벤트를 남긴다.
+                logEvent('logout');
                 await logout();
                 router.replace('/signin');
 
