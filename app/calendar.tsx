@@ -471,7 +471,7 @@ export default function CalendarPage() {
             onPress={() =>
               router.push({
                 pathname: '/report',
-                params: { year: selectedYear, month: selectedMonth },
+                params: { year: calendarYear, month: calendarMonth },
               })
             }
           >
