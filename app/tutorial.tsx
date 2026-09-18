@@ -260,6 +260,9 @@ export default function TutorialScreen() {
         await createDrinkHistoryMutation.mutateAsync({
           drinkDate: formattedDate,
           isDrink: didDrink,
+          source: 'tutorial',
+          // 튜토리얼은 항상 '어제'로 안내한다.
+          recordDay: 'yesterday',
         });
       } catch (error) {
         // 실패해도 튜토리얼은 끝까지 진행시킨다. (홈에서 다시 기록할 수 있다)

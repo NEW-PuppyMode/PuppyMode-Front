@@ -30,7 +30,7 @@ import { useIsRecordedQuery } from '@/hooks/queries/useIsRecordedQuery';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
 import { useVersionCheckQuery } from '@/hooks/queries/useVersionCheckQuery';
-import { logButtonTap, logEvent } from '@/utils/analytics';
+import { logEvent } from '@/utils/analytics';
 import { maxDaysInMonth } from '@/utils/dateUtils';
 import { router } from 'expo-router';
 import { throttle } from 'lodash';
@@ -143,7 +143,6 @@ export default function HomeScreen() {
   };
 
   const handleDrinkRecordPress = () => {
-    logButtonTap('drink_record');
     const willOpen = !recordMode;
     setRecordMode(willOpen);
     setShowNameInput(false);
@@ -279,12 +278,13 @@ export default function HomeScreen() {
   }, [puppyInfo, isFetching]);
 
   const _handleAdviceClick = async () => {
-    logButtonTap('advice');
     try {
       const result = await advicePuppyMutation.mutateAsync();
       const advice = result.result.advice?.trim();
       if (advice) {
         setAdviceMessage(advice);
+        // 빈 응답은 범용 멘트로 대체되므로 "조언을 받았다"고 보지 않는다.
+        logEvent('dog_advice_received');
       } else {
         // 성공했지만 빈 응답: 범용 멘트(default)로 fallback
         setAdviceMessage('');
@@ -376,6 +376,8 @@ export default function HomeScreen() {
       await createDrinkHistoryMutation.mutateAsync({
         drinkDate: formattedDate,
         isDrink: didDrink,
+        source: 'home',
+        recordDay: recordType === 'yesterday' ? 'yesterday' : 'today',
       });
     } catch (error) {
       console.error('음주 기록 처리 중 오류 발생:', error);

@@ -1,3 +1,4 @@
+import { logEvent } from '@/utils/analytics';
 import { getGrowthStage } from '@/utils/dogMapper';
 import { useEffect, useRef, useState } from 'react';
 
@@ -30,12 +31,19 @@ export function useLevelUpDetector(level: number | undefined): LevelUpEvent | nu
     // 첫 관측이거나 레벨이 오르지 않았으면 무시
     if (prev === null || level <= prev) return;
 
+    const didEvolve = getGrowthStage(prev) !== getGrowthStage(level);
+
+    // 레벨업을 감지하는 지점이 여기 한 곳뿐이라 이벤트도 여기서 남긴다.
+    // 홈과 튜토리얼이 각자 이 훅을 쓰지만 두 화면이 동시에 떠 있지 않고,
+    // 위에서 prevLevelRef를 먼저 갱신하므로 같은 레벨업이 두 번 나가지 않는다.
+    logEvent('puppy_level_up', { to_level: level, did_evolve: didEvolve });
+
     eventIdRef.current += 1;
     setEvent({
       id: eventIdRef.current,
       fromLevel: prev,
       toLevel: level,
-      didEvolve: getGrowthStage(prev) !== getGrowthStage(level),
+      didEvolve,
     });
   }, [level]);
 
