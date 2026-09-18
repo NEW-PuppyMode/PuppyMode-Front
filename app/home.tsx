@@ -324,7 +324,7 @@ export default function HomeScreen() {
 
   const level = puppyInfo?.puppyLevel ?? 0;
   const percent = puppyInfo?.puppyLevelPercent ?? 0;
-  const displayName = puppyInfo?.puppyLevelName; // 강아지 종 ex)눈송이 비숑
+  const breedName = puppyInfo?.puppyLevelName; // 강아지 종 ex)눈송이 비숑
   const puppyName = puppyInfo?.currentPuppyName; // 강아지 이름
 
   // const displayName = puppyInfo?.puppyLevelName
@@ -441,7 +441,7 @@ export default function HomeScreen() {
         {/* ===== 실제 UI 레이어 ===== */}
         <TopBar
           level={level}
-          displayName={displayName ?? ''}
+          puppyName={puppyName ?? ''}
           percent={percent}
           levelUpEvent={levelUpEvent}
         />
@@ -759,7 +759,7 @@ export default function HomeScreen() {
         <View pointerEvents='box-none' style={styles.gifLayer}>
           <Pressable onPress={handleAdviceClick} accessibilityRole='button'>
             <EvolvingPuppy
-              breedName={displayName ?? ''}
+              breedName={breedName ?? ''}
               level={level}
               reaction={reaction}
               evolveEvent={levelUpEvent}

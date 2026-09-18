@@ -14,7 +14,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 /**
- * 레벨 뱃지 + 종 이름 + 경험치 게이지 카드. (상단 바 좌측 컴포넌트바)
+ * 레벨 뱃지 + 강아지 이름 + 경험치 게이지 카드. (상단 바 좌측 컴포넌트바)
  *
  * progress / displayLevel 등 상태가 전부 이 카드만을 위한 것이고 우측 아이콘 버튼과는
  * 아무것도 공유하지 않아 TopBar에서 분리했다. JSX와 애니메이션 로직은 옮기기 전과 동일하다.
@@ -22,7 +22,7 @@ import Animated, {
 
 interface Props {
   level: number;
-  displayName: string;
+  puppyName: string;
   percent: number;
   levelUpEvent?: LevelUpEvent | null;
   /**
@@ -42,7 +42,7 @@ const FILL_NEW_MS = 800;
 
 export function ProgressCard({
   level,
-  displayName,
+  puppyName,
   percent,
   levelUpEvent,
   onLayout,
@@ -119,7 +119,7 @@ export function ProgressCard({
           </ThemedText>
         </ThemedView>
         <ThemedText className='ml-2 text-sm text-gray-600'>
-          {displayName}
+          {puppyName}
         </ThemedText>
         <AnimatedTextInput
           editable={false}
