@@ -22,7 +22,7 @@ import { useCreateDrinkHistoryMutation } from '@/hooks/mutations/useCreateDrinkH
 import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { onboardingAPI } from '@/services/onboarding';
-import { logButtonTap } from '@/utils/analytics';
+import { logEvent } from '@/utils/analytics';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -113,6 +113,15 @@ export default function TutorialScreen() {
     setDisplayedLevel(puppyInfo.puppyLevel ?? 0);
     setDisplayedPercent(puppyInfo.puppyLevelPercent ?? 0);
   }, [puppyInfo, displayedLevel]);
+
+  // 단계를 넘어갈 때 "직전 단계를 통과했다"고 남긴다. setStep 호출부가 버튼·자동
+  // 진행·배경 탭으로 흩어져 있어서, 상태 변화를 한 곳에서 보는 편이 누락이 없다.
+  const prevStepRef = useRef<Step>(1);
+  useEffect(() => {
+    if (step === prevStepRef.current) return;
+    logEvent('tutorial_step_completed', { step_number: prevStepRef.current });
+    prevStepRef.current = step;
+  }, [step]);
 
   useEffect(() => {
     return () => {
@@ -224,12 +233,10 @@ export default function TutorialScreen() {
   }, [step, puppyInfo]);
 
   const handleRecordButton = useCallback(() => {
-    logButtonTap('tutorial_drink_record');
     setStep(2);
   }, []);
 
   const handleYesterdayButton = useCallback(() => {
-    logButtonTap('tutorial_record_yesterday');
     setStep(3);
   }, []);
 
@@ -253,6 +260,9 @@ export default function TutorialScreen() {
         await createDrinkHistoryMutation.mutateAsync({
           drinkDate: formattedDate,
           isDrink: didDrink,
+          source: 'tutorial',
+          // 튜토리얼은 항상 '어제'로 안내한다.
+          recordDay: 'yesterday',
         });
       } catch (error) {
         // 실패해도 튜토리얼은 끝까지 진행시킨다. (홈에서 다시 기록할 수 있다)
@@ -265,7 +275,8 @@ export default function TutorialScreen() {
   );
 
   const handleFinish = useCallback(async () => {
-    logButtonTap('tutorial_finish');
+    // 6단계 통과 = 튜토리얼 완료라 tutorial_step_completed(6)은 따로 남기지 않는다.
+    logEvent('tutorial_completed');
 
     // 진입 시 마킹이 실패했다면 마지막으로 한 번 더 시도한다. 여기서도 실패하면
     // 다음 실행에 튜토리얼이 다시 뜨지만, 종료를 막지는 않는다.

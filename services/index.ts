@@ -110,6 +110,7 @@ async function clearTokens(
     KEYS.ACCESS_TOKEN,
     KEYS.REFRESH_TOKEN,
     KEYS.PROVIDER,
+    KEYS.DOG_TYPE,
   ]);
 }
 

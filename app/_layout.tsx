@@ -1,9 +1,11 @@
 import { AnalyticsRouteTracker } from '@/components/common/AnalyticsRouteTracker';
+import { AnalyticsUserPropsTracker } from '@/components/common/AnalyticsUserPropsTracker';
 import { CrashlyticsRouteTracker } from '@/components/common/CrashlyticsRouteTracker';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import theme from '@/styles/theme';
+import { initAmplitude } from '@/utils/amplitude';
 import {
   createDefaultChannel,
   setupForegroundNotificationHandler,
@@ -30,6 +32,9 @@ import {
 } from 'react-native';
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
+
+// 자식 컴포넌트의 이벤트보다 먼저 초기화되도록 렌더 전에 한 번만 호출
+initAmplitude();
 
 function setGlobalFontFamily(fontFamily: string) {
   const TextComp = RNText as unknown as {
@@ -158,6 +163,7 @@ export default function RootLayout() {
           <EmotionThemeProvider theme={theme}>
             <ErrorBoundary>
               <AnalyticsRouteTracker />
+              <AnalyticsUserPropsTracker />
               <CrashlyticsRouteTracker />
               <Stack>
                 <Stack.Screen name='index' options={{ headerShown: false }} />

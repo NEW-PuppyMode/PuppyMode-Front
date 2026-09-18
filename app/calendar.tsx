@@ -1,5 +1,6 @@
 import { useCalendarQuery } from '@/hooks/queries/useCalendarQuery';
 import { useGoalMonthsQuery } from '@/hooks/queries/useGoalMonthsQuery';
+import { logEvent } from '@/utils/analytics';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { getCalendarDogImage } from '@/utils/dogMapper';
 import { Stack, useRouter } from 'expo-router';
@@ -326,6 +327,17 @@ export default function CalendarPage() {
   // 모달 확인: currentDate 갱신 → query key 변경으로 자동 재요청
   const handleModalConfirm = () => {
     const newDate = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`;
+
+    // 이번 달이 0, 지난달이 -1. 연도를 넘어가도 이어지도록 개월 수로 환산한다.
+    // 같은 달을 다시 고른 경우는 바뀐 게 없으므로 남기지 않는다.
+    if (!currentDate.startsWith(newDate.slice(0, 7))) {
+      const now = new Date();
+      logEvent('calendar_month_changed', {
+        month_offset:
+          (selectedYear - now.getFullYear()) * 12 +
+          (selectedMonth - (now.getMonth() + 1)),
+      });
+    }
     setCurrentDate(newDate);
     setModalVisible(false);
   };

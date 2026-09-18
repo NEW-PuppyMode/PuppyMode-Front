@@ -1,6 +1,7 @@
 import { useEnableNotifications } from '@/hooks/notifications/useEnableNotifications';
 import { KEYS } from '@/constants/storage';
 import { KakaoLoginResult, loginAPI } from '@/services/auth';
+import { logEvent } from '@/utils/analytics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { login as loginWithKakaoAccount } from '@react-native-seoul/kakao-login';
 import { useCallback, useState } from 'react';
@@ -34,6 +35,12 @@ export const useLogin = (): UseLoginReturn => {
       );
 
       await AsyncStorage.setItem(KEYS.ACCESS_TOKEN, result.accessToken);
+
+      // 자동 로그인은 이 훅을 타지 않으므로, 여기 도달했다면 사용자가 직접 로그인한 것이다.
+      logEvent('login_completed', {
+        provider: 'kakao',
+        is_new_user: Boolean(result.userInfo?.isNewUser),
+      });
 
       requestAndEnable();
 

@@ -1,6 +1,7 @@
 import {
   getIosNotificationPermissionStatus,
   hasGrantedIosNotificationPermission,
+  logNotificationPermissionResponse,
   requestIosNotificationPermission,
 } from '@/utils/notificationPermission';
 import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
@@ -68,6 +69,10 @@ export function useCompleteOnboarding() {
     }
 
     const hasPermission = await requestIosNotificationPermission();
+
+    // 안드로이드는 로그인 때 이미 물어보므로 여기까지 오는 건 iOS뿐이고, 로그인
+    // 시점에 이미 물었다면 헬퍼가 알아서 건너뛴다.
+    await logNotificationPermissionResponse(hasPermission);
 
     if (!hasPermission) {
       Alert.alert(

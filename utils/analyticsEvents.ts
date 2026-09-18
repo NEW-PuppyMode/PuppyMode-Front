@@ -1,0 +1,94 @@
+/**
+ * 이벤트 이름과 속성의 단일 정의.
+ *
+ * 이벤트명을 호출부에 문자열로 흩뿌리면 오타를 잡을 수 없고, 같은 이벤트의
+ * 속성 이름이 화면마다 조금씩 달라진다. 여기 한 곳에만 적어두고
+ * utils/analytics.ts 의 logEvent가 타입으로 강제한다.
+ *
+ * 속성이 없는 이벤트는 값을 undefined로 둔다. (logEvent의 인자도 함께 사라진다)
+ */
+
+export type LoginProvider = 'kakao' | 'apple';
+
+export type AnalyticsEventMap = {
+  // ===== 인증 =====
+  /** 소셜 로그인 성공. 토큰으로 자동 로그인된 경우는 제외한다. */
+  login_completed: {
+    provider: LoginProvider;
+    /**
+     * 서버 응답의 isNewUser. 탈퇴 후 재가입에서 실제 상태와 어긋날 수 있어
+     * 참고용으로만 본다. (app/signin.tsx 의 라우팅도 이 값을 쓰지 않는다)
+     */
+    is_new_user: boolean;
+  };
+
+  logout: undefined;
+  account_deleted: undefined;
+
+  // ===== 온보딩 =====
+  /** 유형 테스트 각 문항 답변. 뒤로가기로 다시 답하면 중복 발생 → 사용자 수로 집계한다. */
+  puppy_test_question_answered: { question_number: number };
+  puppy_test_completed: { dog_type: string };
+  name_set: { target: 'dog' | 'user'; source: 'onboarding' | 'home' };
+  tutorial_step_completed: { step_number: number };
+  /**
+   * 튜토리얼을 끝내고 홈으로 들어간 시점. 신규 사용자 여정(로그인 → 유형 검사 →
+   * 온보딩 → 튜토리얼)의 마지막이기도 하다.
+   *
+   * 이름을 onboarding_completed로 두면 /onboarding 화면이 끝날 때 나갈 것처럼
+   * 읽히는데, 실제로는 그보다 한참 뒤인 튜토리얼 끝에서 나간다.
+   */
+  tutorial_completed: undefined;
+
+  // ===== 목표 설정 =====
+  /**
+   * 목표 저장 완료.
+   *
+   * 주의: entry_point 'home'과 goal_type 'same'은 현재 **나올 수 없다**.
+   * 홈의 목표 설정 UI는 isGoal === false일 때만 렌더되는데(app/home.tsx),
+   * 같은 조건에서 홈이 /goal로 리다이렉트해버려 버튼을 누를 틈이 없다.
+   * '지난 달이랑 똑같아'(= 'same')도 그 UI 안에 있어서 함께 도달 불가다.
+   * 그러니 이 두 값이 0건인 것은 계측 누락이 아니다.
+   *
+   * 계측은 그대로 붙여둔다. UI가 되살아나면 바로 잡힌다.
+   */
+  goal_setup_completed: {
+    entry_point: 'onboarding' | 'renewal' | 'home';
+    goal_type: 'same' | 'new';
+    /** '지난 달과 동일'은 요청에 0을 보내므로 입력값이 아니라 응답값을 쓴다. */
+    monthly_goal: number;
+  };
+
+  // ===== 핵심 행동 =====
+  drink_record_created: {
+    drank: boolean;
+    source: 'tutorial' | 'home';
+    record_day: 'today' | 'yesterday';
+  };
+  dog_advice_received: undefined;
+  puppy_level_up: { to_level: number; did_evolve: boolean };
+
+  // ===== 조회 및 리포트 =====
+  /** 캘린더에서 월 선택 모달로 다른 달을 확정한 시점 */
+  calendar_month_changed: { month_offset: number };
+  report_viewed: { achievement_rate: number };
+
+  // ===== 설정 및 알림 =====
+  notification_setting_changed: { enabled: boolean };
+  notification_permission_responded: { granted: boolean };
+};
+
+export type AnalyticsEventName = keyof AnalyticsEventMap;
+
+/**
+ * 사용자 속성. 앱 실행마다 다시 세팅해서 최신 값으로 덮는다.
+ * (Amplitude의 사용자 속성은 마지막에 세팅된 값만 남는다)
+ */
+export type AnalyticsUserProps = {
+  /** 강아지 유형 영문 코드(puppyBreedEn) */
+  dog_type: string;
+  login_provider: LoginProvider;
+  current_monthly_goal: number;
+  notification_setting: boolean;
+  notification_permission: boolean;
+};

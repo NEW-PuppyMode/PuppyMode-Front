@@ -1,6 +1,9 @@
 import { PrimaryButton } from '@/components/common/buttons/PrimaryButton';
+import { KEYS } from '@/constants/storage';
 import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { TestApi } from '@/services/testData';
+import { logEvent, setUserProps } from '@/utils/analytics';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -122,6 +125,10 @@ export default function TestProceeding() {
   };
 
   const onPressNext = async () => {
+    // 뒤로가기로 앞 문항에 돌아가 다시 답하면 같은 번호가 또 나간다.
+    // 설계상 이탈 지점은 사용자 수 기준으로 집계한다.
+    logEvent('puppy_test_question_answered', { question_number: step });
+
     if (step < TOTAL_STEPS) {
       setStep(step + 1);
     } else {
@@ -137,6 +144,16 @@ export default function TestProceeding() {
 
         console.log('제출 성공:', res.message);
         console.log('제출 성공:', res.result);
+
+        // 유형 코드는 /main·/auth/me 어디에도 없어서, 앱을 다시 켤 때 사용자 속성으로
+        // 세팅하려면 여기서 남겨두는 수밖에 없다. 서버 응답에 유형이 추가되면
+        // 이 캐시는 지워도 된다.
+        await AsyncStorage.setItem(KEYS.DOG_TYPE, res.result.puppyBreedEn);
+
+        // 앱 실행 시점의 세팅(useAnalyticsUserProps)은 이미 지나갔으므로, 지금 바로
+        // 넣지 않으면 신규 가입자는 다음 실행 전까지 이 속성이 비어 있다.
+        setUserProps({ dog_type: res.result.puppyBreedEn });
+        logEvent('puppy_test_completed', { dog_type: res.result.puppyBreedEn });
 
         // 검사를 마쳤으니 진입 판정의 근거가 되는 서버 상태를 새로 받는다.
         // useMeQuery는 staleTime: Infinity라 무효화하지 않으면 "검사 미완료"가

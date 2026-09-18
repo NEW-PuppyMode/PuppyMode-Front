@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { PUPPY_QUERY_KEYS } from '@/hooks/queries/usePuppyInfoQuery';
 import { loginAPI } from '@/services/auth';
 import { IPuppyInfo } from '@/types/models/puppy';
+import { logEvent } from '@/utils/analytics';
 import { getPuppyGifSource } from '@/utils/dogMapper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommonActions } from '@react-navigation/native';
@@ -64,6 +65,9 @@ const DeleteAccount = () => {
         throw new Error('알 수 없는 로그인 방식입니다.');
       }
 
+      // 탈퇴 API가 성공한 뒤에만 남긴다. 실패하면 catch에서도 logout()을 부르지만
+      // 계정은 그대로이므로 이벤트를 보내면 안 된다.
+      logEvent('account_deleted');
       await logout();
       goHomeAndClearStack();
     } catch (err: unknown) {

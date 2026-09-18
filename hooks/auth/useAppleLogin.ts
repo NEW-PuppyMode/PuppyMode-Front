@@ -2,6 +2,7 @@ import { useEnableNotifications } from '@/hooks/notifications/useEnableNotificat
 import { KEYS } from '@/constants/storage';
 import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { axiosInstance } from '@/services/index';
+import { logEvent } from '@/utils/analytics';
 import { describeToken, logAuthEvent } from '@/utils/tokenDebug';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQueryClient } from '@tanstack/react-query';
@@ -78,6 +79,13 @@ export const useAppleLogin = () => {
         } else {
           await AsyncStorage.removeItem(KEYS.REFRESH_TOKEN);
         }
+
+        // 자동 로그인은 이 훅을 타지 않으므로, 여기 도달했다면 사용자가 직접 로그인한 것이다.
+        logEvent('login_completed', {
+          provider: 'apple',
+          is_new_user: Boolean(result.userInfo?.isNewUser),
+        });
+
         requestAndEnable();
 
         // 카카오 로그인과 같은 이유로 isNewUser 분기를 두지 않는다.
