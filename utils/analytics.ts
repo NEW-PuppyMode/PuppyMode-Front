@@ -73,6 +73,11 @@ export const setUserProps = (props: Partial<AnalyticsUserProps>): void => {
   );
   if (entries.length === 0) return;
 
+  // 어떤 속성이 실제로 나가는지 확인하기 위한 임시 로그. 3단계 검증 후 지워도 된다.
+  if (__DEV__) {
+    console.log('[Analytics] setUserProps', Object.fromEntries(entries));
+  }
+
   const identify = new amplitude.Identify();
   entries.forEach(([key, value]) => {
     identify.set(key, value as string | number | boolean);
@@ -101,6 +106,18 @@ export const setAnalyticsUserId = (userId: string): void => {
 };
 
 /**
+ * Firebase에는 clearAll이 없어 키를 하나씩 null로 덮어야 한다.
+ * AnalyticsUserProps에 속성을 추가하면 여기에도 넣어야 지워진다.
+ */
+const USER_PROP_KEYS: (keyof AnalyticsUserProps)[] = [
+  'dog_type',
+  'login_provider',
+  'current_monthly_goal',
+  'notification_setting',
+  'notification_permission',
+];
+
+/**
  * 로그아웃·탈퇴 시 사용자 식별을 끊는다.
  *
  * userId만 비우고 deviceId는 유지한다. SDK의 reset()은 deviceId까지 새로 발급하는데,
@@ -113,5 +130,16 @@ export const setAnalyticsUserId = (userId: string): void => {
  */
 export const resetAnalyticsUser = (): void => {
   amplitude.setUserId(undefined);
+
+  // 사용자 속성은 이벤트와 달리 덮어쓸 때까지 기기에 계속 붙어 있다. deviceId를
+  // 유지하기로 한 이상 여기서 명시적으로 비우지 않으면, 탈퇴하고 새로 가입해도
+  // 이전 계정의 목표·유형이 그대로 보고된다.
+  amplitude.identify(new amplitude.Identify().clearAll());
+
   analytics().setUserId(null).catch(swallow('resetUserId'));
+  analytics()
+    .setUserProperties(
+      Object.fromEntries(USER_PROP_KEYS.map((key) => [key, null])),
+    )
+    .catch(swallow('clearUserProps'));
 };

@@ -1,4 +1,5 @@
 import { AnalyticsRouteTracker } from '@/components/common/AnalyticsRouteTracker';
+import { AnalyticsUserPropsTracker } from '@/components/common/AnalyticsUserPropsTracker';
 import { CrashlyticsRouteTracker } from '@/components/common/CrashlyticsRouteTracker';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -162,6 +163,7 @@ export default function RootLayout() {
           <EmotionThemeProvider theme={theme}>
             <ErrorBoundary>
               <AnalyticsRouteTracker />
+              <AnalyticsUserPropsTracker />
               <CrashlyticsRouteTracker />
               <Stack>
                 <Stack.Screen name='index' options={{ headerShown: false }} />
