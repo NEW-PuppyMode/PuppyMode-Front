@@ -88,9 +88,7 @@ export const setUserProps = (props: Partial<AnalyticsUserProps>): void => {
   const firebaseProps = Object.fromEntries(
     entries.map(([key, value]) => [key, String(value)]),
   );
-  analytics()
-    .setUserProperties(firebaseProps)
-    .catch(swallow('setUserProps'));
+  analytics().setUserProperties(firebaseProps).catch(swallow('setUserProps'));
 };
 
 /**
