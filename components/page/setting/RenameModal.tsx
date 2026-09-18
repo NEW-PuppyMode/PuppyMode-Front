@@ -2,6 +2,7 @@ import DefaultModal from '@/components/common/DefaultModal';
 import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
+  Easing,
   Keyboard,
   Platform,
   Text,
@@ -24,6 +25,14 @@ interface RenameModalProps {
   onSave: (value: string) => void;
   isPending?: boolean;
 }
+
+/**
+ * 키보드 이벤트가 알려주는 애니메이션 길이(ms).
+ *
+ * Android는 이 값이 항상 0으로 와서(RN KeyboardEvent 타입에 명시되어 있다)
+ * `?? `로는 걸러지지 않는다. 그대로 쓰면 카드가 순간이동한다.
+ */
+const resolveDuration = (duration: number) => (duration > 0 ? duration : 250);
 
 /**
  * 이름 수정 모달.
@@ -72,7 +81,8 @@ const RenameModal = ({
     const showSub = Keyboard.addListener(showEvent, (e) => {
       Animated.timing(translateY, {
         toValue: -e.endCoordinates.height / 2,
-        duration: e.duration ?? 250,
+        duration: resolveDuration(e.duration),
+        easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }).start();
     });
@@ -80,7 +90,8 @@ const RenameModal = ({
     const hideSub = Keyboard.addListener(hideEvent, (e) => {
       Animated.timing(translateY, {
         toValue: 0,
-        duration: e.duration ?? 250,
+        duration: resolveDuration(e.duration),
+        easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }).start();
     });
@@ -120,7 +131,7 @@ const RenameModal = ({
             />
           </View>
 
-          <View className='flex-row gap-[10px] h-[48px]'>
+          <View className='flex-row gap-[10px] h-[58px]'>
             <TouchableOpacity
               onPress={() => setVisible(false)}
               className='w-[148px] h-[48px] rounded-[5px] bg-grayscale-50 items-center justify-center'
