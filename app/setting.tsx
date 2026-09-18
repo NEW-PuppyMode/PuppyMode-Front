@@ -1,22 +1,26 @@
 import DefaultModal from '@/components/common/DefaultModal';
 import ChevronLeftImage from '@/assets/images/chevron_left.png';
 import PolicyModal from '@/components/page/setting/PolicyModal';
+import RenameModal from '@/components/page/setting/RenameModal';
 import SettingBtn from '@/components/page/setting/SettingBtn';
+import {
+  SettingDivider,
+  SettingSectionHeader,
+} from '@/components/page/setting/SettingSection';
 import { APP_VERSION } from '@/constants/appVersion';
 import { POLICY_MESSAGES } from '@/constants/messages';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEnableNotifications } from '@/hooks/notifications/useEnableNotifications';
+import { useRenamePuppyMutation } from '@/hooks/mutations/useRenamePuppyMutation';
 import {
   useNotificationSettingQuery,
   useUpdateNotificationSettingMutation,
 } from '@/hooks/queries/useNotificationSettingQuery';
-import { PUPPY_QUERY_KEYS } from '@/hooks/queries/usePuppyInfoQuery';
-import { logEvent } from '@/utils/analytics';
 import {
-  getIosNotificationPermissionStatus,
-  hasGrantedIosNotificationPermission,
-  requestIosNotificationPermission,
-} from '@/utils/notificationPermission';
+  PUPPY_QUERY_KEYS,
+  usePuppyInfoQuery,
+} from '@/hooks/queries/usePuppyInfoQuery';
+import { logEvent } from '@/utils/analytics';
 import messaging from '@react-native-firebase/messaging';
 import { useQueryClient } from '@tanstack/react-query';
 import { router, useFocusEffect } from 'expo-router';
@@ -26,7 +30,7 @@ import {
   AppState,
   Image,
   Linking,
-  Platform,
+  ScrollView,
   StyleSheet,
   Switch,
   Text,
@@ -42,8 +46,12 @@ const Setting = () => {
   >('terms_of_uses');
 
   const [signOutModalVisible, setSignOutModalVisible] = useState(false);
+  const [puppyNameModalVisible, setPuppyNameModalVisible] = useState(false);
 
   const { logout } = useAuth();
+  const { data: puppyInfo } = usePuppyInfoQuery();
+  const { mutate: renamePuppy, isPending: isRenamingPuppy } =
+    useRenamePuppyMutation();
   const { data: notificationSetting } = useNotificationSettingQuery();
   const { mutate: updateNotificationSetting } =
     useUpdateNotificationSettingMutation();
@@ -77,6 +85,17 @@ const Setting = () => {
   const showPermissionNotice =
     !hasNotifPermission && !!notificationSetting?.receiveNotifications;
 
+  const handleRenamePuppy = (puppyName: string) => {
+    renamePuppy(puppyName, {
+      onSuccess: () => setPuppyNameModalVisible(false),
+      onError: () => {
+        Alert.alert('이름을 바꾸지 못했어요', '잠시 후 다시 시도해 주세요.', [
+          { text: '확인' },
+        ]);
+      },
+    });
+  };
+
   const handleNotificationToggle = (value: boolean) => {
     if (value && !hasNotifPermission) {
       requestAndEnable();
@@ -88,42 +107,6 @@ const Setting = () => {
   // useEffect(() => {
   //   crashlytics().log('screen: /setting mounted');
   // }, []);
-
-  const handleNotificationSettingPress = async () => {
-    if (Platform.OS !== 'ios') {
-      void Linking.openSettings();
-      return;
-    }
-
-    const currentPermission = await getIosNotificationPermissionStatus();
-    const hasPermission = await requestIosNotificationPermission();
-
-    if (hasPermission) {
-      if (
-        currentPermission &&
-        !hasGrantedIosNotificationPermission(currentPermission)
-      ) {
-        return;
-      }
-
-      void Linking.openSettings();
-      return;
-    }
-
-    Alert.alert(
-      '알림 권한이 꺼져 있어요',
-      'iOS에서는 앱 설정에서 알림 권한을 다시 변경할 수 있어요.',
-      [
-        { text: '취소', style: 'cancel' },
-        {
-          text: '설정 열기',
-          onPress: () => {
-            void Linking.openSettings();
-          },
-        },
-      ],
-    );
-  };
 
   return (
     <View style={styles.container}>
@@ -158,63 +141,89 @@ const Setting = () => {
         <View style={{ width: 40 }} />
       </View>
 
-      <View style={styles.view}>
-        <Text style={styles.text}>알림 수신</Text>
-        <Switch
-          value={notificationSetting?.receiveNotifications ?? false}
-          onValueChange={handleNotificationToggle}
-          trackColor={{ false: '#E0E0E0', true: '#00A775' }}
-          thumbColor='#ffffff'
+      <ScrollView>
+        <SettingSectionHeader title='내 프로필' />
+        {/*
+          사용자 이름 행은 서버가 현재 이름을 내려주지 않아 아직 넣지 않았다.
+          GET /main에 currentMyName이 추가되면 강아지 이름 행과 같은 형태로 붙인다.
+        */}
+        <SettingBtn
+          title='강아지 이름'
+          value={puppyInfo?.currentPuppyName}
+          onPress={() => setPuppyNameModalVisible(true)}
+          hideBorder
         />
-      </View>
 
-      {showPermissionNotice && (
-        <TouchableOpacity
-          style={styles.permissionNotice}
-          activeOpacity={0.7}
-          onPress={() => Linking.openSettings()}
-        >
-          <Text style={styles.permissionNoticeText}>
-            기기 알림이 꺼져 있어 알림을 받을 수 없어요.
-          </Text>
-          <Text style={styles.permissionNoticeAction}>설정 열기</Text>
-        </TouchableOpacity>
-      )}
+        <SettingDivider />
 
-      <SettingBtn
-        title='이용약관'
-        onPress={() => {
-          setPolicyModalVisible(true);
-          setPolicyModalType('terms_of_uses');
-        }}
+        <SettingSectionHeader title='일반' />
+        <View style={styles.view}>
+          <Text style={styles.text}>알림 수신</Text>
+          <Switch
+            value={notificationSetting?.receiveNotifications ?? false}
+            onValueChange={handleNotificationToggle}
+            trackColor={{ false: '#E0E0E0', true: '#00A775' }}
+            thumbColor='#ffffff'
+          />
+        </View>
+
+        {showPermissionNotice && (
+          <TouchableOpacity
+            style={styles.permissionNotice}
+            activeOpacity={0.7}
+            onPress={() => Linking.openSettings()}
+          >
+            <Text style={styles.permissionNoticeText}>
+              기기 알림이 꺼져 있어 알림을 받을 수 없어요.
+            </Text>
+            <Text style={styles.permissionNoticeAction}>설정 열기</Text>
+          </TouchableOpacity>
+        )}
+
+        <SettingBtn
+          title='이용약관'
+          onPress={() => {
+            setPolicyModalVisible(true);
+            setPolicyModalType('terms_of_uses');
+          }}
+        />
+        <SettingBtn
+          title='개인정보 처리방침'
+          onPress={() => {
+            setPolicyModalVisible(true);
+            setPolicyModalType('privacy_policies');
+          }}
+        />
+
+        <SettingDivider />
+
+        <SettingBtn
+          title='탈퇴하기'
+          onPress={() => {
+            router.push('/delete_account');
+          }}
+        />
+        <SettingBtn
+          title='로그아웃'
+          onPress={() => {
+            setSignOutModalVisible(true);
+          }}
+        />
+        <View style={[styles.view, styles.noBorder]}>
+          <Text style={styles.text}>앱 버전</Text>
+          <Text style={styles.text}>{APP_VERSION}</Text>
+        </View>
+      </ScrollView>
+
+      <RenameModal
+        visible={puppyNameModalVisible}
+        setVisible={setPuppyNameModalVisible}
+        title='강아지 이름 수정'
+        description='내 강아지의 새 이름을 지어주세요'
+        initialValue={puppyInfo?.currentPuppyName ?? ''}
+        onSave={handleRenamePuppy}
+        isPending={isRenamingPuppy}
       />
-      <SettingBtn
-        title='개인정보 처리방침'
-        onPress={() => {
-          setPolicyModalVisible(true);
-          setPolicyModalType('privacy_policies');
-        }}
-      />
-      <SettingBtn
-        title='알림 설정'
-        onPress={handleNotificationSettingPress}
-      />
-      <SettingBtn
-        title='탈퇴하기'
-        onPress={() => {
-          router.push('/delete_account');
-        }}
-      />
-      <SettingBtn
-        title='로그아웃'
-        onPress={() => {
-          setSignOutModalVisible(true);
-        }}
-      />
-      <View style={styles.view}>
-        <Text style={styles.text}>앱 버전</Text>
-        <Text style={styles.text}>{APP_VERSION}</Text>
-      </View>
 
       <PolicyModal
         title={
@@ -282,7 +291,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F1F1',
+    borderBottomColor: '#F8F8F8',
+  },
+  noBorder: {
+    borderBottomWidth: 0,
   },
   text: {
     color: '#282828',

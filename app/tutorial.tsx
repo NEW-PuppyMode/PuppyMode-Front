@@ -298,7 +298,8 @@ export default function TutorialScreen() {
   // 진입 값이 확정되기 전에는 그리지 않는다. (홈과 동일한 처리)
   if (displayedLevel === null || displayedPercent === null) return null;
 
-  const displayName = puppyInfo?.puppyLevelName ?? '';
+  const breedName = puppyInfo?.puppyLevelName ?? ''; // 강아지 종 ex)눈송이 비숑
+  const puppyName = puppyInfo?.currentPuppyName ?? ''; // 강아지 이름
   const dimmed = step === 1 || step === 2 || step === 5 || step === 6;
   const recordMode = step >= 2;
 
@@ -346,7 +347,7 @@ export default function TutorialScreen() {
         <View pointerEvents='none' style={{ flex: 1 }}>
           <ProgressCard
             level={displayedLevel}
-            displayName={displayName}
+            puppyName={puppyName}
             percent={displayedPercent}
             levelUpEvent={levelUpEvent}
           />
@@ -424,7 +425,7 @@ export default function TutorialScreen() {
           <View pointerEvents='none'>
             <TopBar
               level={displayedLevel}
-              displayName={displayName}
+              puppyName={puppyName}
               percent={displayedPercent}
               levelUpEvent={levelUpEvent}
               onCardLayout={(e) => {
@@ -546,7 +547,7 @@ export default function TutorialScreen() {
         {/* ===== 강아지 ===== */}
         <View pointerEvents='none' style={styles.gifLayer}>
           <EvolvingPuppy
-            breedName={displayName}
+            breedName={breedName}
             level={displayedLevel}
             reaction={reaction}
             evolveEvent={levelUpEvent}

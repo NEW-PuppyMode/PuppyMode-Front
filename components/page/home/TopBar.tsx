@@ -8,7 +8,7 @@ import { TouchableOpacity, type ViewProps } from 'react-native';
 
 interface Props {
   level: number;
-  displayName: string;
+  puppyName: string;
   percent: number;
   levelUpEvent?: LevelUpEvent | null;
   /** 경험치 카드의 위치. 튜토리얼이 카드만 스포트라이트로 띄우는 데 쓴다. */
@@ -17,7 +17,7 @@ interface Props {
 
 export function TopBar({
   level,
-  displayName,
+  puppyName,
   percent,
   levelUpEvent,
   onCardLayout,
@@ -33,7 +33,7 @@ export function TopBar({
       {/* 좌측 컴포넌트바 */}
       <ProgressCard
         level={level}
-        displayName={displayName}
+        puppyName={puppyName}
         percent={percent}
         levelUpEvent={levelUpEvent}
         onLayout={onCardLayout}
