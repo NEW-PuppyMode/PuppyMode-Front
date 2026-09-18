@@ -6,11 +6,16 @@ interface SettingBtnProps {
   onPress: () => void;
   /** 우측 화살표 앞에 함께 보여줄 현재 값. e.g. 이름 행의 '정현우' */
   value?: string;
+  /** 그룹의 마지막 행이라 아래 구분선을 그리지 않을 때 */
+  hideBorder?: boolean;
 }
 
-const SettingBtn = ({ title, onPress, value }: SettingBtnProps) => {
+const SettingBtn = ({ title, onPress, value, hideBorder }: SettingBtnProps) => {
   return (
-    <TouchableOpacity onPress={onPress} style={styles.button}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[styles.button, hideBorder && styles.noBorder]}
+    >
       <Text style={styles.text}>{title}</Text>
       <View style={styles.right}>
         {!!value && <Text style={styles.text}>{value}</Text>}
@@ -29,7 +34,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F1F1',
+    borderBottomColor: '#F8F8F8',
+  },
+  noBorder: {
+    borderBottomWidth: 0,
   },
   right: {
     flexDirection: 'row',
