@@ -1,4 +1,5 @@
 import { useUpdateNotificationSettingMutation } from '@/hooks/queries/useNotificationSettingQuery';
+import { logNotificationPermissionResponse } from '@/utils/notificationPermission';
 import { fcmAPI } from '@/services/fcm';
 import notifee, { AuthorizationStatus } from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
@@ -34,6 +35,8 @@ export const useEnableNotifications = () => {
       const enabled =
         settings.authorizationStatus === AuthorizationStatus.AUTHORIZED ||
         settings.authorizationStatus === AuthorizationStatus.PROVISIONAL;
+
+      await logNotificationPermissionResponse(enabled);
 
       if (enabled) {
         await registerTokenAndEnable();

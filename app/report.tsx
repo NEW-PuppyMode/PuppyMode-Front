@@ -1,6 +1,7 @@
 import { useReportQuery } from '@/hooks/queries/useReportQuery';
+import { logEvent } from '@/utils/analytics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -23,6 +24,15 @@ const Report = () => {
     Number(year),
     Number(month),
   );
+
+  // achievement_rate는 응답이 와야 알 수 있어서 화면 진입이 아니라 데이터 도착
+  // 시점에 남긴다. 리페치로 data가 다시 들어와도 한 번만 남기도록 막는다.
+  const loggedRef = useRef(false);
+  useEffect(() => {
+    if (!data || loggedRef.current) return;
+    loggedRef.current = true;
+    logEvent('report_viewed', { achievement_rate: data.achievementRate });
+  }, [data]);
 
   const daysInMonth = useMemo(
     () => new Date(Number(year), Number(month), 0).getDate(),
