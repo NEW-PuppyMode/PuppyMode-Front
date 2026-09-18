@@ -105,16 +105,4 @@ export function useAnalyticsUserProps() {
     if (receiveNotifications === undefined) return;
     setUserProps({ notification_setting: receiveNotifications });
   }, [receiveNotifications]);
-
-  // 어떤 속성이 언제 세팅되는지 눈으로 확인하기 위한 임시 로그.
-  // 3단계 검증이 끝나면 지워도 된다.
-  useEffect(() => {
-    if (!__DEV__) return;
-    console.log('[Analytics] 게이트', {
-      pathname,
-      isLoggedIn,
-      monthlyGoal,
-      receiveNotifications,
-    });
-  }, [pathname, isLoggedIn, monthlyGoal, receiveNotifications]);
 }

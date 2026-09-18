@@ -79,11 +79,6 @@ export const setUserProps = (props: Partial<AnalyticsUserProps>): void => {
   );
   if (entries.length === 0) return;
 
-  // 어떤 속성이 실제로 나가는지 확인하기 위한 임시 로그. 3단계 검증 후 지워도 된다.
-  if (__DEV__) {
-    console.log('[Analytics] setUserProps', Object.fromEntries(entries));
-  }
-
   const identify = new amplitude.Identify();
   entries.forEach(([key, value]) => {
     identify.set(key, value as string | number | boolean);
