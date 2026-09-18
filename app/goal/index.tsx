@@ -4,7 +4,6 @@ import { OnboardingLayout } from '@/components/page/onboarding/OnboardingLayout'
 import { useCreateGoalMutation } from '@/hooks/mutations/useCreateGoalMutation';
 import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
-import { logButtonTap } from '@/utils/analytics';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -30,9 +29,12 @@ export default function GoalRenewal() {
   const [count, setCount] = useState(10);
 
   const handleSubmit = async () => {
-    logButtonTap('goal_renewal_submit');
     try {
-      await createGoalMutation.mutateAsync({ goal: count, isNew: true });
+      await createGoalMutation.mutateAsync({
+        goal: count,
+        isNew: true,
+        entryPoint: 'renewal',
+      });
 
       // 홈은 isGoal로 이 화면 진입을 판정한다. 갱신된 /main을 받기 전에 돌아가면
       // 홈이 다시 여기로 보내므로, 재요청이 끝난 뒤에 이동한다.

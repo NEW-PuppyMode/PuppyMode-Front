@@ -100,7 +100,11 @@ export default function Onboarding() {
 
   const handleGoal = async () => {
     try {
-      await createGoalMutation.mutateAsync({ goal: count, isNew: true });
+      await createGoalMutation.mutateAsync({
+        goal: count,
+        isNew: true,
+        entryPoint: 'onboarding',
+      });
       await goNext();
     } catch (error) {
       console.log('온보딩 목표 설정 실패:', error);

@@ -21,6 +21,7 @@ export type AnalyticsEventMap = {
      */
     is_new_user: boolean;
   };
+
   logout: undefined;
   account_deleted: undefined;
 
@@ -40,9 +41,21 @@ export type AnalyticsEventMap = {
   tutorial_completed: undefined;
 
   // ===== 목표 설정 =====
+  /**
+   * 목표 저장 완료.
+   *
+   * 주의: entry_point 'home'과 goal_type 'same'은 현재 **나올 수 없다**.
+   * 홈의 목표 설정 UI는 isGoal === false일 때만 렌더되는데(app/home.tsx),
+   * 같은 조건에서 홈이 /goal로 리다이렉트해버려 버튼을 누를 틈이 없다.
+   * '지난 달이랑 똑같아'(= 'same')도 그 UI 안에 있어서 함께 도달 불가다.
+   * 그러니 이 두 값이 0건인 것은 계측 누락이 아니다.
+   *
+   * 계측은 그대로 붙여둔다. UI가 되살아나면 바로 잡힌다.
+   */
   goal_setup_completed: {
     entry_point: 'onboarding' | 'renewal' | 'home';
     goal_type: 'same' | 'new';
+    /** '지난 달과 동일'은 요청에 0을 보내므로 입력값이 아니라 응답값을 쓴다. */
     monthly_goal: number;
   };
 

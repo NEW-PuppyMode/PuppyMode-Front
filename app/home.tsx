@@ -592,6 +592,7 @@ export default function HomeScreen() {
                       await createGoalMutation.mutateAsync({
                         goal: goalCount,
                         isNew: true,
+                        entryPoint: 'home',
                       });
                       setShowGoalInput(false);
                       setShowGoalOptions(false);
@@ -635,6 +636,7 @@ export default function HomeScreen() {
                           await createGoalMutation.mutateAsync({
                             goal: 0,
                             isNew: false,
+                            entryPoint: 'home',
                           });
                         }}
                         disabled={!recentGoal}
