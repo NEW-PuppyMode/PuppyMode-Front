@@ -30,7 +30,7 @@ import { useIsRecordedQuery } from '@/hooks/queries/useIsRecordedQuery';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
 import { useVersionCheckQuery } from '@/hooks/queries/useVersionCheckQuery';
-import { logButtonTap } from '@/utils/analytics';
+import { logButtonTap, logEvent } from '@/utils/analytics';
 import { maxDaysInMonth } from '@/utils/dateUtils';
 import { router } from 'expo-router';
 import { throttle } from 'lodash';
@@ -236,6 +236,7 @@ export default function HomeScreen() {
     try {
       if (inputType === 'dog' && dogName.trim()) {
         await renamePuppyMutation.mutateAsync(dogName);
+        logEvent('name_set', { target: 'dog', source: 'home' });
         setShowMessage(true);
         const randomIndex = Math.floor(
           Math.random() * DOG_NAME_MESSAGES.length,
@@ -246,6 +247,7 @@ export default function HomeScreen() {
         setInputType(null);
       } else if (inputType === 'user' && userName.trim()) {
         await renameUserMutation.mutateAsync(userName);
+        logEvent('name_set', { target: 'user', source: 'home' });
         setShowMessage(true);
         const randomIndex = Math.floor(
           Math.random() * USER_NAME_MESSAGES.length,

@@ -30,8 +30,14 @@ export type AnalyticsEventMap = {
   puppy_test_completed: { dog_type: string };
   name_set: { target: 'dog' | 'user'; source: 'onboarding' | 'home' };
   tutorial_step_completed: { step_number: number };
-  /** 튜토리얼까지 마치고 홈으로 진입 = 신규 사용자 여정의 끝 */
-  onboarding_completed: undefined;
+  /**
+   * 튜토리얼을 끝내고 홈으로 들어간 시점. 신규 사용자 여정(로그인 → 유형 검사 →
+   * 온보딩 → 튜토리얼)의 마지막이기도 하다.
+   *
+   * 이름을 onboarding_completed로 두면 /onboarding 화면이 끝날 때 나갈 것처럼
+   * 읽히는데, 실제로는 그보다 한참 뒤인 튜토리얼 끝에서 나간다.
+   */
+  tutorial_completed: undefined;
 
   // ===== 목표 설정 =====
   goal_setup_completed: {

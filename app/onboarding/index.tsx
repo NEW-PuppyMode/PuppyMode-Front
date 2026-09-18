@@ -7,7 +7,7 @@ import { useRenamePuppyMutation } from '@/hooks/mutations/useRenamePuppyMutation
 import { useRenameUserMutation } from '@/hooks/mutations/useRenameUserMutation';
 import { useCompleteOnboarding } from '@/hooks/onboarding/useCompleteOnboarding';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
-import { logButtonTap } from '@/utils/analytics';
+import { logEvent } from '@/utils/analytics';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Alert, StyleSheet, Text } from 'react-native';
 
@@ -75,9 +75,9 @@ export default function Onboarding() {
   const handlePuppyName = async () => {
     const trimmed = dogName.trim();
     if (!trimmed) return;
-    logButtonTap('onboarding_puppy_name_next');
     try {
       await renamePuppyMutation.mutateAsync(trimmed);
+      logEvent('name_set', { target: 'dog', source: 'onboarding' });
       await goNext();
     } catch (error) {
       console.log('온보딩 강아지 이름 설정 실패:', error);
@@ -88,9 +88,9 @@ export default function Onboarding() {
   const handleUserName = async () => {
     const trimmed = userName.trim();
     if (!trimmed) return;
-    logButtonTap('onboarding_user_name_next');
     try {
       await renameUserMutation.mutateAsync(trimmed);
+      logEvent('name_set', { target: 'user', source: 'onboarding' });
       await goNext();
     } catch (error) {
       console.log('온보딩 사용자 이름 설정 실패:', error);
@@ -99,7 +99,6 @@ export default function Onboarding() {
   };
 
   const handleGoal = async () => {
-    logButtonTap('onboarding_goal_next');
     try {
       await createGoalMutation.mutateAsync({ goal: count, isNew: true });
       await goNext();
