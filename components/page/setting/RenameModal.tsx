@@ -1,7 +1,8 @@
 import DefaultModal from '@/components/common/DefaultModal';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
-  KeyboardAvoidingView,
+  Animated,
+  Keyboard,
   Platform,
   Text,
   TextInput,
@@ -45,6 +46,7 @@ const RenameModal = ({
   isPending = false,
 }: RenameModalProps) => {
   const [value, setValue] = useState(initialValue);
+  const translateY = useRef(new Animated.Value(0)).current;
 
   // 모달을 열 때마다 현재 이름으로 되돌린다. 취소로 닫은 뒤 다시 열었을 때
   // 직전에 입력하다 만 값이 남아 있지 않게 하려는 것이다.
@@ -52,13 +54,49 @@ const RenameModal = ({
     if (visible) setValue(initialValue);
   }, [visible, initialValue]);
 
+  /**
+   * 키보드가 올라오면 카드를 키보드 높이의 절반만큼 끌어올린다.
+   *
+   * 카드는 화면 정중앙(화면높이/2)에 있고, 키보드를 뺀 영역의 중앙은
+   * (화면높이 - 키보드높이)/2 이므로 그 차이가 정확히 키보드높이/2다.
+   * 키보드 높이만큼 통째로 밀면 카드가 화면 위쪽에 붙어버린다.
+   */
+  useEffect(() => {
+    if (!visible) return;
+
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      Animated.timing(translateY, {
+        toValue: -e.endCoordinates.height / 2,
+        duration: e.duration ?? 250,
+        useNativeDriver: true,
+      }).start();
+    });
+
+    const hideSub = Keyboard.addListener(hideEvent, (e) => {
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: e.duration ?? 250,
+        useNativeDriver: true,
+      }).start();
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+      translateY.setValue(0);
+    };
+  }, [visible, translateY]);
+
   const canSave = !!value.trim() && !isPending;
 
   return (
     <DefaultModal visible={visible} setVisible={setVisible}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+      <Animated.View style={{ transform: [{ translateY }] }}>
         <View className='items-center px-[15px] pt-[25px] pb-[15px] w-[336px] bg-white rounded-[10px]'>
           <Text className='font-semibold text-[18px] leading-[22px] tracking-[-0.54px] text-grayscale-700'>
             {title}
@@ -106,7 +144,7 @@ const RenameModal = ({
             </TouchableOpacity>
           </View>
         </View>
-      </KeyboardAvoidingView>
+      </Animated.View>
     </DefaultModal>
   );
 };
