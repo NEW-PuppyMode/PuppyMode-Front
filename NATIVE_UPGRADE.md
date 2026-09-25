@@ -9,14 +9,17 @@
 
 ## 0. 이 프로젝트의 워크플로 (왜 조심해야 하나)
 
-이 프로젝트는 순수 CNG도, 순수 bare도 아닌 **하이브리드**입니다.
+이 프로젝트는 네이티브 폴더를 커밋해두고 쓰기 때문에, **개발이든 릴리즈든 prebuild가 돌지 않습니다.**
 
 | 용도 | 명령 | prebuild 실행? |
 |------|------|:-:|
-| 개발 | `npx expo run:android` / `expo start` | ✅ 내부에서 prebuild가 돎 → config plugin 적용됨 |
+| 개발 | `npx expo run:android` / `expo start` | ❌ 안 돎 → `android/` 폴더가 이미 있으면 건너뜀 |
 | 릴리즈 | `cd android && ./gradlew bundleRelease` | ❌ 안 돎 → 커밋된 `android/` 폴더를 그대로 빌드 |
 
-즉 **릴리즈는 디스크의 네이티브 폴더가 단일 진실 공급원**입니다. 그래서 네이티브 폴더를 커밋해두고, 필요한 커스텀도 그 안에 직접 넣어둡니다.
+`expo run:android`는 **해당 플랫폼 폴더가 없을 때만** prebuild를 돌립니다. (`@expo/cli` 의 `run/ensureNativeProject.js` — `fs.existsSync(android)` 면 곧바로 빌드로 넘어감)
+
+즉 **디스크의 네이티브 폴더가 개발·릴리즈 공통의 단일 진실 공급원**입니다. 그래서 네이티브 폴더를 커밋해두고, 필요한 커스텀도 그 안에 직접 넣어둡니다.
+`app.json`과 config plugin은 매 빌드에 적용되는 설정이 아니라 **prebuild를 돌릴 때만 반영되는 생성기**로 이해하세요. `app.json`만 고치고 빌드하면 아무 일도 일어나지 않습니다.
 `prebuild --clean`은 **연 1회 SDK 업그레이드 같은 큰 변화 때만** 쓰고, 그 외에는 네이티브 폴더를 손으로 관리합니다.
 
 ---
