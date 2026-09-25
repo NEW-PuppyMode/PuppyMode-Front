@@ -57,6 +57,9 @@ cd PuppyMode-Front
 npm install
 ```
 
+패키지를 새로 추가할 때는 `npx expo install <패키지>` 를 쓰세요. SDK 54 와 호환되는
+버전으로 맞춰 설치됩니다. 인자 없이 `npx expo install` 만 실행하면 `npm install` 과 같습니다.
+
 ### 2. 환경변수
 
 ```bash
@@ -79,14 +82,21 @@ cp android/gradle.properties.example android/gradle.properties
 ### 4. 실행
 
 ```bash
-npm run android      # expo run:android
-npm run ios          # expo run:ios (macOS)
-npm start            # Metro만 실행 (이미 빌드된 앱에 붙일 때)
-npm run lint
+# 최초 1회 · 네이티브 코드나 의존성이 바뀌었을 때 (첫 빌드 10~20분)
+npx expo run:android          # 빌드 → 기기·에뮬레이터 설치 → Metro 자동 실행
+
+# 이후 JS 만 수정할 때
+npx expo start --dev-client   # Metro 만 실행, 설치된 앱이 여기에 붙음
 ```
 
-`npm run android` 는 `android/` 폴더가 있으면 prebuild를 건너뛰고 기존 네이티브 프로젝트를
-그대로 빌드합니다.
+- `run:android` 가 Metro 를 함께 띄우므로 앞에 `expo start` 를 따로 실행할 필요는 없습니다.
+- `--dev-client` 는 Expo Go 가 아니라 `run:android` 로 설치한 앱에 연결하라는 뜻입니다.
+- `.env` 나 MSW 시나리오를 바꿨다면 캐시를 지웁니다 → `npx expo start -c --dev-client`
+- `npx expo run:ios` 는 macOS 전용입니다. 위 iOS 주의사항을 먼저 확인하세요.
+- `npm run android` · `npm run ios` · `npm start` · `npm run lint` 는 각각의 단축 스크립트입니다.
+
+`npx expo run:android` 는 `android/` 폴더가 있으면 prebuild를 건너뛰고 기존 네이티브
+프로젝트를 그대로 빌드합니다.
 
 ---
 
@@ -126,9 +136,22 @@ android/ ios/  커밋된 네이티브 프로젝트
 
 ### Android
 
+모든 명령은 **프로젝트 루트**에서 시작합니다.
+
 ```bash
+rm -rf android/app/build     # 이전 빌드 산출물 제거 (JS 번들 · 리소스 · 이전 AAB)
 cd android
 ./gradlew bundleRelease      # AAB (Play Console 업로드용)
+```
+
+릴리즈 AAB 는 대부분 그대로 업로드하므로, 이전 빌드가 섞이지 않도록
+`android/app/build` 를 지우고 시작합니다.
+
+네이티브 의존성을 추가·제거했거나 SDK · NDK 버전을 바꿨다면 네이티브 빌드 캐시까지 지웁니다.
+C++ 재컴파일이 들어가 빌드가 오래 걸리므로, 해당할 때만 실행하세요.
+
+```bash
+rm -rf android/app/build android/app/.cxx android/build
 ```
 
 이 경로는 **prebuild를 거치지 않으므로** `app.json` 변경이 반영되지 않습니다.
