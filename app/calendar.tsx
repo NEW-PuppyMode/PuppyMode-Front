@@ -1,7 +1,9 @@
+import AchievementChips from '@/components/page/calendar/AchievementChips';
 import { useCalendarQuery } from '@/hooks/queries/useCalendarQuery';
 import { useGoalMonthsQuery } from '@/hooks/queries/useGoalMonthsQuery';
-import { logEvent } from '@/utils/analytics';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
+import { useReportQuery } from '@/hooks/queries/useReportQuery';
+import { logEvent } from '@/utils/analytics';
 import { getCalendarDogImage } from '@/utils/dogMapper';
 import { Stack, useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
@@ -9,6 +11,7 @@ import {
   Dimensions,
   Image,
   Modal,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -288,6 +291,10 @@ export default function CalendarPage() {
     return map;
   };
 
+  // 상단 목표 칩. 리포트 화면과 같은 쿼리라 캐시를 같이 쓴다.
+  const { data: report } = useReportQuery(calendarYear, calendarMonth);
+  const [isTooltipOpen, setTooltipOpen] = useState(false);
+
   const markedDates = useMemo(
     () => (calendarData ? mapApiToMarkedDates(calendarData) : {}),
     [calendarData],
@@ -339,6 +346,7 @@ export default function CalendarPage() {
       });
     }
     setCurrentDate(newDate);
+    setTooltipOpen(false);
     setModalVisible(false);
   };
 
@@ -412,7 +420,7 @@ export default function CalendarPage() {
           </TouchableOpacity>
         </View>
 
-        <View className='flex-row items-center justify-center mt-5'>
+        <View className='flex-row items-center justify-center'>
           {/* NativeWind v2의 gap-*은 "부모에 음수 마진 + 자식에 양수 마진"으로 흉내 내는
               방식이라 부모 박스가 위/왼쪽으로 밀린다. RN 0.79의 네이티브 gap을 쓴다. */}
           <TouchableOpacity
@@ -429,6 +437,19 @@ export default function CalendarPage() {
               source={require('@/assets/images/grey_arrow_bottom.png')}
             />
           </TouchableOpacity>
+        </View>
+
+        {/* 목표 칩. 불러오는 동안 높이를 잡아 둬서 달력이 튀지 않게 한다. */}
+        <View className='mt-5' style={{ zIndex: 10 }}>
+          {report ? (
+            <AchievementChips
+              report={report}
+              isTooltipOpen={isTooltipOpen}
+              onToggleTooltip={() => setTooltipOpen((open) => !open)}
+            />
+          ) : (
+            <View className='h-[38px]' />
+          )}
         </View>
 
         <View className='px-2'>
@@ -480,6 +501,14 @@ export default function CalendarPage() {
             </Text>
           </TouchableOpacity>
         </View>
+
+        {/* 말풍선이 열려 있으면 칩 바깥 아무 데나 눌러 닫는다. 칩 줄은 이보다 위에 있다. */}
+        {isTooltipOpen && (
+          <Pressable
+            style={[StyleSheet.absoluteFill, { zIndex: 5 }]}
+            onPress={() => setTooltipOpen(false)}
+          />
+        )}
 
         {/* 월 선택 모달 */}
         <Modal
