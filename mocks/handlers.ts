@@ -1,5 +1,6 @@
 // import { calendarHandlers } from './api/calendar';
 // import { onboardHandlers } from './api/onboard';
+import { calendarAchievementHandlers } from './api/calendarAchievement';
 import {
   calendarMonthsEmptyHandlers,
   calendarMonthsErrorHandlers,
@@ -16,12 +17,14 @@ import { puppyHandlers } from './api/puppy';
  * - goalRenewal: 온보딩을 마친 사용자의 월간 목표 갱신 (mocks/api/goalRenewal.ts)
  * - calendarMonths / calendarMonthsEmpty / calendarMonthsError:
  *   캘린더 월 선택 모달의 월·연도 비활성화 (mocks/api/calendarMonths.ts)
+ * - calendarAchievement: 캘린더 상단 목표 달성 칩의 월별 상태 (mocks/api/calendarAchievement.ts)
  */
 const scenarios = {
   goalRenewal: goalRenewalHandlers,
   calendarMonths: calendarMonthsHandlers,
   calendarMonthsEmpty: calendarMonthsEmptyHandlers,
   calendarMonthsError: calendarMonthsErrorHandlers,
+  calendarAchievement: calendarAchievementHandlers,
 };
 
 const scenario = process.env.EXPO_PUBLIC_MOCK_SCENARIO as
