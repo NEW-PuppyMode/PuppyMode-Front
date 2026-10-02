@@ -71,6 +71,8 @@ export type AnalyticsEventMap = {
   // ===== 조회 및 리포트 =====
   /** 캘린더에서 월 선택 모달로 다른 달을 확정한 시점 */
   calendar_month_changed: { month_offset: number };
+  /** 캘린더 상단 달성 확률 칩에서 설명 말풍선을 연 시점. 닫을 때는 남기지 않는다. */
+  achievement_rate_tooltip_opened: { achievement_rate: number };
   report_viewed: { achievement_rate: number };
 
   // ===== 설정 및 알림 =====

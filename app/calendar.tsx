@@ -295,6 +295,16 @@ export default function CalendarPage() {
   const { data: report } = useReportQuery(calendarYear, calendarMonth);
   const [isTooltipOpen, setTooltipOpen] = useState(false);
 
+  // 칩은 IN_PROGRESS일 때만 눌리므로 report가 항상 있다.
+  const handleToggleTooltip = () => {
+    if (!isTooltipOpen && report) {
+      logEvent('achievement_rate_tooltip_opened', {
+        achievement_rate: report.achievementRate,
+      });
+    }
+    setTooltipOpen(!isTooltipOpen);
+  };
+
   const markedDates = useMemo(
     () => (calendarData ? mapApiToMarkedDates(calendarData) : {}),
     [calendarData],
@@ -445,7 +455,7 @@ export default function CalendarPage() {
             <AchievementChips
               report={report}
               isTooltipOpen={isTooltipOpen}
-              onToggleTooltip={() => setTooltipOpen((open) => !open)}
+              onToggleTooltip={handleToggleTooltip}
             />
           ) : (
             <View className='h-[38px]' />
