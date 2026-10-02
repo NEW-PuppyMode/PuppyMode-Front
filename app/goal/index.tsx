@@ -6,9 +6,10 @@ import { useCreateGoalMutation } from '@/hooks/mutations/useCreateGoalMutation';
 import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { useReportQuery } from '@/hooks/queries/useReportQuery';
+import { logEvent } from '@/utils/analytics';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, ImageBackground, StyleSheet, Text, View } from 'react-native';
 
 // 리포트 스텝의 강아지 말풍선. 지난 달 목표를 달성했는지에 따라 다르다.
@@ -50,6 +51,20 @@ export default function GoalRenewal() {
   const [isReportDone, setIsReportDone] = useState(false);
   const [count, setCount] = useState(10);
 
+  const reportStatus =
+    report?.goalStatus === 'ACHIEVED' || report?.goalStatus === 'FAILED'
+      ? report.goalStatus
+      : null;
+
+  // 리포트 스텝이 처음 보일 때 한 번만 남긴다. goal_setup_completed(renewal)와
+  // 이어 보면 리포트를 본 뒤 목표 설정까지 간 비율을 달성/실패별로 볼 수 있다.
+  const hasLoggedReportRef = useRef(false);
+  useEffect(() => {
+    if (!reportStatus || hasLoggedReportRef.current) return;
+    hasLoggedReportRef.current = true;
+    logEvent('monthly_report_viewed', { goal_status: reportStatus });
+  }, [reportStatus]);
+
   const handleSubmit = async () => {
     try {
       await createGoalMutation.mutateAsync({
@@ -85,10 +100,6 @@ export default function GoalRenewal() {
     );
   }
 
-  const reportStatus =
-    report?.goalStatus === 'ACHIEVED' || report?.goalStatus === 'FAILED'
-      ? report.goalStatus
-      : null;
   const totalSteps = reportStatus ? 2 : 1;
   const breed = puppyInfo?.puppyLevelName ?? '';
 
