@@ -6,7 +6,10 @@ import {
   calendarMonthsErrorHandlers,
   calendarMonthsHandlers,
 } from './api/calendarMonths';
-import { goalRenewalHandlers } from './api/goalRenewal';
+import {
+  goalRenewalHandlers,
+  goalRenewalReportHandler,
+} from './api/goalRenewal';
 import { puppyHandlers } from './api/puppy';
 
 /**
@@ -15,12 +18,23 @@ import { puppyHandlers } from './api/puppy';
  * 다른 사람도 .env만 바꾸면 같은 상황을 볼 수 있다.
  *
  * - goalRenewal: 온보딩을 마친 사용자의 월간 목표 갱신 (mocks/api/goalRenewal.ts)
+ *   지난 달 목표가 없어서 리포트 없이 목표 설정만 나온다.
+ * - goalRenewalAchieved / goalRenewalFailed: 위와 같고, 지난 달 목표를 달성/실패해서
+ *   목표 설정 앞에 지난 달 리포트가 붙는다.
  * - calendarMonths / calendarMonthsEmpty / calendarMonthsError:
  *   캘린더 월 선택 모달의 월·연도 비활성화 (mocks/api/calendarMonths.ts)
  * - calendarAchievement: 캘린더 상단 목표 달성 칩의 월별 상태 (mocks/api/calendarAchievement.ts)
  */
 const scenarios = {
-  goalRenewal: goalRenewalHandlers,
+  goalRenewal: [...goalRenewalHandlers, goalRenewalReportHandler('NO_GOAL')],
+  goalRenewalAchieved: [
+    ...goalRenewalHandlers,
+    goalRenewalReportHandler('ACHIEVED'),
+  ],
+  goalRenewalFailed: [
+    ...goalRenewalHandlers,
+    goalRenewalReportHandler('FAILED'),
+  ],
   calendarMonths: calendarMonthsHandlers,
   calendarMonthsEmpty: calendarMonthsEmptyHandlers,
   calendarMonthsError: calendarMonthsErrorHandlers,

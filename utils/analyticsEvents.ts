@@ -74,6 +74,8 @@ export type AnalyticsEventMap = {
   /** 캘린더 상단 달성 확률 칩에서 설명 말풍선을 연 시점. 닫을 때는 남기지 않는다. */
   achievement_rate_tooltip_opened: { achievement_rate: number };
   report_viewed: { achievement_rate: number };
+  /** 목표 갱신 화면에서 지난 달 리포트 스텝을 연 시점. 지난 달 목표가 없으면 스텝이 없어 남지 않는다. */
+  monthly_report_viewed: { goal_status: 'ACHIEVED' | 'FAILED' };
 
   // ===== 설정 및 알림 =====
   notification_setting_changed: { enabled: boolean };
