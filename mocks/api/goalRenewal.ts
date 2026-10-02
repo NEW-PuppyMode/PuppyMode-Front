@@ -1,4 +1,5 @@
 import type { MeResult } from '@/services/auth';
+import type { GoalStatus, ReportResultDTO } from '@/services/reportData';
 import type { GoalDTO, IPuppyInfo } from '@/types/models/puppy';
 import { delay, http, HttpResponse } from 'msw';
 
@@ -7,6 +8,7 @@ import { delay, http, HttpResponse } from 'msw';
  * 이번 달 목표가 없는 상태.
  *
  * 켜는 법: .env에 EXPO_PUBLIC_MOCK_SCENARIO=goalRenewal (mocks/handlers.ts 참고)
+ * 지난 달 리포트까지 보려면 goalRenewalAchieved / goalRenewalFailed
  *
  * 서버에 계정 상태를 만드는 게 아니라, 로그인한 계정의 응답을 앱 안에서 가로채
  * 이 상태인 것처럼 보이게 한다. 여기서 다루지 않는 요청은 진짜 서버로 간다.
@@ -77,3 +79,52 @@ export const goalRenewalHandlers = [
     });
   }),
 ];
+
+/**
+ * 목표 갱신 화면 앞에 붙는 지난 달 리포트용 /report.
+ * 지난 달 결과는 새 계정으로 재현이 어려워서 시나리오마다 goalStatus를 정해 준다.
+ * - ACHIEVED: 15번 목표 중 10번 마심 → 리포트(달성) → 목표 설정
+ * - FAILED: 15번 목표 중 16번 마심 → 리포트(실패) → 목표 설정
+ * - NO_GOAL: 리포트 없이 목표 설정만
+ *
+ * 지난 달이 아닌 요청(캘린더 등)은 진짜 서버로 보낸다.
+ */
+const lastMonthReports: Record<
+  GoalStatus,
+  Pick<ReportResultDTO, 'goal' | 'drinkDays'>
+> = {
+  ACHIEVED: { goal: 15, drinkDays: 10 },
+  FAILED: { goal: 15, drinkDays: 16 },
+  NO_GOAL: { goal: 0, drinkDays: 0 },
+  IN_PROGRESS: { goal: 15, drinkDays: 6 },
+};
+
+export const goalRenewalReportHandler = (goalStatus: GoalStatus) =>
+  http.get('*/report', async ({ request }) => {
+    const lastMonth = new Date();
+    lastMonth.setDate(1);
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+    const url = new URL(request.url);
+    const isLastMonth =
+      Number(url.searchParams.get('year')) === lastMonth.getFullYear() &&
+      Number(url.searchParams.get('month')) === lastMonth.getMonth() + 1;
+    if (!isLastMonth) return;
+
+    await delay(300);
+    const base = lastMonthReports[goalStatus];
+    const result: ReportResultDTO = {
+      ...base,
+      drinkRecordCount: base.drinkDays,
+      achievementRate: goalStatus === 'ACHIEVED' ? 100 : 0,
+      scoldedCount: 0,
+      goalStatus,
+    };
+    console.log('[MSW] /report 지난 달 →', goalStatus);
+    return HttpResponse.json({
+      isSuccess: true,
+      code: 'COMMON200',
+      message: '성공입니다.',
+      result,
+    });
+  });
