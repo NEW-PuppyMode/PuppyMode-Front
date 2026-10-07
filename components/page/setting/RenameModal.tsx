@@ -34,6 +34,9 @@ interface RenameModalProps {
  */
 const resolveDuration = (duration: number) => (duration > 0 ? duration : 250);
 
+// 모달의 fade 애니메이션이 끝난 뒤 포커스를 주기 위한 대기 시간(ms).
+const FOCUS_DELAY_MS = 200;
+
 /**
  * 이름 수정 모달.
  *
@@ -56,12 +59,27 @@ const RenameModal = ({
 }: RenameModalProps) => {
   const [value, setValue] = useState(initialValue);
   const translateY = useRef(new Animated.Value(0)).current;
+  const inputRef = useRef<TextInput>(null);
 
   // 모달을 열 때마다 현재 이름으로 되돌린다. 취소로 닫은 뒤 다시 열었을 때
   // 직전에 입력하다 만 값이 남아 있지 않게 하려는 것이다.
   useEffect(() => {
     if (visible) setValue(initialValue);
   }, [visible, initialValue]);
+
+  /**
+   * 모달이 열리면 입력창에 포커스를 줘서 키보드를 바로 띄운다.
+   *
+   * TextInput의 autoFocus를 쓰지 않는 이유: Modal 안에서는 모달 창이 붙기 전에
+   * autoFocus가 실행돼 Android에서 자주 먹지 않는다. fade 애니메이션이 끝날 때까지
+   * 기다렸다가 직접 focus를 호출한다.
+   */
+  useEffect(() => {
+    if (!visible) return;
+
+    const timer = setTimeout(() => inputRef.current?.focus(), FOCUS_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [visible]);
 
   /**
    * 키보드가 올라오면 카드를 키보드 높이의 절반만큼 끌어올린다.
@@ -118,6 +136,7 @@ const RenameModal = ({
 
           <View className='py-[16px] w-full'>
             <TextInput
+              ref={inputRef}
               value={value}
               onChangeText={setValue}
               placeholder={placeholder}
