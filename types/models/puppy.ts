@@ -9,6 +9,7 @@ export interface IPuppyInfo {
   isMyName: boolean;
   isGoal: boolean;
   currentPuppyName?: string;
+  currentMyName?: string;
   isOnboarded: boolean;
 }
 
