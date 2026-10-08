@@ -1,5 +1,5 @@
-import DefaultModal from '@/components/common/DefaultModal';
 import ChevronLeftImage from '@/assets/images/chevron_left.png';
+import DefaultModal from '@/components/common/DefaultModal';
 import PolicyModal from '@/components/page/setting/PolicyModal';
 import RenameModal from '@/components/page/setting/RenameModal';
 import SettingBtn from '@/components/page/setting/SettingBtn';
@@ -10,8 +10,9 @@ import {
 import { APP_VERSION } from '@/constants/appVersion';
 import { POLICY_MESSAGES } from '@/constants/messages';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEnableNotifications } from '@/hooks/notifications/useEnableNotifications';
 import { useRenamePuppyMutation } from '@/hooks/mutations/useRenamePuppyMutation';
+import { useRenameUserMutation } from '@/hooks/mutations/useRenameUserMutation';
+import { useEnableNotifications } from '@/hooks/notifications/useEnableNotifications';
 import {
   useNotificationSettingQuery,
   useUpdateNotificationSettingMutation,
@@ -47,11 +48,14 @@ const Setting = () => {
 
   const [signOutModalVisible, setSignOutModalVisible] = useState(false);
   const [puppyNameModalVisible, setPuppyNameModalVisible] = useState(false);
+  const [userNameModalVisible, setUserNameModalVisible] = useState(false);
 
   const { logout } = useAuth();
   const { data: puppyInfo } = usePuppyInfoQuery();
   const { mutate: renamePuppy, isPending: isRenamingPuppy } =
     useRenamePuppyMutation();
+  const { mutate: renameUser, isPending: isRenamingUser } =
+    useRenameUserMutation();
   const { data: notificationSetting } = useNotificationSettingQuery();
   const { mutate: updateNotificationSetting } =
     useUpdateNotificationSettingMutation();
@@ -85,14 +89,23 @@ const Setting = () => {
   const showPermissionNotice =
     !hasNotifPermission && !!notificationSetting?.receiveNotifications;
 
+  const notifyRenameFailed = () => {
+    Alert.alert('이름을 바꾸지 못했어요', '잠시 후 다시 시도해 주세요.', [
+      { text: '확인' },
+    ]);
+  };
+
   const handleRenamePuppy = (puppyName: string) => {
     renamePuppy(puppyName, {
       onSuccess: () => setPuppyNameModalVisible(false),
-      onError: () => {
-        Alert.alert('이름을 바꾸지 못했어요', '잠시 후 다시 시도해 주세요.', [
-          { text: '확인' },
-        ]);
-      },
+      onError: notifyRenameFailed,
+    });
+  };
+
+  const handleRenameUser = (userName: string) => {
+    renameUser(userName, {
+      onSuccess: () => setUserNameModalVisible(false),
+      onError: notifyRenameFailed,
     });
   };
 
@@ -143,10 +156,11 @@ const Setting = () => {
 
       <ScrollView>
         <SettingSectionHeader title='내 프로필' />
-        {/*
-          사용자 이름 행은 서버가 현재 이름을 내려주지 않아 아직 넣지 않았다.
-          GET /main에 currentMyName이 추가되면 강아지 이름 행과 같은 형태로 붙인다.
-        */}
+        <SettingBtn
+          title='내 이름'
+          value={puppyInfo?.currentMyName}
+          onPress={() => setUserNameModalVisible(true)}
+        />
         <SettingBtn
           title='강아지 이름'
           value={puppyInfo?.currentPuppyName}
@@ -214,6 +228,16 @@ const Setting = () => {
           <Text style={styles.text}>{APP_VERSION}</Text>
         </View>
       </ScrollView>
+
+      <RenameModal
+        visible={userNameModalVisible}
+        setVisible={setUserNameModalVisible}
+        title='이름 수정'
+        description='친구들에게 보여질 이름이에요'
+        initialValue={puppyInfo?.currentMyName ?? ''}
+        onSave={handleRenameUser}
+        isPending={isRenamingUser}
+      />
 
       <RenameModal
         visible={puppyNameModalVisible}
