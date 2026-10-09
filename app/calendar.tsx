@@ -12,6 +12,7 @@ import {
   Image,
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -295,6 +296,9 @@ export default function CalendarPage() {
   const { data: report } = useReportQuery(calendarYear, calendarMonth);
   const [isTooltipOpen, setTooltipOpen] = useState(false);
 
+  // 하단 버튼이 absolute라 캘린더 끝에 그만큼 여백을 둬야 마지막 주가 가려지지 않는다.
+  const [bottomButtonHeight, setBottomButtonHeight] = useState(0);
+
   // 칩은 IN_PROGRESS일 때만 눌리므로 report가 항상 있다.
   const handleToggleTooltip = () => {
     if (!isTooltipOpen && report) {
@@ -418,7 +422,7 @@ export default function CalendarPage() {
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.container}>
         {/* 상단 헤더 */}
-        <View className='px-[20px] mt-12 h-[60px] justify-center'>
+        <View className='px-[20px] mt-12 h-[48px] justify-center'>
           <TouchableOpacity
             onPress={() => router.back()}
             className='px-[8px] py-[6px]'
@@ -430,7 +434,7 @@ export default function CalendarPage() {
           </TouchableOpacity>
         </View>
 
-        <View className='flex-row items-center justify-center'>
+        <View className='flex-row h-[40px] items-center justify-center'>
           {/* NativeWind v2의 gap-*은 "부모에 음수 마진 + 자식에 양수 마진"으로 흉내 내는
               방식이라 부모 박스가 위/왼쪽으로 밀린다. RN 0.79의 네이티브 gap을 쓴다. */}
           <TouchableOpacity
@@ -462,7 +466,12 @@ export default function CalendarPage() {
           )}
         </View>
 
-        <View className='px-2'>
+        <ScrollView
+          className='flex-1 px-2'
+          showsVerticalScrollIndicator={false}
+          // 44는 하단 버튼의 bottom-11
+          contentContainerStyle={{ paddingBottom: bottomButtonHeight + 44 }}
+        >
           {/* 캘린더 */}
           <Calendar
             key={currentDate}
@@ -493,10 +502,13 @@ export default function CalendarPage() {
               textDayHeaderFontSize: 14,
             }}
           />
-        </View>
+        </ScrollView>
 
         {/* 하단 버튼 */}
-        <View className='absolute w-full p-5 bottom-11'>
+        <View
+          className='absolute w-full p-5 bottom-11'
+          onLayout={(e) => setBottomButtonHeight(e.nativeEvent.layout.height)}
+        >
           <TouchableOpacity
             className='bg-[#1EBE71] rounded-[10px] p-[18px] items-center'
             onPress={() =>
