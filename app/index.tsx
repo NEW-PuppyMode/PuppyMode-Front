@@ -1,5 +1,6 @@
 import { KEYS } from '@/constants/storage';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
+import { clearTokens, NoRefreshTokenError } from '@/services/index';
 import { resolveNextRoute } from '@/utils/authRoute';
 import { describeToken, logAuthEvent } from '@/utils/tokenDebug';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -30,23 +31,24 @@ export default function Index() {
   useEffect(() => {
     if (!isError || !error) return;
     const isNetworkError = axios.isAxiosError(error) && !error.response;
+    const status = axios.isAxiosError(error)
+      ? error.response?.status
+      : undefined;
 
-    // 응답을 동반한 모든 에러(500/502/403 등)가 여기서 토큰을 지운다.
-    // 배포 중 일시적 5xx가 영구 로그아웃으로 이어지는지 관측하기 위한 로그.
+    // 인증이 거부된 경우(401/403)나 refresh token이 없는 경우만 토큰을 지운다.
+    // 배포 중 일시적 5xx 등에서는 토큰을 남겨 다음 실행 때 복구되게 한다.
+    const isAuthRejected =
+      status === 401 || status === 403 || error instanceof NoRefreshTokenError;
+
     logAuthEvent('bootstrap:me-failed', {
-      status: axios.isAxiosError(error) ? error.response?.status : undefined,
+      status,
       body: axios.isAxiosError(error) ? error.response?.data : String(error),
       isNetworkError,
-      willClearTokens: !isNetworkError,
+      willClearTokens: isAuthRejected,
     });
 
-    if (!isNetworkError) {
-      AsyncStorage.multiRemove([
-        KEYS.ACCESS_TOKEN,
-        KEYS.REFRESH_TOKEN,
-        KEYS.PROVIDER,
-        KEYS.DOG_TYPE,
-      ]);
+    if (isAuthRejected) {
+      void clearTokens('bootstrap-auth-rejected', { status });
     }
   }, [isError, error]);
 

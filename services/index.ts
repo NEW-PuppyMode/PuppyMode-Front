@@ -40,7 +40,11 @@ reissueInstance.interceptors.request.use((config) => {
 reissueInstance.interceptors.response.use(
   (res) => {
     const url = `${res.config.baseURL ?? ''}${res.config.url ?? ''}`;
-    console.log('[REISSUE RES]', res.status, url, res.data);
+    // 응답 본문에 토큰 원문이 있으므로 결과 코드만 남긴다
+    console.log('[REISSUE RES]', res.status, url, {
+      code: res.data?.code,
+      isSuccess: res.data?.isSuccess,
+    });
     return res;
   },
   (error: AxiosError) => {
@@ -90,7 +94,7 @@ async function saveTokens(accessToken: string, refreshToken?: string) {
 /**
  * 토큰 삭제 = 강제 로그아웃. 모든 로그아웃에 원인을 남기기 위해 reason을 받는다.
  */
-async function clearTokens(
+export async function clearTokens(
   reason: string,
   extra?: Record<string, unknown>,
 ) {
@@ -114,6 +118,14 @@ async function clearTokens(
   ]);
 }
 
+/** 저장된 refresh token이 없어 재발급 자체가 불가능한 경우 */
+export class NoRefreshTokenError extends Error {
+  constructor() {
+    super('리프레시 토큰이 없습니다.');
+    this.name = 'NoRefreshTokenError';
+  }
+}
+
 // 중복 재발급 방지용
 let refreshPromise: Promise<string> | null = null;
 
@@ -125,7 +137,7 @@ export async function reissueAccessToken(): Promise<string> {
 
     if (!refreshToken) {
       logAuthEvent('reissue:no-refresh-token');
-      throw new Error('리프레시 토큰이 없습니다.');
+      throw new NoRefreshTokenError();
     }
 
     const accessToken = await getAccessToken();
