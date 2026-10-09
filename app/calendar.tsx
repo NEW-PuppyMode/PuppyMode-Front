@@ -425,7 +425,8 @@ export default function CalendarPage() {
         <View className='px-[20px] mt-12 h-[48px] justify-center'>
           <TouchableOpacity
             onPress={() => router.back()}
-            className='px-[8px] py-[6px]'
+            className='self-start px-[8px] py-[6px]'
+            hitSlop={10}
           >
             <Image
               className='w-[8px] h-[16px]'
