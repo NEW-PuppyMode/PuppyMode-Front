@@ -1,5 +1,10 @@
 import { KEYS } from '@/constants/storage';
-import { describeToken, logAuthEvent } from '@/utils/tokenDebug';
+import {
+  describeToken,
+  logAuthEvent,
+  reportForcedLogout,
+  setCrashlyticsUser,
+} from '@/utils/tokenDebug';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, {
   AxiosError,
@@ -40,7 +45,11 @@ reissueInstance.interceptors.request.use((config) => {
 reissueInstance.interceptors.response.use(
   (res) => {
     const url = `${res.config.baseURL ?? ''}${res.config.url ?? ''}`;
-    console.log('[REISSUE RES]', res.status, url, res.data);
+    // 응답 본문에 토큰 원문이 있으므로 결과 코드만 남긴다
+    console.log('[REISSUE RES]', res.status, url, {
+      code: res.data?.code,
+      isSuccess: res.data?.isSuccess,
+    });
     return res;
   },
   (error: AxiosError) => {
@@ -87,24 +96,42 @@ async function saveTokens(accessToken: string, refreshToken?: string) {
   await AsyncStorage.multiSet(items);
 }
 
+// 동시에 실패한 요청들이 각자 clearTokens를 불러도 한 번만 처리하기 위함
+let clearPromise: Promise<void> | null = null;
+
 /**
  * 토큰 삭제 = 강제 로그아웃. 모든 로그아웃에 원인을 남기기 위해 reason을 받는다.
  */
-async function clearTokens(
+export function clearTokens(
   reason: string,
   extra?: Record<string, unknown>,
-) {
-  const [access, refresh] = await Promise.all([
+): Promise<void> {
+  if (!clearPromise) {
+    clearPromise = removeTokens(reason, extra).finally(() => {
+      clearPromise = null;
+    });
+  }
+  return clearPromise;
+}
+
+async function removeTokens(reason: string, extra?: Record<string, unknown>) {
+  const [access, refresh, provider] = await Promise.all([
     getAccessToken(),
     getRefreshToken(),
+    AsyncStorage.getItem(KEYS.PROVIDER).catch(() => null),
   ]);
+
+  // 이미 지워진 뒤 늦게 들어온 호출은 같은 로그아웃이므로 다시 올리지 않는다
+  if (!access && !refresh) return;
 
   logAuthEvent('tokens:cleared', {
     reason,
+    provider,
     access: describeToken(access),
     refresh: describeToken(refresh),
     ...extra,
   });
+  reportForcedLogout(reason, { provider: provider ?? 'unknown' });
 
   await AsyncStorage.multiRemove([
     KEYS.ACCESS_TOKEN,
@@ -112,6 +139,14 @@ async function clearTokens(
     KEYS.PROVIDER,
     KEYS.DOG_TYPE,
   ]);
+}
+
+/** 저장된 refresh token이 없어 재발급 자체가 불가능한 경우 */
+export class NoRefreshTokenError extends Error {
+  constructor() {
+    super('리프레시 토큰이 없습니다.');
+    this.name = 'NoRefreshTokenError';
+  }
 }
 
 // 중복 재발급 방지용
@@ -125,7 +160,7 @@ export async function reissueAccessToken(): Promise<string> {
 
     if (!refreshToken) {
       logAuthEvent('reissue:no-refresh-token');
-      throw new Error('리프레시 토큰이 없습니다.');
+      throw new NoRefreshTokenError();
     }
 
     const accessToken = await getAccessToken();
@@ -175,6 +210,7 @@ export async function reissueAccessToken(): Promise<string> {
     });
 
     await saveTokens(newAccessToken, newRefreshToken);
+    setCrashlyticsUser(newAccessToken);
 
     return newAccessToken;
   })();

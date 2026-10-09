@@ -1,5 +1,9 @@
 import { KEYS } from '@/constants/storage';
-import { describeToken, logAuthEvent } from '@/utils/tokenDebug';
+import {
+  describeToken,
+  logAuthEvent,
+  setCrashlyticsUser,
+} from '@/utils/tokenDebug';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { axiosInstance } from '.';
 
@@ -81,6 +85,7 @@ export const loginAPI = {
       [KEYS.REFRESH_TOKEN, response.data.result.refreshToken],
       [KEYS.PROVIDER, 'kakao'],
     ]);
+    setCrashlyticsUser(response.data.result.accessToken);
 
     return response.data.result;
   },
