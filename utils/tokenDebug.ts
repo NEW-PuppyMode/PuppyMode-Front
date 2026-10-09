@@ -117,6 +117,38 @@ export function logAuthEvent(event: string, payload?: Record<string, unknown>) {
   void appendToRingBuffer({ at, event, ...payload });
 }
 
+/**
+ * Crashlytics 리포트를 사용자별로 찾을 수 있게 토큰의 userId를 등록한다.
+ * userId는 JWT 페이로드에 이미 있으므로 API를 따로 부르지 않는다.
+ */
+export function setCrashlyticsUser(accessToken: string | null | undefined) {
+  if (!accessToken) return;
+
+  const userId = decodeJwtPayload(accessToken)?.userId;
+  if (userId === undefined || userId === null) return;
+
+  crashlytics()
+    .setUserId(String(userId))
+    .catch((e) => console.warn('[AUTH] crashlytics setUserId 실패', e));
+}
+
+/**
+ * 강제 로그아웃을 non-fatal로 올린다.
+ * crashlytics().log()는 크래시나 recordError가 있어야만 업로드되므로,
+ * 이 호출이 있어야 직전에 쌓인 [AUTH] 로그가 함께 Crashlytics로 올라간다.
+ */
+export function reportForcedLogout(
+  reason: string,
+  attributes: Record<string, string> = {},
+) {
+  try {
+    crashlytics().setAttributes({ logout_reason: reason, ...attributes });
+    crashlytics().recordError(new Error(`[AUTH] forced-logout: ${reason}`));
+  } catch (e) {
+    console.warn('[AUTH] crashlytics recordError 실패', e);
+  }
+}
+
 /** 기기에 쌓인 최근 인증 이벤트를 콘솔에 출력한다. */
 export async function dumpAuthLog(): Promise<unknown[]> {
   try {

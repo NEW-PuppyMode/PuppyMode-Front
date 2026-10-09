@@ -3,7 +3,11 @@ import { KEYS } from '@/constants/storage';
 import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { axiosInstance } from '@/services/index';
 import { logEvent } from '@/utils/analytics';
-import { describeToken, logAuthEvent } from '@/utils/tokenDebug';
+import {
+  describeToken,
+  logAuthEvent,
+  setCrashlyticsUser,
+} from '@/utils/tokenDebug';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useQueryClient } from '@tanstack/react-query';
 import * as AppleAuthentication from 'expo-apple-authentication';
@@ -79,6 +83,7 @@ export const useAppleLogin = () => {
         } else {
           await AsyncStorage.removeItem(KEYS.REFRESH_TOKEN);
         }
+        setCrashlyticsUser(result.accessToken);
 
         // 자동 로그인은 이 훅을 타지 않으므로, 여기 도달했다면 사용자가 직접 로그인한 것이다.
         logEvent('login_completed', {

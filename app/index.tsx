@@ -2,7 +2,11 @@ import { KEYS } from '@/constants/storage';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
 import { clearTokens, NoRefreshTokenError } from '@/services/index';
 import { resolveNextRoute } from '@/utils/authRoute';
-import { describeToken, logAuthEvent } from '@/utils/tokenDebug';
+import {
+  describeToken,
+  logAuthEvent,
+  setCrashlyticsUser,
+} from '@/utils/tokenDebug';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { Redirect } from 'expo-router';
@@ -21,6 +25,8 @@ export default function Index() {
           access: describeToken(access),
           refresh: describeToken(refresh),
         });
+        // 업데이트 전부터 로그인돼 있던 사용자도 userId가 잡히도록 시작 시에도 등록
+        setCrashlyticsUser(access);
         setHasTokens(!!(access || refresh));
       },
     );
