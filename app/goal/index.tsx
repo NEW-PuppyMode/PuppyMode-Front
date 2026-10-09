@@ -102,6 +102,7 @@ export default function GoalRenewal() {
 
   const totalSteps = reportStatus ? 2 : 1;
   const breed = puppyInfo?.puppyLevelName ?? '';
+  const level = puppyInfo?.puppyLevel ?? 1;
 
   if (report && reportStatus && !isReportDone) {
     return (
@@ -109,6 +110,7 @@ export default function GoalRenewal() {
         step={1}
         totalSteps={totalSteps}
         breed={breed}
+        level={level}
         title={
           <>
             {lastMonth.month}월 리포트가{'\n'}
@@ -135,6 +137,7 @@ export default function GoalRenewal() {
       step={totalSteps}
       totalSteps={totalSteps}
       breed={breed}
+      level={level}
       title={
         <>
           이번 달 <Text style={styles.highlight}>나의 목표</Text>로{'\n'}

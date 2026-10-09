@@ -35,6 +35,8 @@ type OnboardingLayoutProps = {
   bubbleText: string;
   /** 강아지 종(한글). 미지정 시 기본 비숑 */
   breed?: string;
+  /** 강아지 레벨(성장 단계 외형 결정). 미지정 시 1. 마운트 후 성장 단계가 바뀌는 변화는 반영되지 않는다. */
+  level?: number;
   /** 하단 입력/버튼 영역. 키보드가 올라오면 함께 따라 올라온다. */
   children: React.ReactNode;
 };
@@ -52,6 +54,7 @@ export function OnboardingLayout({
   subtitle,
   bubbleText,
   breed = '',
+  level = 1,
   children,
 }: OnboardingLayoutProps) {
   const insets = useSafeAreaInsets();
@@ -113,7 +116,7 @@ export function OnboardingLayout({
           </View>
           <EvolvingPuppy
             breedName={breed}
-            level={1}
+            level={level}
             reaction='normal'
             evolveEvent={null}
             size={PUPPY_SIZE}
