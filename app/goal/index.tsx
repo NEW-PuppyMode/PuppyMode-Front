@@ -38,7 +38,8 @@ const getLastMonth = () => {
  * 보여준다. 지난 달 목표가 없었거나 리포트를 못 불러오면 목표 설정만 나온다.
  */
 export default function GoalRenewal() {
-  const { data: puppyInfo } = usePuppyInfoQuery();
+  const { data: puppyInfo, isPending: isPuppyInfoPending } =
+    usePuppyInfoQuery();
   const createGoalMutation = useCreateGoalMutation();
   const queryClient = useQueryClient();
 
@@ -89,7 +90,9 @@ export default function GoalRenewal() {
   // 그동안 빈 화면 대신 레이아웃과 같은 배경만 깔아 둔다. 타이틀·강아지 등을 먼저 띄우면
   // 진행 점 개수와 하단 버튼이 응답 뒤에 바뀌어 오히려 깜빡여 보인다.
   // 실패하면 isPending이 풀리고 report가 없어 목표 설정만 나온다.
-  if (isReportPending) {
+  // 강아지 외형(성장 단계)은 마운트 시 레벨로 정해지고 이후 단계 변화는 반영되지 않으므로
+  // (EvolvingPuppy) /main도 함께 기다린다. 홈에서 오면 캐시가 있어 바로 지나간다.
+  if (isReportPending || isPuppyInfoPending) {
     return (
       <ImageBackground
         // eslint-disable-next-line @typescript-eslint/no-require-imports

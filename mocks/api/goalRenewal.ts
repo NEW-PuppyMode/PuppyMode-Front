@@ -43,7 +43,7 @@ export const goalRenewalHandlers = [
   http.get('*/main', async () => {
     await delay(300);
     const result: IPuppyInfo = {
-      puppyLevel: 2,
+      puppyLevel: 15,
       puppyLevelName: '눈송이 비숑',
       puppyLevelPercent: 40,
       puppyImageUrl: '',
@@ -70,7 +70,13 @@ export const goalRenewalHandlers = [
     await delay(300);
     const body = (await request.json()) as GoalDTO;
     isGoalSet = true;
-    console.log('[MSW] POST /goals → 목표', body.goal, '회 저장 (isNew:', body.isNew, ')');
+    console.log(
+      '[MSW] POST /goals → 목표',
+      body.goal,
+      '회 저장 (isNew:',
+      body.isNew,
+      ')',
+    );
     return HttpResponse.json({
       isSuccess: true,
       code: 'GOAL200',
