@@ -24,7 +24,7 @@ interface AchievementChipsProps {
 
 /**
  * 캘린더 월 제목 아래의 목표 칩 두 개.
- * - IN_PROGRESS: 목표 N번 · 달성 확률 N% (정보 아이콘을 누르면 설명 말풍선)
+ * - IN_PROGRESS: 목표 최대 N번 · 달성 확률 N% (정보 아이콘을 누르면 설명 말풍선)
  * - ACHIEVED / FAILED: 목표 달성 성공!/실패 · 마신 날/목표
  * NO_GOAL이면 아무것도 그리지 않는다.
  */
@@ -46,7 +46,7 @@ export default function AchievementChips({
   const isInProgress = goalStatus === 'IN_PROGRESS';
   const color = goalStatus === 'FAILED' ? COLORS.red : COLORS.green;
   const mainLabel = isInProgress
-    ? `목표 ${goal}번`
+    ? `목표 최대 ${goal}번`
     : goalStatus === 'ACHIEVED'
       ? '목표 달성 성공!'
       : '목표 달성 실패';
