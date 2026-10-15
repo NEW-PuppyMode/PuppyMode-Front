@@ -143,11 +143,11 @@ export default function GoalRenewal() {
       level={level}
       title={
         <>
-          이번 달 <Text style={styles.highlight}>나의 목표</Text>로{'\n'}
-          정해봐요!
+          이번 달 <Text style={styles.highlight}>최대 몇 번</Text>까지{'\n'}
+          마실 건가요?
         </>
       }
-      subtitle='목표는 언제든지 바꿀 수 있습니다.'
+      subtitle='목표는 매달 새로 정할 수 있어요.'
       bubbleText={
         '이번 달에 지키고 싶은\n새로운 목표를 알려주세요!\n오늘부터 한 달 동안 지킬 거예요!'
       }

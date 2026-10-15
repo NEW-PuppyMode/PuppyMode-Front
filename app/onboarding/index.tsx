@@ -127,8 +127,8 @@ export default function Onboarding() {
     ),
     goal: (
       <>
-        이번 달 <Text style={styles.highlight}>나의 목표</Text>로{'\n'}
-        정해봐요!
+        이번 달 <Text style={styles.highlight}>최대 몇 번</Text>까지{'\n'}
+        마실 건가요?
       </>
     ),
   };
@@ -136,7 +136,7 @@ export default function Onboarding() {
   const subtitleByKey: Record<StepKey, string> = {
     puppyName: '이름을 지어주면 강아지와 더 친해질 수 있어요.',
     userName: '이름을 알려주면 강아지와 더 친해질 수 있어요.',
-    goal: '목표는 언제든지 바꿀 수 있습니다.',
+    goal: '목표는 매달 새로 정할 수 있어요.',
   };
 
   const bubbleByKey: Record<StepKey, string> = {

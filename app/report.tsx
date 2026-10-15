@@ -20,10 +20,11 @@ const Report = () => {
     month: string;
   }>();
 
-  const { data, isLoading: loading, isError } = useReportQuery(
-    Number(year),
-    Number(month),
-  );
+  const {
+    data,
+    isLoading: loading,
+    isError,
+  } = useReportQuery(Number(year), Number(month));
 
   // achievement_rate는 응답이 와야 알 수 있어서 화면 진입이 아니라 데이터 도착
   // 시점에 남긴다. 리페치로 data가 다시 들어와도 한 번만 남기도록 막는다.
@@ -114,7 +115,11 @@ const Report = () => {
               >
                 <View
                   className='flex-row items-end'
-                  style={{ flexDirection: 'row', alignItems: 'flex-end' }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'flex-end',
+                    gap: 2,
+                  }}
                 >
                   <Text style={styles.contentBlockCommonText}>
                     {data.drinkRecordCount}
@@ -174,9 +179,28 @@ const Report = () => {
                 <View
                   style={[styles.contentGreenBlock, { flexDirection: 'row' }]}
                 >
-                  <Text style={styles.contentBlockCommonText}>
-                    {data.goal}번
-                  </Text>
+                  <View
+                    className='flex-row items-end'
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'flex-end',
+                      gap: 4,
+                    }}
+                  >
+                    <Text
+                      className='text-base'
+                      style={{
+                        color: '#A6DCCC',
+                        fontSize: 16,
+                        fontWeight: '700',
+                      }}
+                    >
+                      최대
+                    </Text>
+                    <Text style={styles.contentBlockCommonText}>
+                      {data.goal}번
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>
@@ -303,8 +327,9 @@ const styles = StyleSheet.create({
   contentGreenBlock: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: 86,
+    minWidth: 86,
     height: 44,
+    paddingHorizontal: 12,
     flexShrink: 0,
     borderRadius: 15,
     backgroundColor: '#E4FAE8',
