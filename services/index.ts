@@ -2,6 +2,7 @@ import { KEYS } from '@/constants/storage';
 import {
   describeToken,
   logAuthEvent,
+  reportError,
   reportForcedLogout,
   setCrashlyticsUser,
 } from '@/utils/tokenDebug';
@@ -152,6 +153,9 @@ export class NoRefreshTokenError extends Error {
 // 중복 재발급 방지용
 let refreshPromise: Promise<string> | null = null;
 
+// 동시에 401을 받은 요청들은 같은 재발급 에러 객체를 받으므로, 한 번만 올리기 위함
+let lastReportedReissueError: unknown = null;
+
 export async function reissueAccessToken(): Promise<string> {
   if (refreshPromise) return refreshPromise;
 
@@ -297,6 +301,10 @@ axiosInstance.interceptors.response.use(
 
         if (reissueStatus === 401 || reissueStatus === 403) {
           await clearTokens('reissue-rejected', { status: reissueStatus });
+        } else if (reissueError !== lastReportedReissueError) {
+          // 토큰을 지우는 경우는 clearTokens가 이미 올리므로 그 외만 올린다
+          lastReportedReissueError = reissueError;
+          reportError(reissueError, 'reissue', { triggered_by: requestUrl });
         }
         return Promise.reject(reissueError);
       }

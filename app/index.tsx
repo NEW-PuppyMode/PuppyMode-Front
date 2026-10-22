@@ -5,6 +5,7 @@ import { resolveNextRoute } from '@/utils/authRoute';
 import {
   describeToken,
   logAuthEvent,
+  reportError,
   setCrashlyticsUser,
 } from '@/utils/tokenDebug';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -55,6 +56,12 @@ export default function Index() {
 
     if (isAuthRejected) {
       void clearTokens('bootstrap-auth-rejected', { status });
+    } else {
+      // 토큰은 남지만 사용자는 로그인 화면으로 가므로 "로그인이 풀렸다"로 보이는 경우다.
+      // 토큰을 지우는 경우는 clearTokens가 이미 올리므로 여기서만 올린다.
+      reportError(error, 'bootstrap', {
+        network_error: isNetworkError ? '1' : '0',
+      });
     }
   }, [isError, error]);
 
