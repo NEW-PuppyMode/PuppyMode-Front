@@ -149,6 +149,25 @@ export function reportForcedLogout(
   }
 }
 
+/**
+ * 앱이 죽지 않고 잡힌 에러를 non-fatal로 올린다.
+ * 잡힌 에러는 이 호출이 없으면 Crashlytics에 남지 않고, 쌓인 log()도 업로드되지 않는다.
+ */
+export function reportError(
+  error: unknown,
+  where: string,
+  attributes: Record<string, string> = {},
+) {
+  const err = error instanceof Error ? error : new Error(String(error));
+
+  try {
+    crashlytics().setAttributes({ where, ...attributes });
+    crashlytics().recordError(err);
+  } catch (e) {
+    console.warn('[CRASHLYTICS] recordError 실패', e);
+  }
+}
+
 /** 기기에 쌓인 최근 인증 이벤트를 콘솔에 출력한다. */
 export async function dumpAuthLog(): Promise<unknown[]> {
   try {
