@@ -38,9 +38,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Setting = () => {
   const queryClient = useQueryClient();
+  const insets = useSafeAreaInsets();
   const [policyModalVisible, setPolicyModalVisible] = useState(false);
   const [policyModalType, setPolicyModalType] = useState<
     'terms_of_uses' | 'privacy_policies'
@@ -154,7 +156,11 @@ const Setting = () => {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView>
+      {/* edge-to-edge에서 마지막 항목이 하단 내비게이션 바에 가려지지 않도록 기기별 inset만큼 띄운다. */}
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
+      >
         <SettingSectionHeader title='내 프로필' />
         <SettingBtn
           title='내 이름'
