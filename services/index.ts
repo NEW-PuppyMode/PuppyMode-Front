@@ -310,6 +310,16 @@ axiosInstance.interceptors.response.use(
       }
     }
 
+    // 인증 API와 401 재발급 흐름은 따로 올리므로 그 외의 서버 장애·네트워크 실패만 올린다.
+    // 4xx는 정상적인 비즈니스 응답도 많아 제외하고, 요청 취소는 에러가 아니므로 제외한다.
+    const isServerOrNetworkError = !error.response || (status ?? 0) >= 500;
+    if (isServerOrNetworkError && !isAuthRoute && !axios.isCancel(error)) {
+      reportError(error, 'api', {
+        url: `${originalRequest.method?.toUpperCase() ?? ''} ${requestUrl.split('?')[0]}`,
+        axios_code: error.code ?? '-',
+      });
+    }
+
     return Promise.reject(error);
   },
 );
