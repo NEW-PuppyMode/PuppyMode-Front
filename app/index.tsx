@@ -1,6 +1,7 @@
 import { KEYS } from '@/constants/storage';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
 import { clearTokens, NoRefreshTokenError } from '@/services/index';
+import { setAnalyticsUserId } from '@/utils/analytics';
 import { resolveNextRoute } from '@/utils/authRoute';
 import {
   describeToken,
@@ -33,6 +34,12 @@ export default function Index() {
   }, []);
 
   const { data, isError, isPending, error } = useMeQuery(hasTokens === true);
+
+  // 서버 배포가 늦어 userId가 빠진 응답이면 기기 단위 집계를 그대로 둔다.
+  const userId = data?.userId;
+  useEffect(() => {
+    if (userId) setAnalyticsUserId(userId);
+  }, [userId]);
 
   useEffect(() => {
     if (!isError || !error) return;

@@ -42,6 +42,8 @@ export interface MeResult {
    * 언젠가 사라질 필드이기에 선택 필드로 둔다.
    */
   isOnboarded?: boolean;
+  /** 분석 도구(Amplitude·Firebase)에서 사용자를 식별하는 서버 사용자 ID */
+  userId?: string;
 }
 
 export interface MeResponse {
