@@ -11,6 +11,7 @@ import {
   setupForegroundNotificationHandler,
   setupTokenRefreshListener,
 } from '@/utils/fcm';
+import { holdSplash } from '@/utils/splash';
 import { ThemeProvider as EmotionThemeProvider } from '@emotion/react';
 import analytics from '@react-native-firebase/analytics';
 import crashlytics from '@react-native-firebase/crashlytics';
@@ -35,6 +36,9 @@ import 'react-native-reanimated';
 
 // 자식 컴포넌트의 이벤트보다 먼저 초기화되도록 렌더 전에 한 번만 호출
 initAmplitude();
+
+// 첫 화면이 준비될 때까지 스플래시를 유지한다. 내리는 곳은 utils/splash.ts 참고
+holdSplash();
 
 function setGlobalFontFamily(fontFamily: string) {
   const TextComp = RNText as unknown as {

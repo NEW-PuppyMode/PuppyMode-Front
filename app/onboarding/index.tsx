@@ -8,6 +8,7 @@ import { useRenameUserMutation } from '@/hooks/mutations/useRenameUserMutation';
 import { useCompleteOnboarding } from '@/hooks/onboarding/useCompleteOnboarding';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { logEvent } from '@/utils/analytics';
+import { hideSplash } from '@/utils/splash';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Alert, StyleSheet, Text } from 'react-native';
 
@@ -56,6 +57,12 @@ export default function Onboarding() {
     }
     setSteps(needed);
   }, [puppyInfo, complete]);
+
+  // 온보딩 중인 상태로 앱에 진입하면 단계가 정해져 화면이 그려질 때 스플래시를 내린다.
+  // 그 전에는 빈 화면이라 먼저 내리면 흰 화면이 보인다. (utils/splash.ts)
+  useEffect(() => {
+    if (steps && steps.length > 0) hideSplash();
+  }, [steps]);
 
   // 필요한 단계가 확정되기 전에는 렌더하지 않는다.
   if (!steps || steps.length === 0) return null;

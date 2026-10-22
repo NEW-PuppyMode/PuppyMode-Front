@@ -7,6 +7,7 @@ import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { useReportQuery } from '@/hooks/queries/useReportQuery';
 import { logEvent } from '@/utils/analytics';
+import { hideSplash } from '@/utils/splash';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -48,6 +49,12 @@ export default function GoalRenewal() {
     lastMonth.year,
     lastMonth.month,
   );
+
+  // 앱 진입 시 홈에서 바로 넘어온 경우 스플래시를 여기서 내린다.
+  // 대기 중에도 배경이 깔려 있어 흰 화면이 보이지 않는다. (utils/splash.ts)
+  useEffect(() => {
+    hideSplash();
+  }, []);
 
   const [isReportDone, setIsReportDone] = useState(false);
   const [count, setCount] = useState(10);

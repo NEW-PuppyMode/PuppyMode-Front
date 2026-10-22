@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PrimaryButton } from '@/components/common/buttons/PrimaryButton';
+import { hideSplash } from '@/utils/splash';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -31,6 +32,11 @@ const TestStart = () => {
   const spreadAnim = useRef(new Animated.Value(1)).current;
   // step 2: center card slides up from below
   const cardSlideAnim = useRef(new Animated.Value(0)).current;
+
+  // 강아지 유형 검사 전 상태로 앱에 진입하면 여기서 스플래시를 내린다. (utils/splash.ts)
+  useEffect(() => {
+    hideSplash();
+  }, []);
 
   useEffect(() => {
     Animated.sequence([

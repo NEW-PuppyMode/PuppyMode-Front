@@ -32,6 +32,7 @@ import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
 import { useVersionCheckQuery } from '@/hooks/queries/useVersionCheckQuery';
 import { logEvent } from '@/utils/analytics';
 import { maxDaysInMonth } from '@/utils/dateUtils';
+import { hideSplash } from '@/utils/splash';
 import { router } from 'expo-router';
 import { throttle } from 'lodash';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -276,6 +277,12 @@ export default function HomeScreen() {
       router.replace('/goal');
     }
   }, [puppyInfo, isFetching]);
+
+  // 앱 진입 시 홈 UI가 그려질 때까지 스플래시를 유지한다. (utils/splash.ts)
+  // 목표 갱신 대상이면 갱신 화면이 대신 내린다.
+  useEffect(() => {
+    if (isError || puppyInfo?.isGoal) hideSplash();
+  }, [isError, puppyInfo?.isGoal]);
 
   const _handleAdviceClick = async () => {
     try {

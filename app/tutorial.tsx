@@ -23,6 +23,7 @@ import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { onboardingAPI } from '@/services/onboarding';
 import { logEvent } from '@/utils/analytics';
+import { hideSplash } from '@/utils/splash';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -113,6 +114,12 @@ export default function TutorialScreen() {
     setDisplayedLevel(puppyInfo.puppyLevel ?? 0);
     setDisplayedPercent(puppyInfo.puppyLevelPercent ?? 0);
   }, [puppyInfo, displayedLevel]);
+
+  // 튜토리얼 전 상태로 앱에 진입하면 진입 값이 정해져 화면이 그려질 때 스플래시를 내린다.
+  // 그 전에는 빈 화면이라 먼저 내리면 흰 화면이 보인다. (utils/splash.ts)
+  useEffect(() => {
+    if (displayedLevel !== null) hideSplash();
+  }, [displayedLevel]);
 
   // 단계를 넘어갈 때 "직전 단계를 통과했다"고 남긴다. setStep 호출부가 버튼·자동
   // 진행·배경 탭으로 흩어져 있어서, 상태 변화를 한 곳에서 보는 편이 누락이 없다.
