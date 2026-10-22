@@ -21,6 +21,9 @@ export const initAmplitude = () => {
     // 볼 수 있고, 전송 실패는 Warn/Error로 올라오므로 문제 추적에도 지장이 없다.
     // 계측을 새로 붙이며 흐름을 눈으로 좇아야 할 때만 잠깐 Debug로 올린다.
     logLevel: Types.LogLevel.Warn,
+    // 기본값(5)이면 5자 미만 user_id의 이벤트를 서버가 거부한다.
+    // 서버 사용자 ID는 짧은 숫자일 수 있어 길이 제한을 푼다.
+    minIdLength: 1,
   });
   initialized = true;
 };

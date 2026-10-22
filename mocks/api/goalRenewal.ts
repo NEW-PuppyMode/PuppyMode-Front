@@ -28,6 +28,7 @@ export const goalRenewalHandlers = [
       onboardingCompleted: true,
       isPuppyTestCompleted: true,
       isOnboarded: true,
+      userId: '12345',
     };
     console.log('[MSW] /auth/me → 온보딩 완료 사용자');
     return HttpResponse.json({

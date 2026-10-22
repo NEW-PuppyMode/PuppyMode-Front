@@ -95,9 +95,8 @@ export const setUserProps = (props: Partial<AnalyticsUserProps>): void => {
 /**
  * 로그인한 사용자를 식별한다.
  *
- * 서버가 아직 사용자 식별자를 내려주지 않아 호출할 곳이 없다. /auth/me 또는
- * 로그인 응답에 id가 추가되면 로그인·부팅 시점에서 이 함수를 부르면 된다.
- * 그 전까지 Amplitude는 기기 단위로만 집계한다.
+ * app/index.tsx가 /auth/me의 userId로 부른다. 로그인 직후에도 index를 거쳐
+ * /auth/me를 다시 받으므로 부팅·로그인 두 시점을 한 곳에서 처리한다.
  */
 export const setAnalyticsUserId = (userId: string): void => {
   amplitude.setUserId(userId);
@@ -123,9 +122,7 @@ const USER_PROP_KEYS: (keyof AnalyticsUserProps)[] = [
  * 그러면 같은 실기기에서 로그아웃할 때마다 다른 기기로 잡혀 운영 환경 테스트가
  * 여러 사용자로 쪼개진다.
  *
- * 대신 "한 기기에서 계정을 바꾼 경우"의 분리는 포기했다. 서버가 사용자 식별자를
- * 내려주기 시작하면 setAnalyticsUserId가 계정을 구분해주므로, 이 함수는 그대로
- * 두어도 그때부터 제 역할을 한다.
+ * 한 기기에서 계정을 바꾼 경우의 구분은 다음 로그인 때 setAnalyticsUserId가 맡는다.
  */
 export const resetAnalyticsUser = (): void => {
   amplitude.setUserId(undefined);
