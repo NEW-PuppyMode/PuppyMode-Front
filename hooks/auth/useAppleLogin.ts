@@ -6,6 +6,7 @@ import { logEvent } from '@/utils/analytics';
 import {
   describeToken,
   logAuthEvent,
+  reportError,
   setCrashlyticsUser,
 } from '@/utils/tokenDebug';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -36,6 +37,12 @@ export const useAppleLogin = () => {
         credentialState !==
         AppleAuthentication.AppleAuthenticationCredentialState.AUTHORIZED
       ) {
+        // 사용자에게는 아무 반응 없이 끝나는 경우라 리포트가 없으면 원인을 알 수 없다
+        reportError(
+          new Error(`Apple credential not authorized: ${credentialState}`),
+          'login:apple',
+          { stage: 'credential-state' },
+        );
         return null;
       }
 
@@ -48,6 +55,15 @@ export const useAppleLogin = () => {
           identityTokenExists: !!identityToken,
           authorizationCodeExists: !!authorizationCode,
         });
+        reportError(
+          new Error('Apple 로그인 응답에 token/code가 없습니다.'),
+          'login:apple',
+          {
+            stage: 'apple-sdk',
+            identity_token: identityToken ? '1' : '0',
+            authorization_code: authorizationCode ? '1' : '0',
+          },
+        );
         Alert.alert('오류', 'Apple 로그인 정보를 가져오지 못했습니다.');
         return null;
       }
@@ -105,6 +121,7 @@ export const useAppleLogin = () => {
           '백엔드 Apple 로그인 실패:',
           backendError.response?.data || backendError.message,
         );
+        reportError(backendError, 'login:apple', { stage: 'server' });
 
         // 서버가 보내주는 message를 그대로 보여주면 디버깅에 도움됨
         Alert.alert(
@@ -118,6 +135,7 @@ export const useAppleLogin = () => {
       if (error.code === 'ERR_CANCELED') return null;
 
       console.error('Apple 로그인 에러:', error);
+      reportError(error, 'login:apple', { stage: 'apple-sdk' });
       Alert.alert('로그인 오류', 'Apple 로그인 중 문제가 발생했습니다.');
       return null;
     }

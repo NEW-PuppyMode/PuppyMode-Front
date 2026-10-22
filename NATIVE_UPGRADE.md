@@ -123,35 +123,48 @@ cd android && ./gradlew bundleRelease && cd ..
 
 ---
 
-## 4. iOS — 아직 SDK 54 미마이그레이션
+## 4. iOS — SDK 54 마이그레이션 완료 (SCRUM-112, #133)
 
-**현재 상태:** `ios/`는 SDK 53(React Native 0.79.6) 그대로이고, JS/node_modules만 SDK 54(RN 0.81.5)로 올라가 서로 어긋난 상태입니다.
-이 상태로도 기존 iOS 릴리즈는 지금까지 하던 방식(Xcode Archive 등) 그대로 나가지만, **iOS를 SDK 54로 맞추는 작업은 아직 수행되지 않았습니다.** 이 작업은 맥 환경이 필요합니다(Windows에서 iOS 빌드·테스트 불가).
+**현재 상태:** `ios/`도 SDK 54(React Native 0.81.5)에 맞춰졌습니다. (커밋 `a4de3f9`)
+iOS 작업은 맥 환경이 필요합니다(Windows에서 iOS 빌드·테스트 불가).
 
 ### 4-1. `prebuild --clean`을 iOS에 단독 실행하지 말 것
 
 `ios/`에는 config plugin으로 재생성되지 않는 **수동 패치**가 있어, `prebuild --clean`을 돌리면 아래가 사라지고 빌드/서명이 깨집니다. Android보다 복구가 어렵습니다(인증서·프로비저닝·CocoaPods 관여).
 
 보존해야 하는 수동 커스텀:
-- **Xcode 16+ `fmt` 컴파일 에러 패치** (git: `e9e13fa`)
+- **Xcode 16+ `fmt` 컴파일 에러 패치** (git: `e9e13fa`) — `ios/Podfile`의 `post_install` 안. SDK 54 업그레이드 후에도 유지됨
 - **애플 로그인 entitlements** — `expo-apple-authentication`이 `app.json` plugins에 없어 수동 설정됨 (6번 TODO에서 이관 시 해소)
 - **pbxproj 수동 편집** (빌드 설정, Firebase 연동 등)
-- `Podfile.lock` (현재 RN 0.79.6 기준) — 업그레이드 시 재생성됨
 
-### 4-2. iOS SDK 54 마이그레이션 절차 (맥 환경, 미검증)
+> `Podfile.lock`은 #133에서 레포에서 삭제되었습니다(`.gitignore` 대상은 아님). 현재는 `pod install` 시 로컬에서 새로 생성됩니다. 팀원 간 pod 버전을 고정하려면 다시 커밋할지 결정이 필요합니다.
 
-Android(3번)와 동일한 "재생성 → 복원 → 검증" 골격입니다. 아래는 아직 실제로 수행·검증되지 않았으므로, 진행하며 막히는 지점을 기록하고 검증된 절차로 이 절을 갱신하세요.
+### 4-2. iOS SDK 업그레이드 방식 (SDK 54에서 실제 사용)
 
-1. 시작 전 `ios/` 전체와 위 4-1 수동 패치를 백업(브랜치 분리 또는 폴더 복사).
-2. 의존성은 이미 SDK 54 정렬됨(2번에서 완료). 추가로 iOS 전용 패키지 버전만 `npx expo install --fix`로 재확인.
-3. 네이티브 재생성:
+iOS는 `prebuild --clean`으로 재생성하지 **않고**, 새 SDK 템플릿과 달라진 부분만 손으로 옮겼습니다.
+그래서 `project.pbxproj`·`AppDelegate.swift`·entitlements 등 4-1의 커스텀은 건드리지 않았습니다.
+
+1. 새 SDK 기본 템플릿의 `ios/Podfile`·`Info.plist`를 현재 파일과 비교합니다.
+   (예: 빈 임시 폴더에서 `npx create-expo-app --template blank@sdk-54` → `npx expo prebuild --platform ios`로 만든 결과와 diff)
+2. 차이 중 **템플릿 변경분만** 옮기고, 4-1의 커스텀(fmt 패치 등)은 그대로 둡니다.
+3. 맥에서 pod 재설치 후 빌드:
    ```bash
-   npx expo prebuild --clean --platform ios
    cd ios && pod install && cd ..
+   npx expo run:ios   # 또는 Xcode Archive
    ```
-4. 4-1의 수동 패치 재적용(Xcode fmt 패치, 애플 로그인 entitlements, pbxproj 설정, 서명/프로비저닝).
-5. 검증: `npx expo run:ios`(또는 Xcode Archive)로 빌드 → 애플 로그인·푸시 알림·주요 화면 확인.
-6. 검증 완료 후, 실제로 통과한 절차/주의점을 이 4-2에 반영.
+4. 애플 로그인·푸시 알림·주요 화면을 확인합니다.
+
+SDK 54에서 실제로 옮긴 변경분:
+
+| 파일 | 변경 내용 |
+|------|-----------|
+| `Podfile` | `RCT_USE_PREBUILT_RNCORE`·`RCT_USE_RN_DEP` 활성화 → RN을 미리 빌드된 바이너리로 받아 빌드 시간 단축 |
+| `Podfile` | 오토링킹 명령을 `npx expo-modules-autolinking` → `node --eval "require('expo/bin/autolinking')"`로 변경 |
+| `Podfile` | ccache를 환경변수 `USE_CCACHE=1`로도 켤 수 있도록 `ccache_enabled?` 함수 추가 |
+| `Podfile` | `install! 'cocoapods', :deterministic_uuids => false` 삭제, `ENV[...] =` → `\|\|=`(외부 환경변수 우선) |
+| `Info.plist` | `RCTNewArchEnabled = true`(New Architecture), `CFBundleAllowMixedLocalizations = true` 추가 |
+
+> 1번의 템플릿 비교 방법과 4번의 검증 범위는 커밋 내용을 기준으로 정리한 것입니다. 담당자가 실제로 사용한 방법과 다르면 이 절을 갱신하세요.
 
 ---
 
@@ -173,6 +186,7 @@ Android(3번)와 동일한 "재생성 → 복원 → 검증" 골격입니다. �
    npx expo prebuild --clean --platform android
    ```
    → 이후 **3번 복원 체크리스트** 전부 수행.
+   - iOS는 prebuild 대신 **4-2 방식**(템플릿 변경분만 손으로 반영 → `pod install`)으로 맥에서 진행.
 4. **빌드 캐시 주의**
    - node_modules를 지웠다 재설치했다면, 낡은 CMake 캐시가 깨지므로 함께 삭제:
      ```bash

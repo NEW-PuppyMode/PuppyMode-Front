@@ -2,6 +2,7 @@ import { KEYS } from '@/constants/storage';
 import {
   describeToken,
   logAuthEvent,
+  reportError,
   reportForcedLogout,
   setCrashlyticsUser,
 } from '@/utils/tokenDebug';
@@ -152,6 +153,9 @@ export class NoRefreshTokenError extends Error {
 // 중복 재발급 방지용
 let refreshPromise: Promise<string> | null = null;
 
+// 동시에 401을 받은 요청들은 같은 재발급 에러 객체를 받으므로, 한 번만 올리기 위함
+let lastReportedReissueError: unknown = null;
+
 export async function reissueAccessToken(): Promise<string> {
   if (refreshPromise) return refreshPromise;
 
@@ -297,9 +301,23 @@ axiosInstance.interceptors.response.use(
 
         if (reissueStatus === 401 || reissueStatus === 403) {
           await clearTokens('reissue-rejected', { status: reissueStatus });
+        } else if (reissueError !== lastReportedReissueError) {
+          // 토큰을 지우는 경우는 clearTokens가 이미 올리므로 그 외만 올린다
+          lastReportedReissueError = reissueError;
+          reportError(reissueError, 'reissue', { triggered_by: requestUrl });
         }
         return Promise.reject(reissueError);
       }
+    }
+
+    // 인증 API와 401 재발급 흐름은 따로 올리므로 그 외의 서버 장애·네트워크 실패만 올린다.
+    // 4xx는 정상적인 비즈니스 응답도 많아 제외하고, 요청 취소는 에러가 아니므로 제외한다.
+    const isServerOrNetworkError = !error.response || (status ?? 0) >= 500;
+    if (isServerOrNetworkError && !isAuthRoute && !axios.isCancel(error)) {
+      reportError(error, 'api', {
+        url: `${originalRequest.method?.toUpperCase() ?? ''} ${requestUrl.split('?')[0]}`,
+        axios_code: error.code ?? '-',
+      });
     }
 
     return Promise.reject(error);

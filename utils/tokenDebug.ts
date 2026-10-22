@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import crashlytics from '@react-native-firebase/crashlytics';
+import axios from 'axios';
 
 /**
  * 로그인이 약 2주마다 풀리는 문제를 추적하기 위한 진단 로깅.
@@ -146,6 +147,38 @@ export function reportForcedLogout(
     crashlytics().recordError(new Error(`[AUTH] forced-logout: ${reason}`));
   } catch (e) {
     console.warn('[AUTH] crashlytics recordError 실패', e);
+  }
+}
+
+/**
+ * 앱이 죽지 않고 잡힌 에러를 non-fatal로 올린다.
+ * 잡힌 에러는 이 호출이 없으면 Crashlytics에 남지 않고, 쌓인 log()도 업로드되지 않는다.
+ */
+export function reportError(
+  error: unknown,
+  where: string,
+  attributes: Record<string, string> = {},
+) {
+  const err = error instanceof Error ? error : new Error(String(error));
+
+  // 속성은 이후 리포트에도 남으므로 axios 에러가 아니어도 항상 덮어쓴다
+  const status = axios.isAxiosError(error)
+    ? String(error.response?.status ?? 'network')
+    : '-';
+  const serverCode = axios.isAxiosError(error)
+    ? String(error.response?.data?.code ?? '-')
+    : '-';
+
+  try {
+    crashlytics().setAttributes({
+      where,
+      status,
+      server_code: serverCode,
+      ...attributes,
+    });
+    crashlytics().recordError(err);
+  } catch (e) {
+    console.warn('[CRASHLYTICS] recordError 실패', e);
   }
 }
 
