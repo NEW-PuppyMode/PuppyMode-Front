@@ -12,6 +12,7 @@ import { TextInput } from '@/components/common/Inputs/TextInput';
 import { ChoiceButton } from '@/components/page/home/ChoiceButton';
 import { ControlButton } from '@/components/page/home/ControlButton';
 import { EvolvingPuppy } from '@/components/page/home/EvolvingPuppy';
+import { HomeErrorView } from '@/components/page/home/HomeErrorView';
 import { IconButton } from '@/components/page/home/IconButton';
 import { LevelUpBadge } from '@/components/page/home/LevelUpBadge';
 import { SpeechBubble } from '@/components/page/home/SpeechBubble';
@@ -32,6 +33,7 @@ import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
 import { useVersionCheckQuery } from '@/hooks/queries/useVersionCheckQuery';
 import { logEvent } from '@/utils/analytics';
 import { maxDaysInMonth } from '@/utils/dateUtils';
+import { hideSplash } from '@/utils/splash';
 import { router } from 'expo-router';
 import { throttle } from 'lodash';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -63,6 +65,8 @@ export default function HomeScreen() {
     isLoading,
     isFetching,
     isError,
+    errorUpdateCount,
+    refetch,
   } = usePuppyInfoQuery();
   const { data: isRecorded } = useIsRecordedQuery();
   const { data: recentGoal } = useRecentGoalQuery();
@@ -277,6 +281,12 @@ export default function HomeScreen() {
     }
   }, [puppyInfo, isFetching]);
 
+  // 앱 진입 시 홈 UI가 그려질 때까지 스플래시를 유지한다. (utils/splash.ts)
+  // 목표 갱신 대상이면 갱신 화면이 대신 내린다.
+  useEffect(() => {
+    if (isError || puppyInfo?.isGoal) hideSplash();
+  }, [isError, puppyInfo?.isGoal]);
+
   const _handleAdviceClick = async () => {
     try {
       const result = await advicePuppyMutation.mutateAsync();
@@ -413,12 +423,17 @@ export default function HomeScreen() {
     };
   }, [bottomPanelHeight, keyboardAnim]);
 
+  // 보여줄 데이터가 없을 때만 에러 화면을 띄운다. 기록 후 재요청처럼 데이터가 이미
+  // 있는 상태에서 실패하면(isError도 true가 된다) 기존 화면을 그대로 둔다.
+  // 데이터 없이 다시 시도하면 React Query가 상태를 pending으로 되돌려 isError가
+  // false가 되므로, 실패한 적이 있으면(errorUpdateCount) 재요청 중에도 에러 화면을 유지한다.
+  const showError =
+    !puppyInfo && (isError || (isFetching && errorUpdateCount > 0));
+  if (showError) {
+    return <HomeErrorView onRetry={() => refetch()} isRetrying={isFetching} />;
+  }
   if (isLoading) {
     return null; // 추후 로딩 UI 추가
-  }
-  if (isError) {
-    return null;
-    // 추후 에러 UI 추가 (문제가 생겼습니다, 로그인 화면으로 이동? 상의 필요)
   }
 
   // 목표 갱신이 필요하면 홈 UI를 그리지 않고 리다이렉트를 기다린다.

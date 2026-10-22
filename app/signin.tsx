@@ -18,6 +18,7 @@ import {
 
 import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { logButtonTap } from '@/utils/analytics';
+import { hideSplash } from '@/utils/splash';
 import { useQueryClient } from '@tanstack/react-query';
 import Apple from '../assets/icons/signin/ic_apple.svg';
 import Kakao from '../assets/icons/signin/ic_kakao.svg';
@@ -30,6 +31,11 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const IS_SMALL = SCREEN_HEIGHT <= 700; // iPhone 7(667)
 
 const SignIn = () => {
+  // 로그아웃 상태로 앱에 진입하면 여기서 스플래시를 내린다. (utils/splash.ts)
+  useEffect(() => {
+    hideSplash();
+  }, []);
+
   const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
   const { isLoading, error, userInfo, loginWithKakao } = useLogin();
