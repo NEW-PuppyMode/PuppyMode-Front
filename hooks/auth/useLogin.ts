@@ -1,5 +1,5 @@
-import { useEnableNotifications } from '@/hooks/notifications/useEnableNotifications';
 import { KEYS } from '@/constants/storage';
+import { useEnableNotifications } from '@/hooks/notifications/useEnableNotifications';
 import { KakaoLoginResult, loginAPI } from '@/services/auth';
 import { logEvent } from '@/utils/analytics';
 import { reportError } from '@/utils/tokenDebug';
@@ -64,10 +64,14 @@ export const useLogin = (): UseLoginReturn => {
 
       setUserInfo(result.userInfo);
     } catch (err: any) {
-      console.error('[KAKAO] 로그인 에러:', err);
-      if (!(stage === 'kakao-sdk' && isKakaoCancel(err))) {
-        reportError(err, 'login:kakao', { stage });
+      // 사용자가 창을 닫은 건 실패가 아니므로 알럿도 리포트도 남기지 않는다
+      if (stage === 'kakao-sdk' && isKakaoCancel(err)) {
+        console.log('[KAKAO] 로그인 취소:', err?.message);
+        return;
       }
+
+      console.error('[KAKAO] 로그인 에러:', err);
+      reportError(err, 'login:kakao', { stage });
       setError(err.message ?? '로그인에 실패했습니다.');
     } finally {
       setIsLoading(false);
