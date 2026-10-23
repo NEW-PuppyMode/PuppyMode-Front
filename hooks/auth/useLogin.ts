@@ -17,10 +17,15 @@ export interface UseLoginReturn {
 /**
  * 카카오 SDK는 취소를 포함한 모든 실패를 같은 코드("RNKakaoLogins")로 내보내므로
  * 메시지로만 취소를 구분할 수 있다. 사용자가 창을 닫은 건 에러로 올리지 않는다.
+ *
+ * - Android: "user cancelled."
+ * - iOS: 래퍼가 localizedDescription만 넘겨 "...(KakaoSDKCommon.SdkError error 0.)"로 온다.
+ *   error 0(ClientFailed)에는 취소 외에 앱 키 미설정 같은 클라이언트 오류도 섞여 있지만,
+ *   이들은 설정 문제라 개발 중에 드러나므로 취소로 함께 취급한다.
  */
 function isKakaoCancel(err: unknown): boolean {
   const message = err instanceof Error ? err.message : String(err);
-  return /cancel/i.test(message);
+  return /cancel|SdkError error 0\b/i.test(message);
 }
 
 export const useLogin = (): UseLoginReturn => {
