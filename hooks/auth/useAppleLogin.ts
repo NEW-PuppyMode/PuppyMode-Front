@@ -132,7 +132,13 @@ export const useAppleLogin = () => {
         return null;
       }
     } catch (error: any) {
-      if (error.code === 'ERR_CANCELED') return null;
+      // 사용자가 창을 닫으면 RequestCanceledException → ERR_REQUEST_CANCELED로 온다
+      if (
+        error.code === 'ERR_REQUEST_CANCELED' ||
+        error.code === 'ERR_CANCELED'
+      ) {
+        return null;
+      }
 
       console.error('Apple 로그인 에러:', error);
       reportError(error, 'login:apple', { stage: 'apple-sdk' });
