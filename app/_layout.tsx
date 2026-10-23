@@ -26,6 +26,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import {
+  Platform,
   Text as RNText,
   TextInput as RNTextInput,
   type StyleProp,
@@ -118,6 +119,28 @@ export default function RootLayout() {
     analytics()
       .setAnalyticsCollectionEnabled(!__DEV__)
       .catch((e) => console.log('[Analytics] setCollectionEnabled failed', e));
+  }, []);
+
+  useEffect(() => {
+    // firebase.json의 crashlytics_debug_enabled는 iOS에도 적용되는데, iOS는 아직
+    // 개발용 Firebase로 분리되지 않아 디버그 빌드 에러가 운영으로 간다. 그래서 iOS 디버그만 끈다.
+    // 이 값은 기기에 저장되어 앱을 덮어 설치해도 남으므로 릴리즈에서도 매번 명시한다.
+    // TODO: iOS도 개발용 Firebase로 분리하면 이 effect를 지운다.
+    const isIosDebug = __DEV__ && Platform.OS === 'ios';
+    crashlytics()
+      .setCrashlyticsCollectionEnabled(!isIosDebug)
+      .catch((e) =>
+        console.log('[Crashlytics] setCollectionEnabled failed', e),
+      );
+
+    // 꺼져 있는 동안 쌓인 리포트가 나중에 릴리즈 빌드에서 운영으로 올라가지 않게 지운다
+    if (isIosDebug) {
+      crashlytics()
+        .deleteUnsentReports()
+        .catch((e) =>
+          console.log('[Crashlytics] deleteUnsentReports failed', e),
+        );
+    }
   }, []);
 
   useEffect(() => {
