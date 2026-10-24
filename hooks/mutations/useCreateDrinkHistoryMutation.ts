@@ -12,7 +12,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
  * 하나 더 생겨도 컴파일이 계측을 강제한다.
  */
 type CreateDrinkHistoryInput = DrinkHistoryDTO & {
-  source: 'tutorial' | 'home';
+  source: 'tutorial' | 'home' | 'monthly_report';
   recordDay: 'today' | 'yesterday';
 };
 

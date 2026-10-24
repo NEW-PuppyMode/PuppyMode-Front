@@ -48,6 +48,23 @@ defineMockGlobal('Document');
  * 거쳐 처리하는데, text()는 문자열 본문을 JS 안에서 그대로 돌려준다. 목 응답은
  * 전부 JSON 문자열이라 이걸로 충분하다. (바이너리 본문을 목킹하려면 바꿔야 한다)
  */
+/**
+ * MSW는 앱이 보낸 요청 본문(문자열)을 UTF-8 바이트로 바꿔 Request를 만든다.
+ * 그런데 RN의 Request(whatwg-fetch)는 바이트 본문을 text()로 읽을 때 1바이트를
+ * 1글자로 바꿔서, 한글처럼 여러 바이트인 글자가 깨진다. (readArrayBufferAsText)
+ * 그래서 목 핸들러의 request.json()이 깨진 이름을 받고, 그대로 응답에 돌려준다.
+ *
+ * 바이트 본문만 UTF-8로 읽고 나머지는 원래 동작에 맡긴다. json()은 안에서 text()를
+ * 부르므로 함께 고쳐진다. 한 번만 읽을 수 있는 원래 동작(bodyUsed)도 지킨다.
+ */
+const originalRequestText = Request.prototype.text;
+Request.prototype.text = function () {
+  if (!this._bodyArrayBuffer) return originalRequestText.call(this);
+  if (this.bodyUsed) return Promise.reject(new TypeError('Already read'));
+  this.bodyUsed = true;
+  return Promise.resolve(new TextDecoder().decode(this._bodyArrayBuffer));
+};
+
 if (!('body' in Response.prototype)) {
   Object.defineProperty(Response.prototype, 'body', {
     configurable: true,

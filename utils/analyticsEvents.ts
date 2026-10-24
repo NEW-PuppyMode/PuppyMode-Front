@@ -62,7 +62,7 @@ export type AnalyticsEventMap = {
   // ===== 핵심 행동 =====
   drink_record_created: {
     drank: boolean;
-    source: 'tutorial' | 'home';
+    source: 'tutorial' | 'home' | 'monthly_report';
     record_day: 'today' | 'yesterday';
   };
   dog_advice_received: undefined;

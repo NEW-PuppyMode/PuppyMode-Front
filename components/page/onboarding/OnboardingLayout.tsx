@@ -9,6 +9,7 @@ import {
   Platform,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import {
@@ -18,7 +19,15 @@ import {
 import { OnboardingProgress } from './OnboardingProgress';
 
 // home보다 살짝 작은 강아지 (home: 288)
-const PUPPY_SIZE = 250;
+const PUPPY_MAX_SIZE = 250;
+// 강아지 크기와 위치는 하단 영역이 아니라 화면(안전 영역) 높이 기준으로 정한다.
+// 하단 영역은 단계마다 높이가 달라서(카운터·선택 카드·입력창), 거기에 붙이면 단계를
+// 넘길 때 강아지가 오르내리고, 작은 화면에서는 말풍선이 부제를 덮는다.
+// - 크기: 안전 영역 높이의 비율. 큰 화면에서는 PUPPY_MAX_SIZE에서 멈춘다.
+// - 위치: 강아지 아래 끝을 안전 영역 아래에서 이 비율만큼 띄운다. 가장 높은 하단
+//   영역(선택 카드 + 버튼)과 겹치지 않을 정도로 잡았다.
+const PUPPY_SIZE_RATIO = 0.32;
+const PUPPY_BOTTOM_RATIO = 0.24;
 // 말풍선 최소 높이(3줄 기준). 단계별 멘트 줄 수가 달라도 높이를 일정하게 유지한다.
 const BUBBLE_MIN_HEIGHT = 120;
 
@@ -60,6 +69,14 @@ export function OnboardingLayout({
   const insets = useSafeAreaInsets();
   const keyboardAnim = useRef(new Animated.Value(0)).current;
 
+  const { height: windowHeight } = useWindowDimensions();
+  const safeHeight = windowHeight - insets.top - insets.bottom;
+  const puppySize = Math.min(
+    PUPPY_MAX_SIZE,
+    Math.round(safeHeight * PUPPY_SIZE_RATIO),
+  );
+  const puppyBottom = Math.round(safeHeight * PUPPY_BOTTOM_RATIO);
+
   useEffect(() => {
     const showEvent =
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
@@ -94,45 +111,57 @@ export function OnboardingLayout({
       resizeMode='cover'
     >
       <SafeAreaView style={styles.container}>
-        <View style={styles.progressWrapper}>
-          <OnboardingProgress step={step} total={totalSteps} />
-        </View>
-
-        <View style={styles.titleBlock}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
-        </View>
-
-        <View style={styles.middle}>
-          <View style={styles.bubbleWrapper}>
-            {/* step이 바뀌면 remount 되어 등장 애니메이션이 다시 재생된다. */}
-            <SpeechBubble
-              key={step}
-              minHeight={BUBBLE_MIN_HEIGHT}
-              tailScale={2.4}
-            >
-              {bubbleText}
-            </SpeechBubble>
+        <View style={styles.content}>
+          {/* 말풍선·강아지는 흐름에서 빼서 화면 기준 위치에 고정한다. 하단 영역보다 먼저
+              그려서, 겹치더라도 버튼·입력이 위에 오고 터치를 가로채지 않는다. */}
+          <View
+            style={[styles.stage, { bottom: puppyBottom }]}
+            pointerEvents='box-none'
+          >
+            <View style={styles.bubbleWrapper}>
+              {/* step이 바뀌면 remount 되어 등장 애니메이션이 다시 재생된다. */}
+              <SpeechBubble
+                key={step}
+                minHeight={BUBBLE_MIN_HEIGHT}
+                tailScale={2.4}
+              >
+                {bubbleText}
+              </SpeechBubble>
+            </View>
+            <EvolvingPuppy
+              breedName={breed}
+              level={level}
+              reaction='normal'
+              evolveEvent={null}
+              size={puppySize}
+            />
           </View>
-          <EvolvingPuppy
-            breedName={breed}
-            level={level}
-            reaction='normal'
-            evolveEvent={null}
-            size={PUPPY_SIZE}
-          />
-        </View>
 
-        <Animated.View
-          style={[
-            styles.bottom,
-            {
-              transform: [{ translateY: Animated.multiply(keyboardAnim, -1) }],
-            },
-          ]}
-        >
-          {children}
-        </Animated.View>
+          <View style={styles.progressWrapper}>
+            <OnboardingProgress step={step} total={totalSteps} />
+          </View>
+
+          <View style={styles.titleBlock}>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.subtitle}>{subtitle}</Text>
+          </View>
+
+          {/* 하단 영역을 화면 아래에 붙인다. 입력 칸이 높아지면 위로만 커지므로 버튼 위치는 그대로다. */}
+          <View style={styles.spacer} />
+
+          <Animated.View
+            style={[
+              styles.bottom,
+              {
+                transform: [
+                  { translateY: Animated.multiply(keyboardAnim, -1) },
+                ],
+              },
+            ]}
+          >
+            {children}
+          </Animated.View>
+        </View>
       </SafeAreaView>
     </ImageBackground>
   );
@@ -171,10 +200,17 @@ const styles = StyleSheet.create({
     color: '#777777',
     textAlign: 'center',
   },
-  middle: {
+  content: {
     flex: 1,
+  },
+  stage: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
     alignItems: 'center',
-    justifyContent: 'flex-end',
+  },
+  spacer: {
+    flex: 1,
   },
   bubbleWrapper: {
     width: '100%',
