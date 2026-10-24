@@ -12,6 +12,7 @@ import {
   goalRenewalYesterdayHandlers,
 } from './api/goalRenewal';
 import { homeErrorHandlers } from './api/homeError';
+import { onboardingHandlers } from './api/onboarding';
 import { puppyHandlers } from './api/puppy';
 
 /**
@@ -29,6 +30,8 @@ import { puppyHandlers } from './api/puppy';
  *   캘린더 월 선택 모달의 월·연도 비활성화 (mocks/api/calendarMonths.ts)
  * - calendarAchievement: 캘린더 상단 목표 달성 칩의 월별 상태 (mocks/api/calendarAchievement.ts)
  * - homeError: 홈 데이터 조회 실패 → 에러 화면 → 다시 시도로 복구 (mocks/api/homeError.ts)
+ * - onboarding: 검사만 마친 사용자의 최초 온보딩 (강아지 이름 → 내 이름 → 목표 → 홈)
+ *   (mocks/api/onboarding.ts)
  */
 const scenarios = {
   goalRenewal: [...goalRenewalHandlers, goalRenewalReportHandler('NO_GOAL')],
@@ -49,6 +52,7 @@ const scenarios = {
   calendarMonthsError: calendarMonthsErrorHandlers,
   calendarAchievement: calendarAchievementHandlers,
   homeError: homeErrorHandlers,
+  onboarding: onboardingHandlers,
 };
 
 const scenario = process.env.EXPO_PUBLIC_MOCK_SCENARIO as
