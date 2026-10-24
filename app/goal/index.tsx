@@ -268,14 +268,12 @@ export default function GoalRenewal() {
         subtitle={`오늘이 지나면 ${reportMonth.month}월 ${lastDay}일은 기록할 수 없어요.`}
         bubbleText={`${reportMonth.month}월 마지막 날은 어땠어?\n알려주면 리포트 완성해줄게!`}
       >
-        <View style={styles.choiceSlot}>
-          <YesterdayDrinkChoice
-            value={yesterdayDrink}
-            onChange={setYesterdayDrink}
-            breed={breed}
-            disabled={isRecordSaving}
-          />
-        </View>
+        <YesterdayDrinkChoice
+          value={yesterdayDrink}
+          onChange={setYesterdayDrink}
+          breed={breed}
+          disabled={isRecordSaving}
+        />
         <PrimaryButton
           title='다음으로'
           onPress={handleRecordSubmit}
@@ -351,10 +349,6 @@ const styles = StyleSheet.create({
   },
   inputSlot: {
     height: 52,
-    justifyContent: 'center',
-  },
-  choiceSlot: {
-    height: 85,
     justifyContent: 'center',
   },
 });
