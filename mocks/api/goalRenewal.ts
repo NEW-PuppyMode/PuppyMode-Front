@@ -1,6 +1,11 @@
 import type { MeResult } from '@/services/auth';
 import type { GoalStatus, ReportResultDTO } from '@/services/reportData';
-import type { GoalDTO, IPuppyInfo, RecentGoal } from '@/types/models/puppy';
+import type {
+  DrinkHistoryDTO,
+  GoalDTO,
+  IPuppyInfo,
+  RecentGoal,
+} from '@/types/models/puppy';
 import { delay, http, HttpResponse } from 'msw';
 
 /**
@@ -20,6 +25,8 @@ import { delay, http, HttpResponse } from 'msw';
 // 목표를 저장했는지. JS를 다시 불러오면(Metro에서 r) 처음 값으로 돌아간다.
 let isGoalSet = false;
 let savedGoal = 0;
+// 지난 달 마지막 날(어제)에 마셨는지. null이면 아직 기록 전. (goalRenewalYesterdayHandlers)
+let lastDayDrink: boolean | null = null;
 
 export const goalRenewalHandlers = [
   // 앱 진입: 검사·온보딩·튜토리얼을 모두 마친 사용자 → app/index.tsx가 홈으로 보낸다.
@@ -49,7 +56,7 @@ export const goalRenewalHandlers = [
       puppyLevelName: '눈송이 비숑',
       puppyLevelPercent: 40,
       puppyImageUrl: '',
-      didRecordYesterday: false,
+      didRecordYesterday: lastDayDrink !== null,
       didRecordToday: false,
       isPuppyName: true,
       isMyName: true,
@@ -165,3 +172,64 @@ export const goalRenewalReportHandler = (goalStatus: GoalStatus) =>
       result,
     });
   });
+
+/**
+ * 지난 달 마지막 날(어제)을 기록하지 않은 채 리포트를 받는 경우.
+ * 목표 갱신 화면 맨 앞에 '어제 술 마셨어요?' 스텝이 붙는다.
+ *
+ * 어제가 지난 달 마지막 날이어야 하므로 기기 날짜를 매달 1일로 바꿔서 본다.
+ * (다른 날이면 어제 기록 스텝 없이 리포트부터 나온다)
+ *
+ * 13번 목표에 13일 마신 상태로 시작해서, 마지막 날 마셨다고 기록하면 14일이 되어
+ * 실패, 안 마셨다고 하면 그대로 달성이 된다. 기록은 진짜 서버로 보내지 않는다.
+ */
+export const goalRenewalYesterdayHandlers = [
+  http.post('*/drink-history', async ({ request }) => {
+    await delay(300);
+    const body = (await request.json()) as DrinkHistoryDTO;
+    lastDayDrink = body.isDrink;
+    console.log(
+      '[MSW] POST /drink-history →',
+      body.drinkDate,
+      body.isDrink ? '마심' : '안 마심',
+    );
+    return HttpResponse.json({
+      isSuccess: true,
+      code: 'COMMON200',
+      message: '성공입니다.',
+      result: {},
+    });
+  }),
+
+  http.get('*/report', async ({ request }) => {
+    const lastMonth = new Date();
+    lastMonth.setDate(1);
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+    const url = new URL(request.url);
+    const isLastMonth =
+      Number(url.searchParams.get('year')) === lastMonth.getFullYear() &&
+      Number(url.searchParams.get('month')) === lastMonth.getMonth() + 1;
+    if (!isLastMonth) return;
+
+    await delay(300);
+    const goal = 13;
+    const drinkDays = 13 + (lastDayDrink ? 1 : 0);
+    const goalStatus: GoalStatus = drinkDays > goal ? 'FAILED' : 'ACHIEVED';
+    const result: ReportResultDTO = {
+      goal,
+      drinkDays,
+      drinkRecordCount: drinkDays,
+      achievementRate: goalStatus === 'ACHIEVED' ? 100 : 0,
+      scoldedCount: 0,
+      goalStatus,
+    };
+    console.log('[MSW] /report 지난 달 →', goalStatus, `(${drinkDays}일)`);
+    return HttpResponse.json({
+      isSuccess: true,
+      code: 'COMMON200',
+      message: '성공입니다.',
+      result,
+    });
+  }),
+];

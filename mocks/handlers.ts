@@ -9,6 +9,7 @@ import {
 import {
   goalRenewalHandlers,
   goalRenewalReportHandler,
+  goalRenewalYesterdayHandlers,
 } from './api/goalRenewal';
 import { homeErrorHandlers } from './api/homeError';
 import { puppyHandlers } from './api/puppy';
@@ -22,6 +23,8 @@ import { puppyHandlers } from './api/puppy';
  *   지난 달 목표가 없어서 리포트 없이 목표 설정만 나온다.
  * - goalRenewalAchieved / goalRenewalFailed: 위와 같고, 지난 달 목표를 달성/실패해서
  *   목표 설정 앞에 지난 달 리포트가 붙는다.
+ * - goalRenewalYesterday: 지난 달 마지막 날(어제)을 기록하지 않아 리포트 앞에
+ *   '어제 술 마셨어요?' 스텝이 붙는다. 기기 날짜를 매달 1일로 바꿔서 본다.
  * - calendarMonths / calendarMonthsEmpty / calendarMonthsError:
  *   캘린더 월 선택 모달의 월·연도 비활성화 (mocks/api/calendarMonths.ts)
  * - calendarAchievement: 캘린더 상단 목표 달성 칩의 월별 상태 (mocks/api/calendarAchievement.ts)
@@ -36,6 +39,10 @@ const scenarios = {
   goalRenewalFailed: [
     ...goalRenewalHandlers,
     goalRenewalReportHandler('FAILED'),
+  ],
+  goalRenewalYesterday: [
+    ...goalRenewalHandlers,
+    ...goalRenewalYesterdayHandlers,
   ],
   calendarMonths: calendarMonthsHandlers,
   calendarMonthsEmpty: calendarMonthsEmptyHandlers,

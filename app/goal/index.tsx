@@ -1,7 +1,9 @@
 import { PrimaryButton } from '@/components/common/buttons/PrimaryButton';
 import { MonthlyReportStats } from '@/components/page/goal/MonthlyReportStats';
+import { YesterdayDrinkChoice } from '@/components/page/goal/YesterdayDrinkChoice';
 import { GoalCounter } from '@/components/page/onboarding/GoalCounter';
 import { OnboardingLayout } from '@/components/page/onboarding/OnboardingLayout';
+import { useCreateDrinkHistoryMutation } from '@/hooks/mutations/useCreateDrinkHistoryMutation';
 import { useCreateGoalMutation } from '@/hooks/mutations/useCreateGoalMutation';
 import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
@@ -37,6 +39,31 @@ const getReportMonth = (recentGoal: RecentGoal | null | undefined) => {
   return { year, month };
 };
 
+type ReportMonth = { year: number; month: number };
+
+const getLastDay = ({ year, month }: ReportMonth) =>
+  new Date(year, month, 0).getDate();
+
+// 리포트 기준 달의 마지막 날이 어제인지. 홈에서는 어제까지만 기록할 수 있어서,
+// 이 날을 비워 둔 채 리포트를 받으면 오늘이 지나 기록할 길이 없다. 또 리포트를 본
+// 뒤에 홈에서 어제를 기록하면 이미 본 달성/실패가 뒤집힐 수 있다. 그래서 리포트
+// 앞에서 먼저 기록받는다. 8월 목표 후 10월에 들어온 경우처럼 마지막 날이 어제가
+// 아니면 해당하지 않는다.
+const isLastDayYesterday = (reportMonth: ReportMonth) => {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return (
+    yesterday.getFullYear() === reportMonth.year &&
+    yesterday.getMonth() + 1 === reportMonth.month &&
+    yesterday.getDate() === getLastDay(reportMonth)
+  );
+};
+
+const isFinishedReport = (
+  report: ReportResultDTO | undefined,
+): report is ReportResultDTO & { goalStatus: 'ACHIEVED' | 'FAILED' } =>
+  report?.goalStatus === 'ACHIEVED' || report?.goalStatus === 'FAILED';
+
 // 목표 설정 스텝의 처음 값. 리포트 기준 달의 목표가 있으면 그 값으로 시작한다.
 // /goals의 monthlyGoalCount는 현재 달 목표라 쓰지 않는다. (types/models/puppy.ts)
 // 31번이던 목표를 30일인 달에 이어 쓰면 카운터 범위(이번 달 일수)를 넘으므로 맞춘다.
@@ -58,7 +85,8 @@ const getInitialGoal = (report: ReportResultDTO | undefined) => {
  * 진입 판정은 홈이 /main의 isGoal로 한다. (app/home.tsx)
  * 가장 최근에 목표를 세운 달(/goals)의 목표를 달성했거나 실패했으면 목표 설정 앞에
  * 그 달의 리포트 스텝을 보여준다. 그 달 목표가 없었거나 /goals·리포트를 못 불러오면
- * 목표 설정만 나온다.
+ * 목표 설정만 나온다. 그 달 마지막 날이 어제인데 기록이 없으면 리포트 앞에 어제 기록
+ * 스텝을 넣는다. (isLastDayYesterday)
  */
 export default function GoalRenewal() {
   const { data: puppyInfo, isPending: isPuppyInfoPending } =
@@ -98,22 +126,85 @@ export default function GoalRenewal() {
     hideSplash();
   }, []);
 
-  const [isReportDone, setIsReportDone] = useState(false);
-
   const reportStatus =
-    reportMonth &&
-    (report?.goalStatus === 'ACHIEVED' || report?.goalStatus === 'FAILED')
+    reportMonth && report && isFinishedReport(report)
       ? report.goalStatus
       : null;
 
+  // 어제 기록 스텝을 넣을지도 진입 시점에 한 번만 정한다. 기록하면 /main의
+  // didRecordYesterday가 true로 바뀌므로, 그때마다 다시 따지면 스텝이 사라진다.
+  // 리포트 스텝이 없으면 기록할 이유도 없으니 넣지 않는다. undefined는 아직 정하지 않았다는 뜻이다.
+  const [hasRecordStep, setHasRecordStep] = useState<boolean | undefined>(
+    undefined,
+  );
+  const isEntryDataReady =
+    reportMonth !== undefined &&
+    !(reportMonth && isReportPending) &&
+    !isPuppyInfoPending;
+  useEffect(() => {
+    if (hasRecordStep !== undefined || !isEntryDataReady) return;
+    setHasRecordStep(
+      !!reportMonth &&
+        isFinishedReport(report) &&
+        isLastDayYesterday(reportMonth) &&
+        puppyInfo?.didRecordYesterday === false,
+    );
+  }, [hasRecordStep, isEntryDataReady, reportMonth, report, puppyInfo]);
+
+  const createDrinkHistoryMutation = useCreateDrinkHistoryMutation();
+  const [yesterdayDrink, setYesterdayDrink] = useState<boolean | null>(null);
+  const [isRecordSaving, setIsRecordSaving] = useState(false);
+  const [isRecordDone, setIsRecordDone] = useState(false);
+  const [isReportDone, setIsReportDone] = useState(false);
+
+  const currentStep =
+    hasRecordStep && !isRecordDone
+      ? 'record'
+      : reportStatus && !isReportDone
+        ? 'report'
+        : 'goal';
+
   // 리포트 스텝이 처음 보일 때 한 번만 남긴다. goal_setup_completed(renewal)와
   // 이어 보면 리포트를 본 뒤 목표 설정까지 간 비율을 달성/실패별로 볼 수 있다.
+  // 어제 기록 스텝이 앞에 있으면 기록으로 바뀐 결과를 남기도록 리포트가 실제로 보일 때 남긴다.
   const hasLoggedReportRef = useRef(false);
   useEffect(() => {
+    if (hasRecordStep === undefined || currentStep !== 'report') return;
     if (!reportStatus || hasLoggedReportRef.current) return;
     hasLoggedReportRef.current = true;
     logEvent('monthly_report_viewed', { goal_status: reportStatus });
-  }, [reportStatus]);
+  }, [hasRecordStep, currentStep, reportStatus]);
+
+  const handleRecordSubmit = async () => {
+    if (yesterdayDrink === null || !reportMonth) return;
+    setIsRecordSaving(true);
+    try {
+      // 누른 시각의 어제가 아니라 기준 달의 마지막 날로 기록한다. 화면을 띄워 둔 채
+      // 자정을 넘기면 어제가 다음 달 1일로 바뀌기 때문이다.
+      const month = String(reportMonth.month).padStart(2, '0');
+      const day = String(getLastDay(reportMonth)).padStart(2, '0');
+      await createDrinkHistoryMutation.mutateAsync({
+        drinkDate: `${reportMonth.year}-${month}-${day}`,
+        isDrink: yesterdayDrink,
+        source: 'monthly_report',
+        recordDay: 'yesterday',
+      });
+
+      // 기록으로 달성/실패가 바뀔 수 있으니 리포트를 다시 받은 뒤 넘어간다.
+      // 뮤테이션이 이미 리포트 재요청을 시작했으므로 새로 보내지 않고 그 요청을 기다린다.
+      await queryClient.refetchQueries(
+        { queryKey: QUERY_KEYS.report(reportMonth.year, reportMonth.month) },
+        { cancelRefetch: false },
+      );
+
+      setIsRecordDone(true);
+    } catch (error) {
+      console.log('어제 음주 기록 실패:', error);
+      Alert.alert('잠시 후 다시 시도해주세요', '기록 저장에 실패했어요.');
+    } finally {
+      setIsRecordSaving(false);
+    }
+  };
 
   const handleSubmit = async () => {
     try {
@@ -143,11 +234,8 @@ export default function GoalRenewal() {
   // 조회할 달부터 정하고, 조회할 달이 있을 때만 리포트를 기다린다.
   // 강아지 외형(성장 단계)은 마운트 시 레벨로 정해지고 이후 단계 변화는 반영되지 않으므로
   // (EvolvingPuppy) /main도 함께 기다린다. 홈에서 오면 캐시가 있어 바로 지나간다.
-  if (
-    reportMonth === undefined ||
-    (reportMonth && isReportPending) ||
-    isPuppyInfoPending
-  ) {
+  // 어제 기록 스텝 여부(hasRecordStep)는 이 데이터가 모두 온 뒤에 정해지므로 그것만 보면 된다.
+  if (hasRecordStep === undefined) {
     return (
       <ImageBackground
         // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -158,14 +246,49 @@ export default function GoalRenewal() {
     );
   }
 
-  const totalSteps = reportStatus ? 2 : 1;
+  // 기록으로 달성/실패가 바뀌어도 리포트 스텝은 그대로 있으므로 진행 점 개수는 바뀌지 않는다.
+  const totalSteps = (hasRecordStep ? 1 : 0) + (reportStatus ? 1 : 0) + 1;
   const breed = puppyInfo?.puppyLevelName ?? '';
   const level = puppyInfo?.puppyLevel ?? 1;
 
-  if (reportMonth && report && reportStatus && !isReportDone) {
+  if (currentStep === 'record' && reportMonth) {
+    const lastDay = getLastDay(reportMonth);
     return (
       <OnboardingLayout
         step={1}
+        totalSteps={totalSteps}
+        breed={breed}
+        level={level}
+        title={
+          <>
+            {reportMonth.month}월의 마지막 날,{'\n'}
+            <Text style={styles.highlight}>어제 술 마셨어요?</Text>
+          </>
+        }
+        subtitle={`오늘이 지나면 ${reportMonth.month}월 ${lastDay}일은 기록할 수 없어요.`}
+        bubbleText={`${reportMonth.month}월 마지막 날은 어땠어?\n알려주면 리포트 완성해줄게!`}
+      >
+        <View style={styles.choiceSlot}>
+          <YesterdayDrinkChoice
+            value={yesterdayDrink}
+            onChange={setYesterdayDrink}
+            breed={breed}
+            disabled={isRecordSaving}
+          />
+        </View>
+        <PrimaryButton
+          title='다음으로'
+          onPress={handleRecordSubmit}
+          disabled={yesterdayDrink === null || isRecordSaving}
+        />
+      </OnboardingLayout>
+    );
+  }
+
+  if (currentStep === 'report' && reportMonth && report && reportStatus) {
+    return (
+      <OnboardingLayout
+        step={hasRecordStep ? 2 : 1}
         totalSteps={totalSteps}
         breed={breed}
         level={level}
@@ -228,6 +351,10 @@ const styles = StyleSheet.create({
   },
   inputSlot: {
     height: 52,
+    justifyContent: 'center',
+  },
+  choiceSlot: {
+    height: 85,
     justifyContent: 'center',
   },
 });
