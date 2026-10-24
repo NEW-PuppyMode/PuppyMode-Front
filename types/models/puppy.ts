@@ -23,6 +23,9 @@ export interface RecentGoal {
   monthlyActualCount: number;
   isGoalExceeded: boolean;
   goalSetAt: string;
+  // 가장 최근에 목표를 설정한 연도·월. 목표를 세운 적 없는 신규 사용자는 null
+  latestGoalYear: number | null;
+  latestGoalMonth: number | null;
 }
 
 export interface IAdvice {

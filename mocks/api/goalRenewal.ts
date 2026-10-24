@@ -1,6 +1,6 @@
 import type { MeResult } from '@/services/auth';
 import type { GoalStatus, ReportResultDTO } from '@/services/reportData';
-import type { GoalDTO, IPuppyInfo } from '@/types/models/puppy';
+import type { GoalDTO, IPuppyInfo, RecentGoal } from '@/types/models/puppy';
 import { delay, http, HttpResponse } from 'msw';
 
 /**
@@ -19,6 +19,7 @@ import { delay, http, HttpResponse } from 'msw';
 
 // 목표를 저장했는지. JS를 다시 불러오면(Metro에서 r) 처음 값으로 돌아간다.
 let isGoalSet = false;
+let savedGoal = 0;
 
 export const goalRenewalHandlers = [
   // 앱 진입: 검사·온보딩·튜토리얼을 모두 마친 사용자 → app/index.tsx가 홈으로 보낸다.
@@ -65,12 +66,41 @@ export const goalRenewalHandlers = [
     });
   }),
 
+  // 최근 목표: 지난 달에 목표를 세운 사용자 → app/goal이 지난 달 리포트를 조회한다.
+  // 목표를 저장한 뒤에는 이번 달 목표로 바뀐다.
+  http.get('*/goals', async () => {
+    await delay(300);
+    const target = new Date();
+    target.setDate(1);
+    if (!isGoalSet) target.setMonth(target.getMonth() - 1);
+
+    const result: RecentGoal = {
+      monthlyGoalCount: isGoalSet ? savedGoal : 15,
+      monthlyActualCount: 0,
+      isGoalExceeded: false,
+      goalSetAt: target.toISOString(),
+      latestGoalYear: target.getFullYear(),
+      latestGoalMonth: target.getMonth() + 1,
+    };
+    console.log(
+      '[MSW] /goals → 최근 목표',
+      `${result.latestGoalYear}-${result.latestGoalMonth}`,
+    );
+    return HttpResponse.json({
+      isSuccess: true,
+      code: 'GOAL200',
+      message: 'success',
+      result,
+    });
+  }),
+
   // 목표 저장: 진짜 계정에 목표가 생기지 않도록 서버로 보내지 않는다.
   // 성공으로 응답하고 isGoal을 true로 바꿔서, 홈으로 돌아갔을 때 다시 튕기지 않는지 볼 수 있게 한다.
   http.post('*/goals', async ({ request }) => {
     await delay(300);
     const body = (await request.json()) as GoalDTO;
     isGoalSet = true;
+    savedGoal = body.goal;
     console.log(
       '[MSW] POST /goals → 목표',
       body.goal,
@@ -100,7 +130,7 @@ const lastMonthReports: Record<
   GoalStatus,
   Pick<ReportResultDTO, 'goal' | 'drinkDays'>
 > = {
-  ACHIEVED: { goal: 15, drinkDays: 10 },
+  ACHIEVED: { goal: 13, drinkDays: 9 },
   FAILED: { goal: 15, drinkDays: 16 },
   NO_GOAL: { goal: 0, drinkDays: 0 },
   IN_PROGRESS: { goal: 15, drinkDays: 6 },

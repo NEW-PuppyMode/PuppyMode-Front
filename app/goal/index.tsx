@@ -5,7 +5,9 @@ import { OnboardingLayout } from '@/components/page/onboarding/OnboardingLayout'
 import { useCreateGoalMutation } from '@/hooks/mutations/useCreateGoalMutation';
 import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
+import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
 import { useReportQuery } from '@/hooks/queries/useReportQuery';
+import { RecentGoal } from '@/types/models/puppy';
 import { logEvent } from '@/utils/analytics';
 import { hideSplash } from '@/utils/splash';
 import { useQueryClient } from '@tanstack/react-query';
@@ -19,11 +21,18 @@ const REPORT_BUBBLE = {
   FAILED: '이번 달 목표 달성 실패했어..\n다음 달엔 같이 힘내자!',
 };
 
-const getLastMonth = () => {
-  const d = new Date();
-  d.setDate(1);
-  d.setMonth(d.getMonth() - 1);
-  return { year: d.getFullYear(), month: d.getMonth() + 1 };
+// 리포트를 보여줄 달. 달력상 지난 달이 아니라 가장 최근에 목표를 세운 달이다.
+// 8월에 목표를 세우고 9월을 건너뛴 채 10월에 들어오면 8월 리포트를 보여준다.
+// 목표를 세운 적이 없거나 그 달이 이번 달이면 보여줄 리포트가 없다.
+const getReportMonth = (recentGoal: RecentGoal | null | undefined) => {
+  const year = recentGoal?.latestGoalYear;
+  const month = recentGoal?.latestGoalMonth;
+  if (!year || !month) return null;
+
+  const now = new Date();
+  if (year === now.getFullYear() && month === now.getMonth() + 1) return null;
+
+  return { year, month };
 };
 
 /**
@@ -35,8 +44,9 @@ const getLastMonth = () => {
  * 동안에는 목표를 갱신할 때마다 iOS 알림 권한을 다시 묻는 문제가 있었다.
  *
  * 진입 판정은 홈이 /main의 isGoal로 한다. (app/home.tsx)
- * 지난 달 목표를 달성했거나 실패했으면 목표 설정 앞에 지난 달 리포트 스텝을
- * 보여준다. 지난 달 목표가 없었거나 리포트를 못 불러오면 목표 설정만 나온다.
+ * 가장 최근에 목표를 세운 달(/goals)의 목표를 달성했거나 실패했으면 목표 설정 앞에
+ * 그 달의 리포트 스텝을 보여준다. 그 달 목표가 없었거나 /goals·리포트를 못 불러오면
+ * 목표 설정만 나온다.
  */
 export default function GoalRenewal() {
   const { data: puppyInfo, isPending: isPuppyInfoPending } =
@@ -44,10 +54,24 @@ export default function GoalRenewal() {
   const createGoalMutation = useCreateGoalMutation();
   const queryClient = useQueryClient();
 
-  const [lastMonth] = useState(getLastMonth);
+  const { data: recentGoal, isPending: isRecentGoalPending } =
+    useRecentGoalQuery();
+
+  // 스텝 구성은 진입 시점의 /goals로 한 번만 정한다. 목표를 저장하면 홈으로 가기 전에
+  // /goals를 다시 받는데, 그때는 최근 목표 달이 이번 달이 되어 리포트 스텝이 사라지고
+  // 진행 점 개수와 말풍선이 바뀌어 보인다. undefined는 아직 정하지 않았다는 뜻이다.
+  const [reportMonth, setReportMonth] = useState<
+    ReturnType<typeof getReportMonth> | undefined
+  >(undefined);
+  useEffect(() => {
+    if (reportMonth !== undefined || isRecentGoalPending) return;
+    setReportMonth(getReportMonth(recentGoal));
+  }, [reportMonth, isRecentGoalPending, recentGoal]);
+
   const { data: report, isPending: isReportPending } = useReportQuery(
-    lastMonth.year,
-    lastMonth.month,
+    reportMonth?.year ?? 0,
+    reportMonth?.month ?? 0,
+    !!reportMonth,
   );
 
   // 앱 진입 시 홈에서 바로 넘어온 경우 스플래시를 여기서 내린다.
@@ -60,7 +84,8 @@ export default function GoalRenewal() {
   const [count, setCount] = useState(10);
 
   const reportStatus =
-    report?.goalStatus === 'ACHIEVED' || report?.goalStatus === 'FAILED'
+    reportMonth &&
+    (report?.goalStatus === 'ACHIEVED' || report?.goalStatus === 'FAILED')
       ? report.goalStatus
       : null;
 
@@ -97,9 +122,15 @@ export default function GoalRenewal() {
   // 그동안 빈 화면 대신 레이아웃과 같은 배경만 깔아 둔다. 타이틀·강아지 등을 먼저 띄우면
   // 진행 점 개수와 하단 버튼이 응답 뒤에 바뀌어 오히려 깜빡여 보인다.
   // 실패하면 isPending이 풀리고 report가 없어 목표 설정만 나온다.
+  // 리포트 조회는 조회할 달이 정해져야 켜지므로(꺼진 동안 isPending이 true로 남는다)
+  // 조회할 달부터 정하고, 조회할 달이 있을 때만 리포트를 기다린다.
   // 강아지 외형(성장 단계)은 마운트 시 레벨로 정해지고 이후 단계 변화는 반영되지 않으므로
   // (EvolvingPuppy) /main도 함께 기다린다. 홈에서 오면 캐시가 있어 바로 지나간다.
-  if (isReportPending || isPuppyInfoPending) {
+  if (
+    reportMonth === undefined ||
+    (reportMonth && isReportPending) ||
+    isPuppyInfoPending
+  ) {
     return (
       <ImageBackground
         // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -114,7 +145,7 @@ export default function GoalRenewal() {
   const breed = puppyInfo?.puppyLevelName ?? '';
   const level = puppyInfo?.puppyLevel ?? 1;
 
-  if (report && reportStatus && !isReportDone) {
+  if (reportMonth && report && reportStatus && !isReportDone) {
     return (
       <OnboardingLayout
         step={1}
@@ -123,7 +154,7 @@ export default function GoalRenewal() {
         level={level}
         title={
           <>
-            {lastMonth.month}월 리포트가{'\n'}
+            {reportMonth.month}월 리포트가{'\n'}
             <Text style={styles.highlight}>도착</Text>했어요!
           </>
         }
@@ -132,7 +163,7 @@ export default function GoalRenewal() {
       >
         <View style={styles.inputSlot}>
           <MonthlyReportStats
-            month={lastMonth.month}
+            month={reportMonth.month}
             drinkDays={report.drinkDays}
             goal={report.goal}
           />
