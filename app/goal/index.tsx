@@ -7,8 +7,10 @@ import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
 import { useReportQuery } from '@/hooks/queries/useReportQuery';
+import { ReportResultDTO } from '@/services/reportData';
 import { RecentGoal } from '@/types/models/puppy';
 import { logEvent } from '@/utils/analytics';
+import { maxDaysInMonth } from '@/utils/dateUtils';
 import { hideSplash } from '@/utils/splash';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
@@ -33,6 +35,16 @@ const getReportMonth = (recentGoal: RecentGoal | null | undefined) => {
   if (year === now.getFullYear() && month === now.getMonth() + 1) return null;
 
   return { year, month };
+};
+
+// 목표 설정 스텝의 처음 값. 리포트 기준 달의 목표가 있으면 그 값으로 시작한다.
+// /goals의 monthlyGoalCount는 현재 달 목표라 쓰지 않는다. (types/models/puppy.ts)
+// 31번이던 목표를 30일인 달에 이어 쓰면 카운터 범위(이번 달 일수)를 넘으므로 맞춘다.
+const DEFAULT_GOAL = 10;
+const getInitialGoal = (report: ReportResultDTO | undefined) => {
+  const lastGoal = report?.goal;
+  if (!lastGoal || lastGoal < 1) return DEFAULT_GOAL;
+  return Math.min(lastGoal, maxDaysInMonth);
 };
 
 /**
@@ -74,6 +86,12 @@ export default function GoalRenewal() {
     !!reportMonth,
   );
 
+  // 목표 카운터는 사용자가 바꾸기 전까지 리포트 기준 달의 목표를 보여준다.
+  // 화면은 리포트를 받을 때까지 대기하므로 기본값이 먼저 보였다가 바뀌지 않는다.
+  // 리포트가 없거나 못 불러오면 기본값.
+  const [editedCount, setCount] = useState<number | null>(null);
+  const count = editedCount ?? getInitialGoal(report);
+
   // 앱 진입 시 홈에서 바로 넘어온 경우 스플래시를 여기서 내린다.
   // 대기 중에도 배경이 깔려 있어 흰 화면이 보이지 않는다. (utils/splash.ts)
   useEffect(() => {
@@ -81,7 +99,6 @@ export default function GoalRenewal() {
   }, []);
 
   const [isReportDone, setIsReportDone] = useState(false);
-  const [count, setCount] = useState(10);
 
   const reportStatus =
     reportMonth &&
