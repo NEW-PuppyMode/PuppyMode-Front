@@ -5,6 +5,7 @@ import { GoalCounter } from '@/components/page/onboarding/GoalCounter';
 import { OnboardingLayout } from '@/components/page/onboarding/OnboardingLayout';
 import { useCreateDrinkHistoryMutation } from '@/hooks/mutations/useCreateDrinkHistoryMutation';
 import { useCreateGoalMutation } from '@/hooks/mutations/useCreateGoalMutation';
+import { useGoalRewardMutation } from '@/hooks/mutations/useGoalRewardMutation';
 import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
@@ -174,6 +175,21 @@ export default function GoalRenewal() {
     hasLoggedReportRef.current = true;
     logEvent('monthly_report_viewed', { goal_status: reportStatus });
   }, [hasRecordStep, currentStep, reportStatus]);
+
+  // 목표 달성 보상(경험치)은 리포트 스텝이 처음 보일 때 한 번 요청한다. 어제 기록
+  // 스텝이 있으면 기록 저장과 리포트 재조회가 끝난 뒤라, 서버가 기록까지 반영해 판정한다.
+  // 실패한 달도 요청하며, 지급 여부는 서버가 정한다(rewarded).
+  const rewardMutation = useGoalRewardMutation();
+  const hasRequestedRewardRef = useRef(false);
+  useEffect(() => {
+    if (hasRecordStep === undefined || currentStep !== 'report') return;
+    if (!reportMonth || hasRequestedRewardRef.current) return;
+    hasRequestedRewardRef.current = true;
+    rewardMutation.mutate(reportMonth, {
+      onSuccess: (result) => console.log('목표 보상 응답:', result),
+      onError: (error) => console.log('목표 보상 요청 실패:', error),
+    });
+  }, [hasRecordStep, currentStep, reportMonth, rewardMutation]);
 
   const handleRecordSubmit = async () => {
     if (yesterdayDrink === null || !reportMonth) return;

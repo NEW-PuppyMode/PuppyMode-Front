@@ -1,5 +1,9 @@
 import type { MeResult } from '@/services/auth';
-import type { GoalStatus, ReportResultDTO } from '@/services/reportData';
+import type {
+  GoalRewardResultDTO,
+  GoalStatus,
+  ReportResultDTO,
+} from '@/services/reportData';
 import type {
   DrinkHistoryDTO,
   GoalDTO,
@@ -172,6 +176,45 @@ export const goalRenewalReportHandler = (goalStatus: GoalStatus) =>
       result,
     });
   });
+
+/**
+ * 지난 달 목표 달성 보상(POST /goals/reward). 진짜 계정에 경험치가 쌓이지 않도록 서버로 보내지 않는다.
+ * isRewarded가 true를 돌려주면 경험치 100xp를 받은 것으로 응답한다. (레벨 15, 40% → 90%)
+ * 서버처럼 여러 번 불러도 같은 결과를 준다.
+ */
+export const goalRenewalRewardHandler = (isRewarded: () => boolean) =>
+  http.post('*/goals/reward', async ({ request }) => {
+    await delay(300);
+    const url = new URL(request.url);
+    const target = `${url.searchParams.get('year')}-${url.searchParams.get('month')}`;
+    if (!isRewarded()) {
+      console.log('[MSW] POST /goals/reward', target, '→ 보상 없음');
+      return HttpResponse.json({
+        isSuccess: true,
+        code: 'GOAL200',
+        message: 'success',
+        result: { rewarded: false, goalReward: null },
+      });
+    }
+
+    const result: GoalRewardResultDTO = {
+      rewarded: true,
+      goalReward: {
+        before: { level: 15, percent: 40 },
+        after: { level: 15, percent: 90 },
+      },
+    };
+    console.log('[MSW] POST /goals/reward', target, '→ 보상', result.goalReward);
+    return HttpResponse.json({
+      isSuccess: true,
+      code: 'GOAL200',
+      message: 'success',
+      result,
+    });
+  });
+
+// 어제 기록 시나리오에서는 마지막 날 안 마셨다고 기록해야(=달성) 보상을 받는다.
+export const isLastDayDrinkSkipped = () => lastDayDrink === false;
 
 /**
  * 지난 달 마지막 날(어제)을 기록하지 않은 채 리포트를 받는 경우.

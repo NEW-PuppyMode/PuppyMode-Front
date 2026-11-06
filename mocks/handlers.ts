@@ -9,7 +9,9 @@ import {
 import {
   goalRenewalHandlers,
   goalRenewalReportHandler,
+  goalRenewalRewardHandler,
   goalRenewalYesterdayHandlers,
+  isLastDayDrinkSkipped,
 } from './api/goalRenewal';
 import { homeErrorHandlers } from './api/homeError';
 import { onboardingHandlers } from './api/onboarding';
@@ -38,14 +40,17 @@ const scenarios = {
   goalRenewalAchieved: [
     ...goalRenewalHandlers,
     goalRenewalReportHandler('ACHIEVED'),
+    goalRenewalRewardHandler(() => true),
   ],
   goalRenewalFailed: [
     ...goalRenewalHandlers,
     goalRenewalReportHandler('FAILED'),
+    goalRenewalRewardHandler(() => false),
   ],
   goalRenewalYesterday: [
     ...goalRenewalHandlers,
     ...goalRenewalYesterdayHandlers,
+    goalRenewalRewardHandler(isLastDayDrinkSkipped),
   ],
   calendarMonths: calendarMonthsHandlers,
   calendarMonthsEmpty: calendarMonthsEmptyHandlers,
