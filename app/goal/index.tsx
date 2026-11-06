@@ -1,4 +1,5 @@
 import { PrimaryButton } from '@/components/common/buttons/PrimaryButton';
+import { ExpGainCard } from '@/components/page/goal/ExpGainCard';
 import { MonthlyReportStats } from '@/components/page/goal/MonthlyReportStats';
 import { YesterdayDrinkChoice } from '@/components/page/goal/YesterdayDrinkChoice';
 import { GoalCounter } from '@/components/page/onboarding/GoalCounter';
@@ -10,7 +11,7 @@ import { QUERY_KEYS } from '@/hooks/queries/queryKeys';
 import { usePuppyInfoQuery } from '@/hooks/queries/usePuppyInfoQuery';
 import { useRecentGoalQuery } from '@/hooks/queries/useRecentGoalQuery';
 import { useReportQuery } from '@/hooks/queries/useReportQuery';
-import { ReportResultDTO } from '@/services/reportData';
+import { GoalRewardResultDTO, ReportResultDTO } from '@/services/reportData';
 import { RecentGoal } from '@/types/models/puppy';
 import { logEvent } from '@/utils/analytics';
 import { maxDaysInMonth } from '@/utils/dateUtils';
@@ -41,6 +42,8 @@ const getReportMonth = (recentGoal: RecentGoal | null | undefined) => {
 };
 
 type ReportMonth = { year: number; month: number };
+
+type GoalReward = NonNullable<GoalRewardResultDTO['goalReward']>;
 
 const getLastDay = ({ year, month }: ReportMonth) =>
   new Date(year, month, 0).getDate();
@@ -157,13 +160,18 @@ export default function GoalRenewal() {
   const [isRecordSaving, setIsRecordSaving] = useState(false);
   const [isRecordDone, setIsRecordDone] = useState(false);
   const [isReportDone, setIsReportDone] = useState(false);
+  // 리포트 스텝을 넘길 때 받은 보상. 있으면 목표 설정 앞에 경험치 획득 스텝을 보여준다.
+  const [goalReward, setGoalReward] = useState<GoalReward | null>(null);
+  const [isExpDone, setIsExpDone] = useState(false);
 
   const currentStep =
     hasRecordStep && !isRecordDone
       ? 'record'
       : reportStatus && !isReportDone
         ? 'report'
-        : 'goal';
+        : goalReward && !isExpDone
+          ? 'exp'
+          : 'goal';
 
   // 리포트 스텝이 처음 보일 때 한 번만 남긴다. goal_setup_completed(renewal)와
   // 이어 보면 리포트를 본 뒤 목표 설정까지 간 비율을 달성/실패별로 볼 수 있다.
@@ -179,17 +187,30 @@ export default function GoalRenewal() {
   // 목표 달성 보상(경험치)은 리포트 스텝이 처음 보일 때 한 번 요청한다. 어제 기록
   // 스텝이 있으면 기록 저장과 리포트 재조회가 끝난 뒤라, 서버가 기록까지 반영해 판정한다.
   // 실패한 달도 요청하며, 지급 여부는 서버가 정한다(rewarded).
-  const rewardMutation = useGoalRewardMutation();
-  const hasRequestedRewardRef = useRef(false);
+  // "다음으로"를 누를 때 응답을 기다릴 수 있게 요청 자체를 들고 있는다. 재시도까지
+  // 실패하면 null로 끝나고 경험치 스텝 없이 목표 설정으로 넘어간다.
+  const { mutateAsync: requestReward } = useGoalRewardMutation();
+  const rewardRequestRef = useRef<Promise<GoalRewardResultDTO | null> | null>(
+    null,
+  );
   useEffect(() => {
     if (hasRecordStep === undefined || currentStep !== 'report') return;
-    if (!reportMonth || hasRequestedRewardRef.current) return;
-    hasRequestedRewardRef.current = true;
-    rewardMutation.mutate(reportMonth, {
-      onSuccess: (result) => console.log('목표 보상 응답:', result),
-      onError: (error) => console.log('목표 보상 요청 실패:', error),
+    if (!reportMonth || rewardRequestRef.current) return;
+    rewardRequestRef.current = requestReward(reportMonth).catch((error) => {
+      console.log('목표 보상 요청 실패:', error);
+      return null;
     });
-  }, [hasRecordStep, currentStep, reportMonth, rewardMutation]);
+  }, [hasRecordStep, currentStep, reportMonth, requestReward]);
+
+  // 리포트 스텝에서 "다음으로"를 누르면 보상 응답을 기다렸다가, 받았으면 경험치 스텝으로 간다.
+  const [isReportNextPending, setIsReportNextPending] = useState(false);
+  const handleReportNext = async () => {
+    setIsReportNextPending(true);
+    const result = await rewardRequestRef.current;
+    setGoalReward(result?.rewarded ? result.goalReward : null);
+    setIsReportNextPending(false);
+    setIsReportDone(true);
+  };
 
   const handleRecordSubmit = async () => {
     if (yesterdayDrink === null || !reportMonth) return;
@@ -322,7 +343,40 @@ export default function GoalRenewal() {
             goal={report.goal}
           />
         </View>
-        <PrimaryButton title='다음으로' onPress={() => setIsReportDone(true)} />
+        <PrimaryButton
+          title='다음으로'
+          onPress={handleReportNext}
+          disabled={isReportNextPending}
+        />
+      </OnboardingLayout>
+    );
+  }
+
+  // 경험치 획득은 리포트에 딸린 결과라 진행 점은 리포트와 같은 자리에 둔다.
+  // 보상 여부는 리포트를 넘길 때에야 알 수 있어서, 점을 따로 두면 도중에 점 개수가 바뀐다.
+  if (currentStep === 'exp' && goalReward) {
+    return (
+      <OnboardingLayout
+        step={hasRecordStep ? 2 : 1}
+        totalSteps={totalSteps}
+        breed={breed}
+        level={level}
+        reaction='heart'
+        title={
+          <>
+            경험치를{'\n'}
+            <Text style={styles.highlight}>획득</Text>했어요!
+          </>
+        }
+        subtitle='목표를 지켜서 경험치가 올랐어요.'
+        stageTop={
+          <ExpGainCard
+            after={goalReward.after}
+            puppyName={puppyInfo?.currentPuppyName ?? ''}
+          />
+        }
+      >
+        <PrimaryButton title='다음으로' onPress={() => setIsExpDone(true)} />
       </OnboardingLayout>
     );
   }
