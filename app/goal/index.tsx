@@ -371,6 +371,7 @@ export default function GoalRenewal() {
         subtitle='목표를 지켜서 경험치가 올랐어요.'
         stageTop={
           <ExpGainCard
+            before={goalReward.before}
             after={goalReward.after}
             puppyName={puppyInfo?.currentPuppyName ?? ''}
           />
