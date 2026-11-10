@@ -30,7 +30,11 @@ interface Props {
    * 띄우는 데 쓴다. 콜백이라 레이아웃에는 영향이 없다.
    */
   onLayout?: ViewProps['onLayout'];
+  /** 카드 컨테이너 클래스(크기·여백·배경). 미지정 시 홈 상단 바 모양. */
+  className?: string;
 }
+
+const DEFAULT_CLASS_NAME = 'flex-1 px-4 py-3 rounded-2xl bg-cream-200';
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
@@ -46,6 +50,7 @@ export function ProgressCard({
   percent,
   levelUpEvent,
   onLayout,
+  className = DEFAULT_CLASS_NAME,
 }: Props) {
   // 바 채움 정도(0~100). 퍼센트 숫자 텍스트도 이 값을 따라간다.
   const progress = useSharedValue(percent);
@@ -108,10 +113,7 @@ export function ProgressCard({
   });
 
   return (
-    <ThemedView
-      className='flex-1 px-4 py-3 rounded-2xl bg-cream-200'
-      onLayout={onLayout}
-    >
+    <ThemedView className={className} onLayout={onLayout}>
       <ThemedView className='flex-row items-center mb-2 bg-transparent'>
         <ThemedView className='bg-green-500 px-2 py-1 rounded-full'>
           <ThemedText className='text-white text-xs font-semibold'>

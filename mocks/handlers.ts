@@ -9,7 +9,10 @@ import {
 import {
   goalRenewalHandlers,
   goalRenewalReportHandler,
+  goalRenewalRewardHandler,
   goalRenewalYesterdayHandlers,
+  isLastDayDrinkSkipped,
+  rewardLevelUp,
 } from './api/goalRenewal';
 import { homeErrorHandlers } from './api/homeError';
 import { onboardingHandlers } from './api/onboarding';
@@ -23,7 +26,8 @@ import { puppyHandlers } from './api/puppy';
  * - goalRenewal: 온보딩을 마친 사용자의 월간 목표 갱신 (mocks/api/goalRenewal.ts)
  *   지난 달 목표가 없어서 리포트 없이 목표 설정만 나온다.
  * - goalRenewalAchieved / goalRenewalFailed: 위와 같고, 지난 달 목표를 달성/실패해서
- *   목표 설정 앞에 지난 달 리포트가 붙는다.
+ *   목표 설정 앞에 지난 달 리포트가 붙는다. 달성이면 리포트 뒤에 경험치 획득 스텝이 붙는다.
+ * - goalRenewalLevelUp: goalRenewalAchieved와 같고, 경험치를 받아 레벨이 오른다(15 → 16).
  * - goalRenewalYesterday: 지난 달 마지막 날(어제)을 기록하지 않아 리포트 앞에
  *   '어제 술 마셨어요?' 스텝이 붙는다. 기기 날짜를 매달 1일로 바꿔서 본다.
  * - calendarMonths / calendarMonthsEmpty / calendarMonthsError:
@@ -38,14 +42,22 @@ const scenarios = {
   goalRenewalAchieved: [
     ...goalRenewalHandlers,
     goalRenewalReportHandler('ACHIEVED'),
+    goalRenewalRewardHandler(() => true),
+  ],
+  goalRenewalLevelUp: [
+    ...goalRenewalHandlers,
+    goalRenewalReportHandler('ACHIEVED'),
+    goalRenewalRewardHandler(() => true, rewardLevelUp),
   ],
   goalRenewalFailed: [
     ...goalRenewalHandlers,
     goalRenewalReportHandler('FAILED'),
+    goalRenewalRewardHandler(() => false),
   ],
   goalRenewalYesterday: [
     ...goalRenewalHandlers,
     ...goalRenewalYesterdayHandlers,
+    goalRenewalRewardHandler(isLastDayDrinkSkipped),
   ],
   calendarMonths: calendarMonthsHandlers,
   calendarMonthsEmpty: calendarMonthsEmptyHandlers,

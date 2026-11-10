@@ -40,8 +40,12 @@ type OnboardingLayoutProps = {
   title: React.ReactNode;
   /** 타이틀 하단 보조 설명 */
   subtitle: string;
-  /** 강아지 말풍선 내용 */
-  bubbleText: string;
+  /** 강아지 말풍선 내용. stageTop을 넘기면 말풍선 대신 그것을 보여준다. */
+  bubbleText?: string;
+  /** 말풍선 자리에 대신 놓을 내용 (경험치 카드 등) */
+  stageTop?: React.ReactNode;
+  /** 강아지 표정. 미지정 시 normal */
+  reaction?: 'normal' | 'heart';
   /** 강아지 종(한글). 미지정 시 기본 비숑 */
   breed?: string;
   /** 강아지 레벨(성장 단계 외형 결정). 미지정 시 1. 마운트 후 성장 단계가 바뀌는 변화는 반영되지 않는다. */
@@ -61,7 +65,9 @@ export function OnboardingLayout({
   totalSteps = 3,
   title,
   subtitle,
-  bubbleText,
+  bubbleText = '',
+  stageTop,
+  reaction = 'normal',
   breed = '',
   level = 1,
   children,
@@ -118,20 +124,24 @@ export function OnboardingLayout({
             style={[styles.stage, { bottom: puppyBottom }]}
             pointerEvents='box-none'
           >
-            <View style={styles.bubbleWrapper}>
-              {/* step이 바뀌면 remount 되어 등장 애니메이션이 다시 재생된다. */}
-              <SpeechBubble
-                key={step}
-                minHeight={BUBBLE_MIN_HEIGHT}
-                tailScale={2.4}
-              >
-                {bubbleText}
-              </SpeechBubble>
-            </View>
+            {stageTop ? (
+              <View style={styles.stageTopWrapper}>{stageTop}</View>
+            ) : (
+              <View style={styles.bubbleWrapper}>
+                {/* step이 바뀌면 remount 되어 등장 애니메이션이 다시 재생된다. */}
+                <SpeechBubble
+                  key={step}
+                  minHeight={BUBBLE_MIN_HEIGHT}
+                  tailScale={2.4}
+                >
+                  {bubbleText}
+                </SpeechBubble>
+              </View>
+            )}
             <EvolvingPuppy
               breedName={breed}
               level={level}
-              reaction='normal'
+              reaction={reaction}
               evolveEvent={null}
               size={puppySize}
             />
@@ -215,6 +225,10 @@ const styles = StyleSheet.create({
   bubbleWrapper: {
     width: '100%',
     marginBottom: -40,
+  },
+  // 디자인상 카드와 강아지 사이 간격. 말풍선과 달리 꼬리가 없어 강아지와 겹치지 않는다.
+  stageTopWrapper: {
+    marginBottom: 40,
   },
   bottom: {
     paddingVertical: 14,
