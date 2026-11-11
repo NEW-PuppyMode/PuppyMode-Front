@@ -113,7 +113,7 @@ export const getCalendarDogImage = (
 
 type ReactionState = 'normal' | 'angry' | 'heart';
 
-type GrowthKey = 'growth1' | 'growth2' | 'growth3';
+export type GrowthKey = 'growth1' | 'growth2' | 'growth3';
 
 export const getGrowthStage = (level: number): GrowthKey => {
   if (level >= 20) return 'growth3';
@@ -121,17 +121,21 @@ export const getGrowthStage = (level: number): GrowthKey => {
   return 'growth1';
 };
 
+export type BreedKey = keyof typeof puppyGifs;
+
+// 강아지 종 이름(puppyLevelName, ex. '눈송이 비숑')으로 견종 키를 판별한다. 해당 없으면 비숑.
+export const getBreedKey = (levelName: string): BreedKey => {
+  const name = (levelName ?? '').trim();
+  if (name.includes('코기')) return 'welshcorgi';
+  if (name.includes('시바')) return 'shiba';
+  if (name.includes('푸들')) return 'poodle';
+  return 'bichon';
+};
+
 export const getPuppyGifSource = (
   levelName: string,
   level: number,
   reaction: ReactionState = 'normal',
 ): ImageSourcePropType => {
-  const name = (levelName ?? '').trim();
-
-  let breedKey: keyof typeof puppyGifs = 'bichon';
-  if (name.includes('코기')) breedKey = 'welshcorgi';
-  else if (name.includes('시바')) breedKey = 'shiba';
-  else if (name.includes('푸들')) breedKey = 'poodle';
-
-  return puppyGifs[breedKey][getGrowthStage(level)][reaction];
+  return puppyGifs[getBreedKey(levelName)][getGrowthStage(level)][reaction];
 };

@@ -53,6 +53,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 // 3초 후 자동으로 사라지는 메시지 키 (그 외는 관련 UI가 닫힐 때까지 유지)
 const TRANSIENT_MESSAGE_KEYS = ['default', 'archiveSuccess'] as const;
 
+// 홈 강아지 GIF 크기 (클릭 효과선 오버레이도 같은 크기로 겹친다)
+const PUPPY_SIZE = 288;
+
 export default function HomeScreen() {
   const renamePuppyMutation = useRenamePuppyMutation();
   const renameUserMutation = useRenameUserMutation();
@@ -772,13 +775,18 @@ export default function HomeScreen() {
         {/* ===== 강아지 Gif 레이어 (외형 변화 + 반짝이 연출 포함) ===== */}
         {/* box-none: 강아지 영역만 터치를 받고, 나머지 빈 영역은 하단 버튼으로 터치를 통과시킨다. */}
         <View pointerEvents='box-none' style={styles.gifLayer}>
-          <PressablePuppy onPress={handleAdviceClick}>
+          <PressablePuppy
+            onPress={handleAdviceClick}
+            size={PUPPY_SIZE}
+            breedName={breedName ?? ''}
+            level={level}
+          >
             <EvolvingPuppy
               breedName={breedName ?? ''}
               level={level}
               reaction={reaction}
               evolveEvent={levelUpEvent}
-              size={288}
+              size={PUPPY_SIZE}
             />
           </PressablePuppy>
         </View>
