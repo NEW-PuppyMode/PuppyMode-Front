@@ -3,14 +3,14 @@ export const PuppyInfoData = {
   code: '200',
   message: 'success',
   result: {
-    puppyLevel: 2,
-    puppyLevelName: '멍멍이',
-    puppyLevelPercent: 99,
+    puppyLevel: 10, // 1~9 // 10~19 // 20~
+    puppyLevelName: '비숑', // 비숑 // 푸들 // 시바 // 코기
+    puppyLevelPercent: 90,
     puppyImageUrl: 'string',
     didRecordYesterday: true,
     didRecordToday: true,
-    isPuppyName: false,
-    isMyName: false,
+    isPuppyName: true,
+    isMyName: true,
     isGoal: true,
   },
 };

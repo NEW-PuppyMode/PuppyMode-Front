@@ -15,6 +15,7 @@ import {
   rewardLevelUp,
 } from './api/goalRenewal';
 import { homeErrorHandlers } from './api/homeError';
+import { homeRecordHandlers } from './api/homeRecord';
 import { onboardingHandlers } from './api/onboarding';
 import { puppyHandlers } from './api/puppy';
 
@@ -34,6 +35,8 @@ import { puppyHandlers } from './api/puppy';
  *   캘린더 월 선택 모달의 월·연도 비활성화 (mocks/api/calendarMonths.ts)
  * - calendarAchievement: 캘린더 상단 목표 달성 칩의 월별 상태 (mocks/api/calendarAchievement.ts)
  * - homeError: 홈 데이터 조회 실패 → 에러 화면 → 다시 시도로 복구 (mocks/api/homeError.ts)
+ * - homeRecord: 홈에서 음주 기록할 때마다 레벨 +1 → 기록 리액션·레벨업·외형 변화 연출 반복 확인
+ *   (mocks/api/homeRecord.ts, 시작 레벨·견종은 파일 상단 상수)
  * - onboarding: 검사만 마친 사용자의 최초 온보딩 (강아지 이름 → 내 이름 → 목표 → 홈)
  *   (mocks/api/onboarding.ts)
  */
@@ -64,6 +67,7 @@ const scenarios = {
   calendarMonthsError: calendarMonthsErrorHandlers,
   calendarAchievement: calendarAchievementHandlers,
   homeError: homeErrorHandlers,
+  homeRecord: homeRecordHandlers,
   onboarding: onboardingHandlers,
 };
 
